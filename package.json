@@ -1,6 +1,6 @@
 {
   "name": "package-build-stats",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": "Shubham Kanodia <shubham.kanodia10@gmail.com>",
   "repository": "https://github.com/pastelsky/package-build-stats",
   "license": "MIT",
@@ -16,7 +16,6 @@
   "main": "./getPackageStats.js",
   "scripts": {
     "start": "DEBUG=bp:* sls offline start",
-    "test": "ava",
     "show-logs": "sls logs --tail -f getPackageStats",
     "deploy": "sls deploy"
   },
