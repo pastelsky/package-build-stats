@@ -1,12 +1,12 @@
 {
   "name": "package-build-stats",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "Shubham Kanodia <shubham.kanodia10@gmail.com>",
   "repository": "https://github.com/pastelsky/package-build-stats",
   "license": "MIT",
   "engines": {
-    "node": "6.x.x",
-    "npm": "3.x.x"
+    "node": ">=6.x.x",
+    "npm": ">=3.x.x"
   },
   "files": [
     "getPackageStats.js",
