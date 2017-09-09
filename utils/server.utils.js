@@ -27,13 +27,14 @@ function getExternals(packageName) {
   const packageJSON = require(packageJSONPath)
   let externalsRegex = ''
 
-  if (packageJSON.peerDependencies) {
-    externalsRegex = Object.keys(packageJSON.peerDependencies)
-      .map(dep => `^${escapeRegex(dep)}$|^${escapeRegex(dep)}\\/`)
-      .join('|')
-
-    externalsRegex = `(${externalsRegex})`
+  if (!packageJSON.peerDependencies) {
+    return false
   }
+  externalsRegex = Object.keys(packageJSON.peerDependencies)
+    .map(dep => `^${escapeRegex(dep)}$|^${escapeRegex(dep)}\\/`)
+    .join('|')
+
+  externalsRegex = `(${externalsRegex})`
 
   return new RegExp(externalsRegex)
 }

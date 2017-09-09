@@ -132,7 +132,7 @@ function buildPackage(name, externals) {
                         "last 5 Firefox versions",
                         "Safari >= 8",
                         "Explorer >= 10",
-                        "edge >= 12",
+                        "edge >= 12"
                       ]
                     })
                   ]
@@ -156,12 +156,15 @@ function buildPackage(name, externals) {
     output: {
       filename: "bundle.js"
     },
-    externals: function (context, request, callback) {
-      if (externals.test(request)) {
-        return callback(null, 'commonjs ' + request)
+    externals: externals ? (
+      function (context, request, callback) {
+
+        if (externals.test(request)) {
+          return callback(null, 'commonjs ' + request)
+        }
+        callback()
       }
-      callback()
-    }
+    ) : []
   })
 
   const memoryFileSystem = new MemoryFS()
