@@ -1,5 +1,6 @@
 const childProcess = require('child_process')
 const path = require('path')
+const escapeRegex = require('escape-string-regexp')
 
 const config = require('../config')
 
@@ -18,21 +19,23 @@ function exec(command, options) {
 
 /**
  * Gets external peerDeps that shouldn't be a
- * part of the build in the format -
- * {  peerDep: 'peerDep' }
+ * part of the build in a regex format -
+ * /(^dep-a$|^dep-a\/|^dep-b$|^dep-b\/)\//
  */
 function getExternals(packageName) {
-  const externals = {}
   const packageJSONPath = path.join(config.tmp, 'node_modules', packageName, 'package.json')
   const packageJSON = require(packageJSONPath)
+  let externalsRegex = ''
 
   if (packageJSON.peerDependencies) {
-    Object.keys(packageJSON.peerDependencies)
-      .forEach(peerDep => {
-        externals[peerDep] = peerDep
-      })
+    externalsRegex = Object.keys(packageJSON.peerDependencies)
+      .map(dep => `^${escapeRegex(dep)}$|^${escapeRegex(dep)}\\/`)
+      .join('|')
+
+    externalsRegex = `(${externalsRegex})`
   }
-  return externals
+
+  return new RegExp(externalsRegex)
 }
 
 function parsePackageString(packageString) {
@@ -65,5 +68,5 @@ function parsePackageString(packageString) {
 module.exports = {
   exec,
   getExternals,
-  parsePackageString,
+  parsePackageString
 }

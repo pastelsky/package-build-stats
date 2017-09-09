@@ -31,6 +31,7 @@ package:
   exclude:
     - yarn.lock
     - node_modules/fsevents/**
+    - utils/linux-x64-48/**
 
 plugins:
   - serverless-offline

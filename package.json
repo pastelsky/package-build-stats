@@ -19,7 +19,9 @@
     "start": "DEBUG=bp:* sls offline start",
     "test": "ava",
     "show-logs": "sls logs --tail -f getPackageStats",
-    "deploy": "sls deploy"
+    "replace-sass-bindings": "rm -rf ./node_modules/node-sass/vendor/* && cp -R ./utils/linux-x64-48 ./node_modules/node-sass/vendor/",
+    "restore-sass-bindings": "rm -rf ./node_modules/node-sass/vendor/* && npm rebuild node-sass",
+    "deploy": "yarn run replace-sass-bindings && sls deploy && yarn run restore-sass-bindings"
   },
   "ava": {
     "files": [
@@ -37,6 +39,7 @@
     "autoprefixer": "^7.1.3",
     "css-loader": "^0.28.7",
     "debug": "^3.0.1",
+    "escape-string-regexp": "^1.0.5",
     "extract-text-webpack-plugin": "^3.0.0",
     "memory-fs": "^0.4.1",
     "mkdir-promise": "^1.0.0",

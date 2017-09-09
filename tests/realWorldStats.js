@@ -94,6 +94,16 @@ const UILibraries = [{
   }
 ]
 
+const libsWithPeerDeps = [{
+  name: 'react-dom@15.6.1',
+  size: 130.29 * 1024
+},
+  {
+    name: 'react-redux@5.0.6',
+    size: 12.81 * 1024
+  }
+]
+
 
 test.skip('Sizes of popular UI Frameworks', async t => {
   const promises = UIPackages.map(pack => async () => {
@@ -122,6 +132,19 @@ test.skip('Sizes of popular JS Frameworks', async t => {
 
 test('Sizes of popular UI Libraries', async t => {
   const promises = UILibraries.map(pack => async () => {
+    const res = await fetch(`${process.env.AWS_LAMBDA_ENDPOINT}/size?p=${encodeURIComponent(pack.name)}`)
+    const json = await res.json()
+    console.log(json, pack)
+    t.truthy(isDeltaOk(json.size, pack.size), `Size delta too large, ${json.size - pack.size}`)
+  })
+
+  await pSeries(promises)
+    .catch(r => console.log(r))
+})
+
+
+test('Sizes of libraries with peer dependencies', async t => {
+  const promises = libsWithPeerDeps.map(pack => async () => {
     const res = await fetch(`${process.env.AWS_LAMBDA_ENDPOINT}/size?p=${encodeURIComponent(pack.name)}`)
     const json = await res.json()
     console.log(json, pack)

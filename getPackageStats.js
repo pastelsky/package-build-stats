@@ -156,7 +156,12 @@ function buildPackage(name, externals) {
     output: {
       filename: "bundle.js"
     },
-    externals
+    externals: function (context, request, callback) {
+      if (externals.test(request)) {
+        return callback(null, 'commonjs ' + request)
+      }
+      callback()
+    }
   })
 
   const memoryFileSystem = new MemoryFS()
@@ -225,6 +230,7 @@ function getPackageStats(packageString) {
     })
     .then(() => {
       const externals = getExternals(packageName)
+      debug('externals %o', externals)
       return Promise.all([
         getPackageJSONDetails(packageName),
         buildPackage(packageName, externals)
