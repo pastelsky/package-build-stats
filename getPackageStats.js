@@ -180,7 +180,32 @@ function buildPackage(name, externals) {
       // stats object can be empty if there are build errors
       let jsonStats = stats ? stats.toJson() : {}
       if ((err && err.details) && !stats) {
-        reject(new CustomError("BuildError", err.details))
+        if (err.name === 'ModuleNotFoundError') {
+          // There's a better way to get the missing module's name, maybe ?
+          const missingModuleRegex = /Can't resolve '(.+)' in/
+          const matches = err.error.toString().match(missingModuleRegex)
+
+          if (matches[1]) {
+            reject(new CustomError(
+              "MissingDependencyError", err.details, {
+                name: err.name,
+                message: err.error,
+                missingModule: matches[1]
+              })
+            )
+          } else {
+            reject(new CustomError("BuildError", err.details, {
+              name: err.name,
+              message: err.error
+            }))
+          }
+        } else {
+          reject(new CustomError("BuildError", err.details, {
+            name: err.name,
+            message: err.error
+          }))
+        }
+
       } else if (jsonStats.errors && (jsonStats.errors.length > 0)) {
         reject(new CustomError("BuildError", stats.toJson().errors))
       } else {
