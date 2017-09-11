@@ -80,7 +80,7 @@ function buildPackage(name, externals) {
 
   const compiler = webpack({
     entry: entryPoint,
-    bail: true,
+    //bail: true,
     //target: "web",
     plugins: [
       new webpack.DefinePlugin({
@@ -171,60 +171,60 @@ function buildPackage(name, externals) {
   compiler.outputFileSystem = memoryFileSystem
 
   return new Promise((resolve, reject) => {
-    debug("build start %s", name)
-    compiler.run((err, stats) => {
-      debug("build end %s", name)
+      debug("build start %s", name)
+      compiler.run((err, stats) => {
+        debug("build end %s", name)
 
-      fs.unlinkSync(entryPoint)
+        fs.unlinkSync(entryPoint)
 
-      // stats object can be empty if there are build errors
-      let jsonStats = stats ? stats.toJson() : {}
-      if ((err && err.details) && !stats) {
-        if (err.name === 'ModuleNotFoundError') {
-          // There's a better way to get the missing module's name, maybe ?
-          const missingModuleRegex = /Can't resolve '(.+)' in/
-          const matches = err.error.toString().match(missingModuleRegex)
+        // stats object can be empty if there are build errors
+        let jsonStats = stats ? stats.toJson() : {}
 
-          if (matches[1]) {
-            reject(new CustomError(
-              "MissingDependencyError", err.details, {
-                name: err.name,
-                message: err.error,
-                missingModule: matches[1]
-              })
-            )
-          } else {
-            reject(new CustomError("BuildError", err.details, {
-              name: err.name,
-              message: err.error
-            }))
-          }
-        } else {
+        if ((err && err.details) && !stats) {
           reject(new CustomError("BuildError", err.details, {
             name: err.name,
             message: err.error
           }))
+        } else if (stats.compilation.errors && stats.compilation.errors.length) {
+          const missingModuleErrors = stats.compilation.errors
+            .filter(error => error.name === 'ModuleNotFoundError')
+
+          if (missingModuleErrors.length) {
+            // There's a better way to get the missing module's name, maybe ?
+            const missingModuleRegex = /Can't resolve '(.+)' in/
+
+            const missingModules = missingModuleErrors.map(err => {
+              const matches = err.error.toString().match(missingModuleRegex)
+              return matches[1]
+            })
+
+            reject(new CustomError(
+              "MissingDependencyError",
+              stats.compilation.errors.map(err => err.toString()),
+              { missingModules:  [...new Set(missingModules)] }
+              )
+            )
+          } else if (jsonStats.errors && (jsonStats.errors.length > 0)) {
+            reject(new CustomError("BuildError", jsonStats.errors))
+          }
+        } else {
+          const isCSSAsset = jsonStats.assets.some(
+            asset => asset.name.endsWith('.css'))
+          const bundleName = isCSSAsset ? 'bundle.css' : 'bundle.js'
+          const size = jsonStats.assets
+            .filter(x => x.name === bundleName)
+            .pop()
+            .size
+
+          const bundle = path.join(process.cwd(), bundleName)
+          const gzip = gzipSync(memoryFileSystem.readFileSync(bundle), {}).length
+
+          debug("build result %O", { size, gzip })
+          resolve({ size, gzip })
         }
-
-      } else if (jsonStats.errors && (jsonStats.errors.length > 0)) {
-        reject(new CustomError("BuildError", stats.toJson().errors))
-      } else {
-        const isCSSAsset = jsonStats.assets.some(
-          asset => asset.name.endsWith('.css'))
-        const bundleName = isCSSAsset ? 'bundle.css' : 'bundle.js'
-        const size = jsonStats.assets
-          .filter(x => x.name === bundleName)
-          .pop()
-          .size
-
-        const bundle = path.join(process.cwd(), bundleName)
-        const gzip = gzipSync(memoryFileSystem.readFileSync(bundle), {}).length
-
-        debug("build result %O", { size, gzip })
-        resolve({ size, gzip })
-      }
-    })
-  })
+      })
+    }
+  )
 }
 
 function getPackageJSONDetails(packageName) {
@@ -245,7 +245,6 @@ function getPackageJSONDetails(packageName) {
 
 function getPackageStats(packageString) {
   const packageName = parsePackageString(packageString).name
-
   return mkdir(config.tmp)
     .then(() => mkdir(path.join(config.tmp, "entries")))
     .then(() => {
