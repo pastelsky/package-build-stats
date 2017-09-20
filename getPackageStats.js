@@ -58,8 +58,8 @@ function installPackage(packageName) {
     "loglevel error",
     "ignore-scripts",
     "save-exact",
-    "fetch-retry-factor 0",
-    "fetch-retries 0",
+    //"fetch-retry-factor 0",
+    //"fetch-retries 0",
     "json"
   ]
 
