@@ -22,8 +22,8 @@ provider:
   runtime: nodejs6.10
   profile: test
   versionFunctions: false
-  memorySize: 1536
-  timeout: 40 # optional, in seconds, default is 6
+  memorySize: 1216
+  timeout: 30 # heroku maxes out at 30
   environment:
       DEBUG: bp:*
 
