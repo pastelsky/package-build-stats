@@ -6,7 +6,7 @@ const now = require('performance-now')
 const stats = require("stats-lite")
 const debug = require("debug")("bp:worker")
 
-function getParseTime(currentScript, trialCount = 100) {
+function getParseTime(currentScript, trialCount = 5) {
   let baseVMScript, currentVMScript
 
   const trials = 5
