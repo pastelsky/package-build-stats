@@ -15,6 +15,7 @@ const MemoryFS = require("memory-fs")
 const UglifyJSPlugin = require("webpack-parallel-uglify-plugin")
 //
 const { exec, getExternals, parsePackageString } = require("./utils/server.utils")
+const getParseTime = require('./getParseTime')
 const mkdir = require('mkdir-promise')
 const config = require('./config')
 const CustomError = require("./CustomError")
@@ -201,7 +202,7 @@ function buildPackage(name, externals) {
             reject(new CustomError(
               "MissingDependencyError",
               stats.compilation.errors.map(err => err.toString()),
-              { missingModules:  [...new Set(missingModules)] }
+              { missingModules: Array.from(new Set(missingModules)) }
               )
             )
           } else if (jsonStats.errors && (jsonStats.errors.length > 0)) {
@@ -217,10 +218,12 @@ function buildPackage(name, externals) {
             .size
 
           const bundle = path.join(process.cwd(), bundleName)
-          const gzip = gzipSync(memoryFileSystem.readFileSync(bundle), {}).length
+          const bundleContents = memoryFileSystem.readFileSync(bundle)
+          const parseTimes = getParseTime(bundleContents)
+          const gzip = gzipSync(bundleContents, {}).length
 
           debug("build result %O", { size, gzip })
-          resolve({ size, gzip })
+          resolve({ size, gzip, parse: parseTimes })
         }
       })
     }
