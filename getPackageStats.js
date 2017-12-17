@@ -177,8 +177,6 @@ function buildPackage(name, externals) {
       compiler.run((err, stats) => {
         debug("build end %s", name)
 
-        fs.unlinkSync(entryPoint)
-
         // stats object can be empty if there are build errors
         let jsonStats = stats ? stats.toJson() : {}
 
