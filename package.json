@@ -10,8 +10,10 @@
   },
   "files": [
     "getPackageStats.js",
+    "getParseTime.js",
     "CustomError.js",
     "utils",
+    "fixtures",
     "config.js"
   ],
   "main": "./getPackageStats.js",
