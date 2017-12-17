@@ -66,7 +66,7 @@ function installPackage(packageName) {
   //]
 
   debug("install start %s", packageName)
-  return exec(`yarn add ${packageName} --${flags.join("--")}`, {
+  return exec(`yarn add ${packageName} --${flags.join(" --")}`, {
     cwd: config.tmp
   })
     .then(() => {
