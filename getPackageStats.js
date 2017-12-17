@@ -46,7 +46,7 @@ function getEntryPoint(name) {
 
 function installPackage(packageName) {
 
-  const flags = ['ignore-flags', 'skip-integrity-check', 'exact', 'json', 'no-progress', 'silent', 'no-lockfile', 'no-bin-links', 'ignore-optional', 'mutex network']
+  const flags = ['ignore-flags', 'skip-integrity-check', 'exact', 'json', 'no-progress', 'silent', 'no-lockfile', 'no-bin-links', 'ignore-optional']
 
   //const flags = [
   //  // Setting cache is required for concurrent `npm install`s to work
