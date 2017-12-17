@@ -45,27 +45,28 @@ function getEntryPoint(name) {
 }
 
 function installPackage(packageName) {
-  //const flags = ['ignore-flags', 'skip-integrity-check', 'exact', 'json', 'no-progress', 'silent', 'no-lockfile', 'no-bin-links', 'ignore-optional', 'mutex network']
 
-  const flags = [
-    // Setting cache is required for concurrent `npm install`s to work
-    `cache=${path.join(config.tmp, "cache")}`,
-    "no-package-lock",
-    "no-shrinkwrap",
-    "no-optional",
-    "no-bin-links",
-    "prefer-offline",
-    "progress false",
-    "loglevel error",
-    "ignore-scripts",
-    "save-exact",
-    //"fetch-retry-factor 0",
-    //"fetch-retries 0",
-    "json"
-  ]
+  const flags = ['ignore-flags', 'skip-integrity-check', 'exact', 'json', 'no-progress', 'silent', 'no-lockfile', 'no-bin-links', 'ignore-optional', 'mutex network']
+
+  //const flags = [
+  //  // Setting cache is required for concurrent `npm install`s to work
+  //  `cache=${path.join(config.tmp, "cache")}`,
+  //  "no-package-lock",
+  //  "no-shrinkwrap",
+  //  "no-optional",
+  //  "no-bin-links",
+  //  "prefer-offline",
+  //  "progress false",
+  //  "loglevel error",
+  //  "ignore-scripts",
+  //  "save-exact",
+  //  //"fetch-retry-factor 0",
+  //  //"fetch-retries 0",
+  //  "json"
+  //]
 
   debug("install start %s", packageName)
-  return exec(`npm install ${packageName}`, {
+  return exec(`yarn add ${packageName} --${flags.join("--")}`, {
     cwd: config.tmp
   })
     .then(() => {
