@@ -1,5 +1,5 @@
 const fs = require('fs')
-const baseScript = fs.readFileSync('./fixtures/base.js', 'utf8')
+const baseScript = fs.readFileSync(__dirname + '/fixtures/base.js', 'utf8')
 
 const { VMScript } = require('vm2')
 const now = require('performance-now')
@@ -9,14 +9,13 @@ const debug = require("debug")("bp:worker")
 function getParseTime(currentScript, trialCount = 5) {
   let baseVMScript, currentVMScript
 
-  const trials = 5
   let baseCounter = 0
   let baseResults = []
 
   let currentCounter = 0
   let currentResults = []
 
-  while (baseCounter++ < trials) {
+  while (baseCounter++ < trialCount) {
     baseVMScript = new VMScript(`${Math.random()}; ${baseScript}`)
     const start = now()
     baseVMScript.compile()
@@ -24,7 +23,7 @@ function getParseTime(currentScript, trialCount = 5) {
     baseResults.push(end - start)
   }
 
-  while (currentCounter++ < trials) {
+  while (currentCounter++ < trialCount) {
     currentVMScript = new VMScript(`${Math.random()}; ${currentScript}`)
     const start = now()
     currentVMScript.compile()
