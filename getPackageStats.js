@@ -44,7 +44,7 @@ function getEntryPoint(name) {
   }
 }
 
-function installPackage(packageName, { client, limitConcurrency }) {
+function installPackage(packageName, { client, limitConcurrency, networkConcurrency }) {
   let flags, command
 
   if (client === 'yarn') {
@@ -53,6 +53,10 @@ function installPackage(packageName, { client, limitConcurrency }) {
              'ignore-optional']
     if (limitConcurrency) {
       flags.push('mutex network')
+    }
+
+    if(networkConcurrency) {
+      flags.push(`network-concurrency ${networkConcurrency}`)
     }
     command = `yarn add ${packageName} --${flags.join(" --")}`
   } else {
