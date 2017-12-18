@@ -272,7 +272,8 @@ function getPackageStats(packageString, options = {}) {
 
       return installPackage(packageString, {
         client: options.client,
-        limitConcurrency: options.limitConcurrency
+        limitConcurrency: options.limitConcurrency,
+        networkConcurrency: options.networkConcurrency
       })
     })
     .then(() => {
