@@ -167,6 +167,7 @@ function buildPackage(name, externals) {
       tls: "empty",
       module: "empty",
       child_process: "empty",
+      readline: "empty",
       dns: "empty",
       setImmediate: false
     },
