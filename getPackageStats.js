@@ -251,7 +251,7 @@ function getPackageJSONDetails(packageName) {
     })
 }
 
-function getPackageStats(packageString, options) {
+function getPackageStats(packageString, options = {}) {
   const packageName = parsePackageString(packageString).name
   return mkdir(config.tmp)
     .then(() => mkdir(path.join(config.tmp, "entries")))
