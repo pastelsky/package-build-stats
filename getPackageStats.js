@@ -44,29 +44,35 @@ function getEntryPoint(name) {
   }
 }
 
-function installPackage(packageName) {
+function installPackage(packageName, { client }) {
+  let flags, command
 
-  const flags = ['ignore-flags', 'ignore-engines', 'skip-integrity-check', 'exact', 'json', 'no-progress', 'silent', 'no-lockfile', 'no-bin-links', 'ignore-optional']
+  if(client === 'yarn') {
+    flags = ['ignore-flags', 'ignore-engines', 'skip-integrity-check', 'exact', 'json', 'no-progress', 'silent', 'no-lockfile', 'no-bin-links', 'ignore-optional']
+    command = `yarn add ${packageName} --${flags.join(" --")}`
+  } else {
+    flags = [
+      // Setting cache is required for concurrent `npm install`s to work
+      `cache=${path.join(config.tmp, "cache")}`,
+      "no-package-lock",
+      "no-shrinkwrap",
+      "no-optional",
+      "no-bin-links",
+      "prefer-offline",
+      "progress false",
+      "loglevel error",
+      "ignore-scripts",
+      "save-exact",
+      //"fetch-retry-factor 0",
+      //"fetch-retries 0",
+      "json"
+    ]
 
-  //const flags = [
-  //  // Setting cache is required for concurrent `npm install`s to work
-  //  `cache=${path.join(config.tmp, "cache")}`,
-  //  "no-package-lock",
-  //  "no-shrinkwrap",
-  //  "no-optional",
-  //  "no-bin-links",
-  //  "prefer-offline",
-  //  "progress false",
-  //  "loglevel error",
-  //  "ignore-scripts",
-  //  "save-exact",
-  //  //"fetch-retry-factor 0",
-  //  //"fetch-retries 0",
-  //  "json"
-  //]
+    command = `npm install ${packageName} --${flags.join(" --")}`
+  }
 
   debug("install start %s", packageName)
-  return exec(`yarn add ${packageName} --${flags.join(" --")}`, {
+  return exec(command, {
     cwd: config.tmp
   })
     .then(() => {
@@ -229,7 +235,7 @@ function buildPackage(name, externals) {
   )
 }
 
-function getPackageJSONDetails(packageName) {
+function getPackageJSONDetails(packageName, { options }) {
   const packageJSONPath = path.join(config.tmp, 'node_modules', packageName, 'package.json')
   return pify(fs.readFile)(packageJSONPath, 'utf8')
     .then(contents => {
@@ -255,7 +261,7 @@ function getPackageStats(packageString) {
         JSON.stringify({ dependencies: {} })
       )
 
-      return installPackage(packageString)
+      return installPackage(packageString, { client: options.client })
     })
     .then(() => {
       const externals = getExternals(packageName)
