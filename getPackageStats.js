@@ -235,7 +235,7 @@ function buildPackage(name, externals) {
   )
 }
 
-function getPackageJSONDetails(packageName, { options }) {
+function getPackageJSONDetails(packageName) {
   const packageJSONPath = path.join(config.tmp, 'node_modules', packageName, 'package.json')
   return pify(fs.readFile)(packageJSONPath, 'utf8')
     .then(contents => {
@@ -251,7 +251,7 @@ function getPackageJSONDetails(packageName, { options }) {
     })
 }
 
-function getPackageStats(packageString) {
+function getPackageStats(packageString, { options }) {
   const packageName = parsePackageString(packageString).name
   return mkdir(config.tmp)
     .then(() => mkdir(path.join(config.tmp, "entries")))
