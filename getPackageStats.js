@@ -44,11 +44,16 @@ function getEntryPoint(name) {
   }
 }
 
-function installPackage(packageName, { client }) {
+function installPackage(packageName, { client, limitConcurrency }) {
   let flags, command
 
-  if(client === 'yarn') {
-    flags = ['ignore-flags', 'ignore-engines', 'skip-integrity-check', 'exact', 'json', 'no-progress', 'silent', 'no-lockfile', 'no-bin-links', 'ignore-optional']
+  if (client === 'yarn') {
+    flags = ['ignore-flags', 'ignore-engines', 'skip-integrity-check', 'exact',
+             'json', 'no-progress', 'silent', 'no-lockfile', 'no-bin-links',
+             'ignore-optional']
+    if (limitConcurrency) {
+      flags.push('mutex network')
+    }
     command = `yarn add ${packageName} --${flags.join(" --")}`
   } else {
     flags = [
@@ -261,7 +266,10 @@ function getPackageStats(packageString, options = {}) {
         JSON.stringify({ dependencies: {} })
       )
 
-      return installPackage(packageString, { client: options.client })
+      return installPackage(packageString, {
+        client: options.client,
+        limitConcurrency: options.limitConcurrency
+      })
     })
     .then(() => {
       const externals = getExternals(packageName)
