@@ -15,33 +15,38 @@ function getParseTime(currentScript, trialCount = 5) {
   let currentCounter = 0
   let currentResults = []
 
-  while (baseCounter++ < trialCount) {
-    baseVMScript = new VMScript(`${Math.random()}; ${baseScript}`)
-    const start = now()
-    baseVMScript.compile()
-    const end = now()
-    baseResults.push(end - start)
-  }
+  try {
+    while (baseCounter++ < trialCount) {
+      baseVMScript = new VMScript(`${Math.random()}; ${baseScript}`)
+      const start = now()
+      baseVMScript.compile()
+      const end = now()
+      baseResults.push(end - start)
+    }
 
-  while (currentCounter++ < trialCount) {
-    currentVMScript = new VMScript(`${Math.random()}; ${currentScript}`)
-    const start = now()
-    currentVMScript.compile()
-    const end = now()
-    currentResults.push(end - start)
-  }
+    while (currentCounter++ < trialCount) {
+      currentVMScript = new VMScript(`${Math.random()}; ${currentScript}`)
+      const start = now()
+      currentVMScript.compile()
+      const end = now()
+      currentResults.push(end - start)
+    }
 
-  const baseMedian = stats.median(baseResults)
-  const currentMedian = stats.median(currentResults)
+    const baseMedian = stats.median(baseResults)
+    const currentMedian = stats.median(currentResults)
 
-  debug('base parse time: %d | script parse time: %d', baseMedian, currentMedian)
-  debug('base deviation: %d | script deviation: %d', stats.stdev(baseResults), stats.stdev(currentResults))
+    debug('base parse time: %d | script parse time: %d', baseMedian, currentMedian)
+    debug('base deviation: %d | script deviation: %d', stats.stdev(baseResults), stats.stdev(currentResults))
 
-  debug('parse time ratio', currentMedian / baseMedian)
+    debug('parse time ratio', currentMedian / baseMedian)
 
-  return {
-    baseParseTime: baseMedian,
-    scriptParseTime: currentMedian,
+    return {
+      baseParseTime: baseMedian,
+      scriptParseTime: currentMedian
+    }
+  } catch (err) {
+    console.error('Failed to get parsed times, is this a valid JS file?')
+    return {}
   }
 }
 
