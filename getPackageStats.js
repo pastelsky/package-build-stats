@@ -221,12 +221,24 @@ function buildPackage(name, externals) {
               return matches[1]
             })
 
-            reject(new CustomError(
-              "MissingDependencyError",
-              stats.compilation.errors.map(err => err.toString()),
-              { missingModules: Array.from(new Set(missingModules)) }
+            const uniqueMissingModules = Array.from(new Set(missingModules))
+
+            // If the only missing dependency is the package itself,
+            // it means that no valid entry points were found
+            if (uniqueMissingModules.length === 1 && uniqueMissingModules[0] === name) {
+              reject(new CustomError(
+                "EntryPointError",
+                stats.compilation.errors.map(err => err.toString())
+                )
               )
-            )
+            } else {
+              reject(new CustomError(
+                "MissingDependencyError",
+                stats.compilation.errors.map(err => err.toString()),
+                { missingModules: Array.from(new Set(missingModules)) }
+                )
+              )
+            }
           } else if (jsonStats.errors && (jsonStats.errors.length > 0)) {
             reject(new CustomError("BuildError", jsonStats.errors))
           }
