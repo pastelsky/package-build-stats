@@ -44,7 +44,10 @@ function getEntryPoint(name) {
   }
 }
 
-function installPackage(packageName, { client, limitConcurrency, networkConcurrency }) {
+function installPackage(
+  packageName,
+  { client, limitConcurrency, networkConcurrency }
+) {
   let flags, command
 
   if (client === 'yarn') {
@@ -55,7 +58,7 @@ function installPackage(packageName, { client, limitConcurrency, networkConcurre
       flags.push('mutex network')
     }
 
-    if(networkConcurrency) {
+    if (networkConcurrency) {
       flags.push(`network-concurrency ${networkConcurrency}`)
     }
     command = `yarn add ${packageName} --${flags.join(" --")}`
@@ -88,7 +91,11 @@ function installPackage(packageName, { client, limitConcurrency, networkConcurre
       debug("install finish %s", packageName)
     })
     .catch(err => {
-      throw new CustomError("InstallError", err)
+      if (err.includes('code E404')) {
+        throw new CustomError("PackageNotFoundError", err)
+      } else {
+        throw new CustomError("InstallError", err)
+      }
     })
 }
 
