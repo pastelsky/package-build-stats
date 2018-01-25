@@ -99,7 +99,7 @@ function installPackage(
     })
 }
 
-function buildPackage(name, externals) {
+function buildPackage(name, externals, options) {
   const entryPoint = getEntryPoint(name)
 
   const compiler = webpack({
@@ -253,7 +253,10 @@ function buildPackage(name, externals) {
 
           const bundle = path.join(process.cwd(), bundleName)
           const bundleContents = memoryFileSystem.readFileSync(bundle)
-          const parseTimes = getParseTime(bundleContents)
+          let parseTimes = {}
+          if(options.calcParse) {
+            parseTimes = getParseTime(bundleContents)
+          }
           const gzip = gzipSync(bundleContents, {}).length
 
           debug("build result %O", { size, gzip })
@@ -301,7 +304,7 @@ function getPackageStats(packageString, options = {}) {
       debug('externals %o', externals)
       return Promise.all([
         getPackageJSONDetails(packageName),
-        buildPackage(packageName, externals)
+        buildPackage(packageName, externals, options)
       ])
     })
     .then(([pacakgeJSONDetails, builtDetails]) => {
