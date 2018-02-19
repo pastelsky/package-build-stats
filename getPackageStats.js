@@ -277,6 +277,7 @@ function getPackageJSONDetails(packageName) {
           Object.keys(parsedJSON.dependencies).length : 0,
         hasJSNext: parsedJSON['jsnext:main'] || false,
         hasJSModule: parsedJSON['module'] || false,
+        hasSideEffects:  parsedJSON['sideEffects'] || true,
         peerDependencies: 'peerDependencies' in parsedJSON ?
           Object.keys(parsedJSON.peerDependencies) : []
       }
