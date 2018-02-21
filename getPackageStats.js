@@ -254,7 +254,7 @@ function buildPackage(name, externals, options) {
           const bundle = path.join(process.cwd(), bundleName)
           const bundleContents = memoryFileSystem.readFileSync(bundle)
           let parseTimes = {}
-          if(options.calcParse) {
+          if (options.calcParse) {
             parseTimes = getParseTime(bundleContents)
           }
           const gzip = gzipSync(bundleContents, {}).length
@@ -277,7 +277,8 @@ function getPackageJSONDetails(packageName) {
           Object.keys(parsedJSON.dependencies).length : 0,
         hasJSNext: parsedJSON['jsnext:main'] || false,
         hasJSModule: parsedJSON['module'] || false,
-        hasSideEffects:  parsedJSON['sideEffects'] || true,
+        hasSideEffects: 'sideEffects' in parsedJSON ?
+          parsedJSON['sideEffects'] : true,
         peerDependencies: 'peerDependencies' in parsedJSON ?
           Object.keys(parsedJSON.peerDependencies) : []
       }
