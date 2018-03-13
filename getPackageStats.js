@@ -165,7 +165,13 @@ function buildPackage(name, externals, options) {
               'sass-loader'
             ]
           })
-        }
+        }, {
+          test: /\.(woff|woff2|ttf|svg|png|jpeg|jpg|gif|webp)/,
+          loader: 'file-loader',
+          query: {
+            emitFile: true,
+          },
+        },
       ]
     },
     node: {

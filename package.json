@@ -44,6 +44,7 @@
     "debug": "^3.0.1",
     "escape-string-regexp": "^1.0.5",
     "extract-text-webpack-plugin": "^3.0.0",
+    "file-loader": "^1.1.11",
     "memory-fs": "^0.4.1",
     "micro": "^9.0.2",
     "mkdir-promise": "^1.0.0",
