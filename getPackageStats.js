@@ -22,8 +22,8 @@ const CustomError = require("./CustomError")
 //const WriteFilePlugin = require('write-file-webpack-plugin')
 const ExtractTextPlugin = require("extract-text-webpack-plugin")
 const sanitize = require("sanitize-filename")
+const builtinModules = require('builtin-modules')
 
-"use strict"
 
 function getEntryPoint(name) {
   const entryPath = path.join(
@@ -102,6 +102,13 @@ function installPackage(
 function buildPackage(name, externals, options) {
   const entryPoint = getEntryPoint(name)
 
+  const builtInNode = {}
+  builtinModules.forEach(mod => {
+    builtInNode[mod] = 'empty'
+  })
+
+  builtInNode['setImmediate'] =  false
+
   const compiler = webpack({
     entry: entryPoint,
     //bail: true,
@@ -174,16 +181,7 @@ function buildPackage(name, externals, options) {
         },
       ]
     },
-    node: {
-      fs: "empty",
-      net: "empty",
-      tls: "empty",
-      module: "empty",
-      child_process: "empty",
-      readline: "empty",
-      dns: "empty",
-      setImmediate: false
-    },
+    node: builtInNode,
     output: {
       filename: "bundle.js"
     },
