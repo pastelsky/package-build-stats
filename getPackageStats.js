@@ -108,6 +108,8 @@ function buildPackage(name, externals, options) {
   })
 
   builtInNode['setImmediate'] =  false
+  builtInNode['console'] = false
+  builtInNode['process'] = true
 
   const compiler = webpack({
     entry: entryPoint,
