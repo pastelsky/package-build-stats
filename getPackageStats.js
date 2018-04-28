@@ -12,6 +12,7 @@ const autoprefixer = require('autoprefixer')
 //
 const webpack = require("webpack")
 const MemoryFS = require("memory-fs")
+const rimraf = require('rimraf')
 const UglifyJSPlugin = require("webpack-parallel-uglify-plugin")
 //
 const { exec, getExternals, parsePackageString } = require("./utils/server.utils")
@@ -321,6 +322,7 @@ function getPackageStats(packageString, options = {}) {
       ])
     })
     .then(([pacakgeJSONDetails, builtDetails]) => {
+      rimraf(installPath, () => {})
       return Object.assign({}, pacakgeJSONDetails, builtDetails)
     })
 }

@@ -54,6 +54,7 @@
     "performance-now": "^2.1.0",
     "pify": "^3.0.0",
     "postcss-loader": "^2.0.6",
+    "rimraf": "^2.6.2",
     "sanitize-filename": "^1.6.1",
     "sass-loader": "^6.0.6",
     "server": "^1.0.9",
