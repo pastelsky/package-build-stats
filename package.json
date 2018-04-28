@@ -50,7 +50,7 @@
     "micro": "^9.0.2",
     "mkdir-promise": "^1.0.0",
     "node-fetch": "^1.7.2",
-    "node-sass": "^4.5.3",
+    "node-sass": "^4.9.0",
     "performance-now": "^2.1.0",
     "pify": "^3.0.0",
     "postcss-loader": "^2.0.6",
