@@ -25,11 +25,14 @@ const sanitize = require("sanitize-filename")
 const builtinModules = require('builtin-modules')
 
 
-function getEntryPoint(name) {
+function getInstallPath(packageName) {
+  return path.join(config.tmp, 'packages', sanitize(`build-${packageName}`))
+}
+
+function getEntryPoint(name, installPath) {
   const entryPath = path.join(
-    config.tmp,
-    "entries",
-    sanitize(`index-${name}.js`)
+    installPath,
+    'index.js'
   )
 
   try {
@@ -46,6 +49,7 @@ function getEntryPoint(name) {
 
 function installPackage(
   packageName,
+  installPath,
   { client, limitConcurrency, networkConcurrency }
 ) {
   let flags, command
@@ -85,7 +89,7 @@ function installPackage(
 
   debug("install start %s", packageName)
   return exec(command, {
-    cwd: config.tmp
+    cwd: installPath
   })
     .then(() => {
       debug("install finish %s", packageName)
@@ -99,8 +103,8 @@ function installPackage(
     })
 }
 
-function buildPackage(name, externals, options) {
-  const entryPoint = getEntryPoint(name)
+function buildPackage(name, installPath, externals, options) {
+  const entryPoint = getEntryPoint(name, installPath)
 
   const builtInNode = {}
   builtinModules.forEach(mod => {
@@ -273,8 +277,8 @@ function buildPackage(name, externals, options) {
   )
 }
 
-function getPackageJSONDetails(packageName) {
-  const packageJSONPath = path.join(config.tmp, 'node_modules', packageName, 'package.json')
+function getPackageJSONDetails(packageName, installPath) {
+  const packageJSONPath = path.join(installPath, 'node_modules', packageName, 'package.json')
   return pify(fs.readFile)(packageJSONPath, 'utf8')
     .then(contents => {
       const parsedJSON = JSON.parse(contents)
@@ -293,26 +297,27 @@ function getPackageJSONDetails(packageName) {
 
 function getPackageStats(packageString, options = {}) {
   const packageName = parsePackageString(packageString).name
+  const installPath = getInstallPath(packageString)
   return mkdir(config.tmp)
-    .then(() => mkdir(path.join(config.tmp, "entries")))
+    .then(() => mkdir(installPath))
     .then(() => {
       fs.writeFileSync(
-        path.join(config.tmp, "package.json"),
+        path.join(installPath, "package.json"),
         JSON.stringify({ dependencies: {} })
       )
 
-      return installPackage(packageString, {
+      return installPackage(packageString, installPath, {
         client: options.client,
         limitConcurrency: options.limitConcurrency,
         networkConcurrency: options.networkConcurrency
       })
     })
     .then(() => {
-      const externals = getExternals(packageName)
+      const externals = getExternals(packageName, installPath)
       debug('externals %o', externals)
       return Promise.all([
-        getPackageJSONDetails(packageName),
-        buildPackage(packageName, externals, options)
+        getPackageJSONDetails(packageName, installPath),
+        buildPackage(packageName, installPath, externals, options)
       ])
     })
     .then(([pacakgeJSONDetails, builtDetails]) => {

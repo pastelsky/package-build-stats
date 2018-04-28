@@ -22,8 +22,8 @@ function exec(command, options) {
  * part of the build in a regex format -
  * /(^dep-a$|^dep-a\/|^dep-b$|^dep-b\/)\//
  */
-function getExternals(packageName) {
-  const packageJSONPath = path.join(config.tmp, 'node_modules', packageName, 'package.json')
+function getExternals(packageName, installPath) {
+  const packageJSONPath = path.join(installPath, 'node_modules', packageName, 'package.json')
   const packageJSON = require(packageJSONPath)
   let externalsRegex = ''
 
