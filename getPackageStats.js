@@ -16,6 +16,7 @@ const rimraf = require('rimraf')
 const UglifyJSPlugin = require("webpack-parallel-uglify-plugin")
 //
 const { exec, getExternals, parsePackageString } = require("./utils/server.utils")
+const getDependencySizes = require('./src/getDependencySizeTree')
 const getParseTime = require('./getParseTime')
 const mkdir = require('mkdir-promise')
 const config = require('./config')
@@ -271,7 +272,7 @@ function buildPackage(name, installPath, externals, options) {
           const gzip = gzipSync(bundleContents, {}).length
 
           debug("build result %O", { size, gzip })
-          resolve({ size, gzip, parse: parseTimes })
+          resolve({ size, gzip, parse: parseTimes, dependencySizes: getDependencySizes(jsonStats) })
         }
       })
     }
