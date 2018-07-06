@@ -1,6 +1,6 @@
 {
   "name": "package-build-stats",
-  "version": "3.3.1",
+  "version": "3.4.0",
   "author": "Shubham Kanodia <shubham.kanodia10@gmail.com>",
   "repository": "https://github.com/pastelsky/package-build-stats",
   "license": "MIT",
