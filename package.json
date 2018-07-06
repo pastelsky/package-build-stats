@@ -9,21 +9,14 @@
     "npm": ">=3.x.x"
   },
   "files": [
-    "getPackageStats.js",
-    "getParseTime.js",
-    "CustomError.js",
+    "src",
     "utils",
-    "fixtures",
-    "config.js"
+    "fixtures"
   ],
-  "main": "./getPackageStats.js",
+  "main": "src/getPackageStats.js",
   "scripts": {
-    "sls-start": "DEBUG=bp:* sls offline start",
     "start": "node index.js",
     "test": "ava",
-    "show-logs": "sls logs --tail -f getPackageStats",
-    "replace-sass-bindings": "rm -rf ./node_modules/node-sass/vendor/* && cp -R ./utils/linux-x64-48 ./node_modules/node-sass/vendor/",
-    "restore-sass-bindings": "rm -rf ./node_modules/node-sass/vendor/* && npm rebuild node-sass",
     "deploy": "yarn run replace-sass-bindings && sls deploy && yarn run restore-sass-bindings"
   },
   "ava": {
@@ -35,7 +28,6 @@
     "ava": "^0.22.0",
     "dotenv": "^4.0.0",
     "p-series": "^1.0.0",
-    "serverless-offline": "^3.15.3",
     "write-file-webpack-plugin": "^4.1.0"
   },
   "dependencies": {

@@ -1,5 +1,6 @@
 const fs = require('fs')
-const baseScript = fs.readFileSync(__dirname + '/fixtures/base.js', 'utf8')
+const path = require('path')
+const baseScript = fs.readFileSync(path.join(__dirname, '../fixtures/base.js'), 'utf8')
 
 const { VMScript } = require('vm2')
 const now = require('performance-now')
