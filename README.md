@@ -1,10 +1,13 @@
-This is the function that powers the core of building, minifying and gzipping of packages in bundlephobia.
+  <img src="https://img.shields.io/npm/v/package-build-stats.svg" /> 
+  <img src="https://img.shields.io/npm/l/package-build-stats.svg" 
+  
+  This is the function that powers the core of building, minifying and gzipping of packages in bundlephobia.
 
 ## Commands
 To start an local server that builds packages, run -
 
 ```bash
-    yarn run start
+yarn run start
 ```
 
 The server runs at port `3000`.
@@ -13,13 +16,13 @@ The server runs at port `3000`.
 To build a package and get it's stats, run a curl request like so - 
 
 ```bash
-curl 'localhost:3000/size?p=<package-name>
+curl 'localhost:3000/size?p=<package-name>'
 ```
 
 eg.
 
 ```bash
-curl 'localhost:3000/size?p=react`
+curl 'localhost:3000/size?p=react'
 ```
 
 ## Contributing
