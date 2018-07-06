@@ -1,26 +1,29 @@
-This is the cloud function that powers the core of building, minifying and gzipping of packages in bundlephobia.
-This is built using [serverless](https://serverless.com). 
-Make sure you have serverless installed on your machine using
-
-```bash
-    npm i -g serverless
-```
-
-**Note: The latest node version supported by AWS Lambda is only v6.10.0, and hence very limited ES6 must be used.**
+This is the function that powers the core of building, minifying and gzipping of packages in bundlephobia.
 
 ## Commands
-To start an offline server, use
+To start an local server that builds packages, run -
+
 ```bash
     yarn run start
 ```
 
-To deploy,
-```bash
-    sls deploy
-```
+The server runs at port `3000`.
 
-To see production server logs - 
+### Making requests
+To build a package and get it's stats, run a curl request like so - 
 
 ```bash
-    yarn run show-logs
+curl 'localhost:3000/size?p=<package-name>
 ```
+
+eg.
+
+```bash
+curl 'localhost:3000/size?p=react`
+```
+
+## Contributing
+Clone the repo, npm install, and run the server.
+There isn't any autorestart or hot reloading as of now, so the server will need to be manually restarted on code changes. 
+The file you're probably looking for is `getPackageStats.js`
+
