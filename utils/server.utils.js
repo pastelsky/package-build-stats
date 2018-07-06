@@ -2,7 +2,7 @@ const childProcess = require('child_process')
 const path = require('path')
 const escapeRegex = require('escape-string-regexp')
 
-const config = require('../config')
+const config = require('../src/config')
 
 function exec(command, options) {
   return new Promise((resolve, reject) => {

@@ -2,7 +2,7 @@ const server = require('server');
 const { get } = server.router;
 const { json, status } = server.reply;
 
-const getBuiltPackageStats = require('./getPackageStats')
+const getBuiltPackageStats = require('./src/getPackageStats')
 
 server({ port: 3000 }, [
   get('/size', async ctx => {
