@@ -51,6 +51,7 @@
     "sass-loader": "^6.0.6",
     "server": "^1.0.9",
     "stats-lite": "^2.1.0",
+    "terser": "^3.7.7",
     "vm2": "^3.5.2",
     "webpack": "^3.5.5",
     "webpack-parallel-uglify-plugin": "^1.0.0"
