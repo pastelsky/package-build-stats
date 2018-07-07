@@ -41,13 +41,12 @@ function bundleSizeTree(stats) {
         statsTree.bundleName = stats.name;
     }
 
-    if(!stats.modules)
+    if (!stats.modules)
         return []
 
     // extract source path for each module
     let modules = stats.modules.map(mod => {
         return {
-            orig: mod,
             path: modulePath(mod.identifier),
             sources: [mod.source],
             source: mod.source,
@@ -97,65 +96,69 @@ function bundleSizeTree(stats) {
         })
     })
 
-    const results = statsTree.children.map(treeItem => {
-        const sourcesFiltered  = treeItem.sources.filter(source => !!source)
+    const results = statsTree.children
+        .map(treeItem => ({
+            ...treeItem,
+            sources: treeItem.sources.filter(source => !!source)
+        }))
+        .filter(treeItem => treeItem.sources.length)
+        .map(treeItem => {
+            const uglifiedSource = UglifyJS.minify(treeItem.sources, {
+                mangle: false,
+                compress: {
+                    arrows: false,
+                    booleans: false,
+                    collapse_vars: false,
+                    comparisons: false,
+                    conditionals: false,
+                    dead_code: true,
+                    drop_console: false,
+                    drop_debugger: false,
+                    ecma: 5,
+                    evaluate: false,
+                    expression: false,
+                    global_defs: {},
+                    hoist_funs: false,
+                    hoist_vars: false,
+                    ie8: false,
+                    if_return: false,
+                    inline: true,
+                    join_vars: false,
+                    keep_fargs: true,
+                    keep_fnames: true,
+                    keep_infinity: true,
+                    loops: false,
+                    negate_iife: false,
+                    passes: 1,
+                    properties: false,
+                    pure_getters: "strict",
+                    pure_funcs: null,
+                    reduce_vars: false,
+                    sequences: false,
+                    side_effects: false,
+                    switches: false,
+                    top_retain: null,
+                    toplevel: false,
+                    typeofs: false,
+                    unsafe: false,
+                    unsafe_arrows: false,
+                    unsafe_comps: false,
+                    unsafe_math: false,
+                    unused: true,
+                    warnings: false
+                },
+            })
 
-        const uglifiedSource = UglifyJS.minify(sourcesFiltered, {
-            mangle: false,
-            compress: {
-                arrows           : false,
-                booleans         : false,
-                collapse_vars    : false,
-                comparisons      : false,
-                conditionals     : false,
-                dead_code        : true,
-                drop_console     : false,
-                drop_debugger    : false,
-                ecma             : 5,
-                evaluate         : false,
-                expression       : false,
-                global_defs      : {},
-                hoist_funs       : false,
-                hoist_vars       : false,
-                ie8              : false,
-                if_return        : false,
-                inline           : true,
-                join_vars        : false,
-                keep_fargs       : true,
-                keep_fnames      : true,
-                keep_infinity    : true,
-                loops            : false,
-                negate_iife      : false,
-                passes           : 1,
-                properties       : false,
-                pure_getters     : "strict",
-                pure_funcs       : null,
-                reduce_vars      : false,
-                sequences        : false,
-                side_effects     : false,
-                switches         : false,
-                top_retain       : null,
-                toplevel         : false,
-                typeofs          : false,
-                unsafe           : false,
-                unsafe_arrows    : false,
-                unsafe_comps     : false,
-                unsafe_math      : false,
-                unused           : true,
-                warnings         : false
-            },
+            if (uglifiedSource.error) {
+                console.log(treeItem.packageName)
+                throw new Error('Uglifying failed' + uglifiedSource.error)
+            }
+
+            return {
+                name: treeItem.packageName,
+                approximateSize: getByteLen(uglifiedSource.code)
+            }
         })
-
-        if(uglifiedSource.error) {
-            console.log(treeItem.packageName)
-            throw new Error('Uglifying failed' + uglifiedSource.error)
-        }
-
-        return {
-            name: treeItem.packageName,
-            approximateSize: getByteLen(uglifiedSource.code)
-        }
-    })
 
     return results
 }
