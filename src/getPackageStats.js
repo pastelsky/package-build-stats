@@ -113,9 +113,11 @@ function buildPackage(name, installPath, externals, options) {
     builtInNode[mod] = 'empty'
   })
 
-  builtInNode['setImmediate'] =  false
+  builtInNode['setImmediate'] = false
   builtInNode['console'] = false
   builtInNode['process'] = true
+  builtInNode['Buffer'] = false
+  builtInNode['process'] = false
 
   const compiler = webpack({
     entry: entryPoint,
