@@ -327,6 +327,10 @@ function getPackageStats(packageString, options = {}) {
       rimraf(installPath, () => {})
       return Object.assign({}, pacakgeJSONDetails, builtDetails)
     })
+    .catch(err => {
+      rimraf(installPath, () => {})
+      throw err
+    })
 }
 
 module.exports = getPackageStats
