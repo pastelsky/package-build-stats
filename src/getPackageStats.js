@@ -149,7 +149,8 @@ function buildPackage(name, installPath, externals, options) {
     resolve: {
       modules: ["node_modules"],
       symlinks: false,
-      cacheWithContext: false
+      cacheWithContext: false,
+      extensions: ['.js', '.mjs', '.css', '.sass', '.scss'],
     },
     module: {
       noParse: [/\.min\.js/],
