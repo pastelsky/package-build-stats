@@ -8,6 +8,7 @@ const escapeRegex = require('escape-string-regexp')
 const builtinModules = require('builtin-modules')
 const webpack = require("webpack")
 
+
 function makeWebpackConfig({ entryPoint, externals }) {
   const externalsRegex = makeExternalsRegex(externals)
   debug('externals %o', externalsRegex);
@@ -28,10 +29,9 @@ function makeWebpackConfig({ entryPoint, externals }) {
     },
     mode: "production",
     // bail: true,
-    // target: "web",
     optimization: {
       namedChunks: true,
-      runtimeChunk: {name: "runtime"},
+      runtimeChunk: { name: "runtime" },
       splitChunks: {
         cacheGroups: {
           styles: {
@@ -53,7 +53,7 @@ function makeWebpackConfig({ entryPoint, externals }) {
             }
           }
         }),
-        new CssoWebpackPlugin({restructure: false}),
+        new CssoWebpackPlugin({ restructure: false }),
       ],
     },
     plugins: [

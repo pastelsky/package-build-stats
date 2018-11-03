@@ -33,11 +33,11 @@ function createEntryPoint(name, installPath, customImports) {
 
   if (customImports) {
     importStatement = `
-    import { ${customImports.join(', ')} } from '${name}'; 
+    import { ${customImports.join(', ')} } from '${name}/'; 
     console.log(${customImports.join(', ')})
      `
   } else {
-    importStatement = `const p = require('${name}'); console.log(p)`
+    importStatement = `const p = require('${name}/'); console.log(p)`
   }
 
   try {
@@ -157,7 +157,6 @@ async function buildPackage({ name, installPath, externals, options }) {
   } else if (stats.compilation.errors && stats.compilation.errors.length) {
     const missingModuleErrors = stats.compilation.errors
       .filter(error => error.name === 'ModuleNotFoundError')
-    console.log('got missing module error!', missingModuleErrors.length)
 
     if (missingModuleErrors.length) {
       // There's a better way to get the missing module's name, maybe ?
@@ -185,8 +184,11 @@ async function buildPackage({ name, installPath, externals, options }) {
         )
       }
     } else if (jsonStats.errors && (jsonStats.errors.length > 0)) {
-      console.log('errors', jsonStats.errors)
-      throw new CustomError("BuildError", jsonStats.errors)
+      if (jsonStats.errors.some(error => error.includes('Unexpected character \'#\''))) {
+        throw new CustomError("CLIBuildError", jsonStats.errors)
+      } else {
+        throw new CustomError("BuildError", jsonStats.errors)
+      }
     }
   } else {
     const isCSSAsset = jsonStats.assets.some(
@@ -217,9 +219,9 @@ async function buildPackage({ name, installPath, externals, options }) {
 
 async function buildPackageWithRetries({ name, externals, installPath, options }) {
   try {
-    return buildPackage({ name, externals, installPath, options });
+    return await buildPackage({ name, externals, installPath, options });
   } catch (e) {
-    if (e.name === 'MissingDependencyError') {
+    if (e.name === 'MissingDependencyError' &&  e.extra.missingModules.length <= 6) {
       const { missingModules } = e.extra
       const newExternals = externals.concat(missingModules)
       debug('%s has missing dependencies, rebuilding without %o', name, missingModules)
@@ -288,7 +290,7 @@ async function getPackageStats(packageString, options = {}) {
     rimraf(installPath, noop)
     return { ...pacakgeJSONDetails, ...builtDetails }
   } catch (err) {
-    rimraf(installPath, noop)
+    await rimraf(installPath, noop)
     throw err
   }
 }
