@@ -1,6 +1,5 @@
 const childProcess = require('child_process')
 const path = require('path')
-const escapeRegex = require('escape-string-regexp')
 
 const config = require('../src/config')
 
@@ -25,18 +24,11 @@ function exec(command, options) {
 function getExternals(packageName, installPath) {
   const packageJSONPath = path.join(installPath, 'node_modules', packageName, 'package.json')
   const packageJSON = require(packageJSONPath)
-  let externalsRegex = ''
 
   if (!packageJSON.peerDependencies) {
-    return false
+    return []
   }
-  externalsRegex = Object.keys(packageJSON.peerDependencies)
-    .map(dep => `^${escapeRegex(dep)}$|^${escapeRegex(dep)}\\/`)
-    .join('|')
-
-  externalsRegex = `(${externalsRegex})`
-
-  return new RegExp(externalsRegex)
+  return Object.keys(packageJSON.peerDependencies);
 }
 
 function parsePackageString(packageString) {

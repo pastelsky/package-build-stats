@@ -45,13 +45,33 @@ function bundleSizeTree(stats) {
     return []
 
   // extract source path for each module
-  let modules = stats.modules.map(mod => {
+  let modules = []
+  const makeModule = (mod) => {
+    // Uglifier cannot minify a json file, hence we need
+    // to make it valid javascript syntax
+    const isJSON = mod.identifier.endsWith('.json')
+    const source = isJSON ? `$a$=${mod.source}` : mod.source
+
     return {
       path: modulePath(mod.identifier),
-      sources: [mod.source],
-      source: mod.source,
-    };
-  });
+      sources: [source],
+      source: source,
+    }
+  }
+
+  const topLevelExports = stats.modules.find(module => module.depth === 1).providedExports
+
+  stats.modules
+    .filter(mod => !mod.name.startsWith('external'))
+    .forEach(mod => {
+      if (mod.modules) {
+        mod.modules.forEach(subMod => {
+          modules.push(makeModule(subMod))
+        })
+      } else {
+        modules.push(makeModule(mod))
+      }
+    });
 
   modules.sort((a, b) => {
     if (a === b) {
@@ -145,10 +165,12 @@ function bundleSizeTree(stats) {
             unused: true,
             warnings: false
           },
+          output: {
+            comments: false,
+          }
         })
 
         if (uglifiedSource.error) {
-          console.log(treeItem.packageName)
           throw new Error('Uglifying failed' + uglifiedSource.error)
         }
 
@@ -162,7 +184,10 @@ function bundleSizeTree(stats) {
       }
     })
 
-  return results
+  return {
+    topLevelExports,
+    dependencySize: results,
+  }
 }
 
 module.exports = bundleSizeTree

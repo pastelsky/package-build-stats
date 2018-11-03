@@ -18,5 +18,20 @@ server({ port: 3000 }, [
         body: JSON.stringify(err)
       })
     }
+  }),
+  get('/import-size', async ctx => {
+    const packageString = decodeURIComponent(ctx.query.p)
+    const imports = decodeURIComponent(ctx.query.imports)
+
+    try {
+      const result = await getBuiltPackageStats(packageString, { customImports: imports.split(',') })
+      return json(result)
+    } catch (err) {
+      console.log(err)
+      return status(500).send({
+        statusCode: 500,
+        body: JSON.stringify(err)
+      })
+    }
   })
 ]);
