@@ -3,7 +3,25 @@
   
   This is the function that powers the core of building, minifying and gzipping of packages in bundlephobia.
 
-## Commands
+## Usage
+```js
+const getBuiltPackageStats = require('package-build-stats');
+
+getBuiltPackageStats('packageName', { options })
+    .then((result) => console.log(result))
+```
+
+## Options
+
+| Option  | Values | Description |
+|---|---|---|
+|  client | `'npm' or 'yarn'` | Which client to use to install package for building |
+| limitConcurrency  | `true` or `false`  |  When using `yarn` as the client, use the network mutex to limit concurrency |
+|  networkConcurrency |  `number` |  When using `yarn` as client, limit simultaneous installs to this number. |
+| customImports | `Array<string>` | By default, the default export is used for calculating sizes. Setting this option allows calculation of package stats based on more granular top-level exports.
+
+## Testing results using in-built server in development
+### Commands
 To start an local server that builds packages, run -
 
 ```bash
@@ -27,6 +45,5 @@ curl 'localhost:3000/size?p=react'
 
 ## Contributing
 Clone the repo, npm install, and run the server.
-There isn't any autorestart or hot reloading as of now, so the server will need to be manually restarted on code changes. 
 The file you're probably looking for is `getPackageStats.js`
 
