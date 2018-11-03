@@ -8,39 +8,42 @@ const path = require("path")
 const { gzipSync } = require("zlib")
 const debug = require("debug")("bp:worker")
 const pify = require('pify')
-const autoprefixer = require('autoprefixer')
-//
+
 const webpack = require("webpack")
 const MemoryFS = require("memory-fs")
 const rimraf = require('rimraf')
-const UglifyJSPlugin = require("webpack-parallel-uglify-plugin")
-//
+
 const { exec, getExternals, parsePackageString } = require("../utils/server.utils")
 const getDependencySizes = require('./getDependencySizeTree')
 const getParseTime = require('./getParseTime')
 const mkdir = require('mkdir-promise')
 const config = require('./config')
 const CustomError = require("./CustomError")
-//const WriteFilePlugin = require('write-file-webpack-plugin')
-const ExtractTextPlugin = require("extract-text-webpack-plugin")
 const sanitize = require("sanitize-filename")
-const builtinModules = require('builtin-modules')
-
+const makeWebpackConfig = require('./webpack.config')
 
 function getInstallPath(packageName) {
   return path.join(config.tmp, 'packages', sanitize(`build-${packageName}`))
 }
 
-function getEntryPoint(name, installPath) {
-  const entryPath = path.join(
-    installPath,
-    'index.js'
-  )
+function createEntryPoint(name, installPath, customImports) {
+  const entryPath = path.join(installPath, 'index.js')
+
+  let importStatement;
+
+  if (customImports) {
+    importStatement = `
+    import { ${customImports.join(', ')} } from '${name}/'; 
+    console.log(${customImports.join(', ')})
+     `
+  } else {
+    importStatement = `const p = require('${name}/'); console.log(p)`
+  }
 
   try {
     fs.writeFileSync(
       entryPath,
-      `const p  = require('${name}'); console.log(p)`,
+      importStatement,
       "utf-8"
     )
     return entryPath
@@ -49,17 +52,17 @@ function getEntryPoint(name, installPath) {
   }
 }
 
-function installPackage(
+async function installPackage(
   packageName,
   installPath,
-  { client, limitConcurrency, networkConcurrency }
+  { client, limitConcurrency, networkConcurrency, additionalPackages = [] }
 ) {
   let flags, command
 
   if (client === 'yarn') {
     flags = ['ignore-flags', 'ignore-engines', 'skip-integrity-check', 'exact',
-             'json', 'no-progress', 'silent', 'no-lockfile', 'no-bin-links',
-             'ignore-optional']
+      'json', 'no-progress', 'silent', 'no-lockfile', 'no-bin-links',
+      'ignore-optional']
     if (limitConcurrency) {
       flags.push('mutex network')
     }
@@ -67,7 +70,7 @@ function installPackage(
     if (networkConcurrency) {
       flags.push(`network-concurrency ${networkConcurrency}`)
     }
-    command = `yarn add ${packageName} --${flags.join(" --")}`
+    command = `yarn add ${packageName} ${additionalPackages.join} --${flags.join(" --")}`
   } else {
     flags = [
       // Setting cache is required for concurrent `npm install`s to work
@@ -90,195 +93,146 @@ function installPackage(
   }
 
   debug("install start %s", packageName)
-  return exec(command, {
-    cwd: installPath
-  })
-    .then(() => {
-      debug("install finish %s", packageName)
+
+  try {
+    await exec(command, {
+      cwd: installPath
     })
-    .catch(err => {
-      if (err.includes('code E404')) {
-        throw new CustomError("PackageNotFoundError", err)
-      } else {
-        throw new CustomError("InstallError", err)
-      }
-    })
+    debug("install finish %s", packageName)
+  } catch (err) {
+    if (err.includes('code E404')) {
+      throw new CustomError("PackageNotFoundError", err)
+    } else {
+      throw new CustomError("InstallError", err)
+    }
+  }
 }
 
-function buildPackage(name, installPath, externals, options) {
-  const entryPoint = getEntryPoint(name, installPath)
-
-  const builtInNode = {}
-  builtinModules.forEach(mod => {
-    builtInNode[mod] = 'empty'
-  })
-
-  builtInNode['setImmediate'] = false
-  builtInNode['console'] = false
-  builtInNode['process'] = false
-  builtInNode['Buffer'] = false
-
-  const compiler = webpack({
-    entry: entryPoint,
-    //bail: true,
-    //target: "web",
-    plugins: [
-      new webpack.DefinePlugin({
-        "process.env": {
-          NODE_ENV: JSON.stringify("production")
-        }
-      }),
-      new webpack.IgnorePlugin(/^electron$/),
-      // Removes webpack's bootstrap code so
-      // it doesn't get added in a package's size
-      new webpack.optimize.CommonsChunkPlugin({
-        name: 'commons',
-        filename: 'commons.js',
-        minChunks: Infinity
-      }),
-      new webpack.LoaderOptionsPlugin({ minimize: true }),
-      new ExtractTextPlugin("bundle.css"),
-      //new WriteFilePlugin(),
-      new UglifyJSPlugin({
-        workerCount: require('os').cpus().length,
-        uglifyES: {
-          ie8: false
-        }
-      })
-    ],
-    resolve: {
-      modules: ["node_modules"],
-      symlinks: false,
-      cacheWithContext: false,
-      extensions: ['.js', '.mjs', '.css', '.sass', '.scss'],
-    },
-    module: {
-      noParse: [/\.min\.js/],
-      rules: [
-        {
-          test: /\.css$/,
-          use: ExtractTextPlugin.extract({ use: "css-loader" })
-        },
-        {
-          test: /\.(scss|sass)$/,
-          loader: ExtractTextPlugin.extract({
-            use: [
-              'css-loader', {
-                loader: 'postcss-loader',
-                options: {
-                  plugins: () => [
-                    autoprefixer({
-                      browsers: [
-                        "last 5 Chrome versions",
-                        "last 5 Firefox versions",
-                        "Safari >= 8",
-                        "Explorer >= 10",
-                        "edge >= 12"
-                      ]
-                    })
-                  ]
-                }
-              },
-              'sass-loader'
-            ]
-          })
-        }, {
-          test: /\.(woff|woff2|ttf|svg|png|jpeg|jpg|gif|webp)/,
-          loader: 'file-loader',
-          query: {
-            emitFile: true,
-          },
-        },
-      ]
-    },
-    node: builtInNode,
-    output: {
-      filename: "bundle.js"
-    },
-    externals: externals ? (
-      function (context, request, callback) {
-
-        if (externals.test(request)) {
-          return callback(null, 'commonjs ' + request)
-        }
-        callback()
-      }
-    ) : []
-  })
-
+function compilePackage({ entryPoint, externals }) {
+  const compiler = webpack(makeWebpackConfig({ entryPoint, externals }))
   const memoryFileSystem = new MemoryFS()
   compiler.outputFileSystem = memoryFileSystem
 
   return new Promise((resolve, reject) => {
-      debug("build start %s", name)
-      compiler.run((err, stats) => {
-        debug("build end %s", name)
+    compiler.run((err, stats) => {
+      // stats object can be empty if there are build errors
+      resolve({ stats, err, memoryFileSystem })
+    })
+  })
+}
 
-        // stats object can be empty if there are build errors
-        let jsonStats = stats ? stats.toJson() : {}
+async function buildPackage({ name, installPath, externals, options }) {
+  const entryPoint = createEntryPoint(name, installPath, options.customImports)
+  debug("build start %s", name)
+  const { stats, err, memoryFileSystem } = await compilePackage({ entryPoint, externals })
+  debug("build end %s", name)
 
-        if ((err && err.details) && !stats) {
-          reject(new CustomError("BuildError", err.details, {
-            name: err.name,
-            message: err.error
-          }))
-        } else if (stats.compilation.errors && stats.compilation.errors.length) {
-          const missingModuleErrors = stats.compilation.errors
-            .filter(error => error.name === 'ModuleNotFoundError')
+  let jsonStats = stats ? stats.toJson({
+    assets: true,
+    children: false,
+    chunks: false,
+    chunkGroups: false,
+    chunkModules: false,
+    chunkOrigins: false,
+    modules: true,
+    errorDetails: false,
+    entrypoints: false,
+    reasons: false,
+    maxModules: 500,
+    performance: false,
+    source: true,
+    depth: true,
+    providedExports: true,
+    warnings: false,
+    modulesSort: "depth",
+  }) : {}
 
-          if (missingModuleErrors.length) {
-            // There's a better way to get the missing module's name, maybe ?
-            const missingModuleRegex = /Can't resolve '(.+)' in/
+  fs.writeFileSync('/Users/skanodia/dev/package-build-stats/json.json', JSON.stringify(jsonStats, null, 2), 'utf8')
 
-            const missingModules = missingModuleErrors.map(err => {
-              const matches = err.error.toString().match(missingModuleRegex)
-              return matches[1]
-            })
+  if ((err && err.details) && !stats) {
+    throw new CustomError("BuildError", err.details, {
+      name: err.name,
+      message: err.error
+    })
+  } else if (stats.compilation.errors && stats.compilation.errors.length) {
+    const missingModuleErrors = stats.compilation.errors
+      .filter(error => error.name === 'ModuleNotFoundError')
 
-            const uniqueMissingModules = Array.from(new Set(missingModules))
+    if (missingModuleErrors.length) {
+      // There's a better way to get the missing module's name, maybe ?
+      const missingModuleRegex = /Can't resolve '(.+)' in/
 
-            // If the only missing dependency is the package itself,
-            // it means that no valid entry points were found
-            if (uniqueMissingModules.length === 1 && uniqueMissingModules[0] === name) {
-              reject(new CustomError(
-                "EntryPointError",
-                stats.compilation.errors.map(err => err.toString())
-                )
-              )
-            } else {
-              reject(new CustomError(
-                "MissingDependencyError",
-                stats.compilation.errors.map(err => err.toString()),
-                { missingModules: Array.from(new Set(missingModules)) }
-                )
-              )
-            }
-          } else if (jsonStats.errors && (jsonStats.errors.length > 0)) {
-            reject(new CustomError("BuildError", jsonStats.errors))
-          }
-        } else {
-          const isCSSAsset = jsonStats.assets.some(
-            asset => asset.name.endsWith('.css'))
-          const bundleName = isCSSAsset ? 'bundle.css' : 'bundle.js'
-          const size = jsonStats.assets
-            .filter(x => x.name === bundleName)
-            .pop()
-            .size
-
-          const bundle = path.join(process.cwd(), bundleName)
-          const bundleContents = memoryFileSystem.readFileSync(bundle)
-          let parseTimes = {}
-          if (options.calcParse) {
-            parseTimes = getParseTime(bundleContents)
-          }
-          const gzip = gzipSync(bundleContents, {}).length
-
-          debug("build result %O", { size, gzip })
-          resolve({ size, gzip, parse: parseTimes, dependencySizes: getDependencySizes(jsonStats) })
-        }
+      const missingModules = missingModuleErrors.map(err => {
+        const matches = err.error.toString().match(missingModuleRegex)
+        return matches[1]
       })
+
+      const uniqueMissingModules = Array.from(new Set(missingModules))
+
+      // If the only missing dependency is the package itself,
+      // it means that no valid entry points were found
+      if (uniqueMissingModules.length === 1 && uniqueMissingModules[0] === name) {
+        throw new CustomError(
+          "EntryPointError",
+          stats.compilation.errors.map(err => err.toString())
+        )
+      } else {
+        throw new CustomError(
+          "MissingDependencyError",
+          stats.compilation.errors.map(err => err.toString()),
+          { missingModules: Array.from(new Set(missingModules)) }
+        )
+      }
+    } else if (jsonStats.errors && (jsonStats.errors.length > 0)) {
+      if (jsonStats.errors.some(error => error.includes('Unexpected character \'#\''))) {
+        throw new CustomError("CLIBuildError", jsonStats.errors)
+      } else {
+        throw new CustomError("BuildError", jsonStats.errors)
+      }
     }
-  )
+  } else {
+    const isCSSAsset = jsonStats.assets.some(
+      asset => asset.name.endsWith('.css'))
+    const bundleName = isCSSAsset ? 'main.bundle.css' : 'main.bundle.js'
+    const size = jsonStats.assets
+      .filter(x => x.name === bundleName)
+      .pop()
+      .size
+
+    const bundle = path.join(process.cwd(), 'dist', bundleName)
+    const bundleContents = memoryFileSystem.readFileSync(bundle)
+    let parseTimes = {}
+    if (options.calcParse) {
+      parseTimes = getParseTime(bundleContents)
+    }
+    const gzip = gzipSync(bundleContents, {}).length
+
+    debug("build result %O", { size, gzip })
+    return {
+      size,
+      gzip,
+      parse: parseTimes,
+      ...(!options.customImports && getDependencySizes(jsonStats)),
+    }
+  }
+}
+
+async function buildPackageWithRetries({ name, externals, installPath, options }) {
+  try {
+    return await buildPackage({ name, externals, installPath, options });
+  } catch (e) {
+    if (e.name === 'MissingDependencyError' &&  e.extra.missingModules.length <= 6) {
+      const { missingModules } = e.extra
+      const newExternals = externals.concat(missingModules)
+      debug('%s has missing dependencies, rebuilding without %o', name, missingModules)
+      return {
+        ignoredMissingDependencies: missingModules,
+        ...(await buildPackage({ name, externals: newExternals, installPath, options }))
+      };
+    } else {
+      throw e;
+    }
+  }
 }
 
 function getPackageJSONDetails(packageName, installPath) {
@@ -299,39 +253,46 @@ function getPackageJSONDetails(packageName, installPath) {
     })
 }
 
-function getPackageStats(packageString, options = {}) {
+async function getPackageStats(packageString, options = {}) {
   const packageName = parsePackageString(packageString).name
   const installPath = getInstallPath(packageString)
-  return mkdir(config.tmp)
-    .then(() => mkdir(installPath))
-    .then(() => {
-      fs.writeFileSync(
-        path.join(installPath, "package.json"),
-        JSON.stringify({ dependencies: {} })
-      )
 
-      return installPackage(packageString, installPath, {
-        client: options.client,
-        limitConcurrency: options.limitConcurrency,
-        networkConcurrency: options.networkConcurrency
+  await mkdir(config.tmp)
+  await mkdir(installPath)
+
+  fs.writeFileSync(
+    path.join(installPath, "package.json"),
+    JSON.stringify({ dependencies: {} })
+  )
+
+  await installPackage(packageString, installPath, {
+    client: options.client,
+    limitConcurrency: options.limitConcurrency,
+    networkConcurrency: options.networkConcurrency
+  })
+
+  const externals = getExternals(packageName, installPath)
+  const noop = () => {
+  }
+
+  try {
+    const [pacakgeJSONDetails, builtDetails] = await Promise.all([
+      getPackageJSONDetails(packageName, installPath),
+      buildPackageWithRetries({
+        name: packageName,
+        installPath,
+        externals,
+        options: {
+          customImports: options.customImports,
+        },
       })
-    })
-    .then(() => {
-      const externals = getExternals(packageName, installPath)
-      debug('externals %o', externals)
-      return Promise.all([
-        getPackageJSONDetails(packageName, installPath),
-        buildPackage(packageName, installPath, externals, options)
-      ])
-    })
-    .then(([pacakgeJSONDetails, builtDetails]) => {
-      rimraf(installPath, () => {})
-      return Object.assign({}, pacakgeJSONDetails, builtDetails)
-    })
-    .catch(err => {
-      rimraf(installPath, () => {})
-      throw err
-    })
+    ])
+    rimraf(installPath, noop)
+    return { ...pacakgeJSONDetails, ...builtDetails }
+  } catch (err) {
+    await rimraf(installPath, noop)
+    throw err
+  }
 }
 
 module.exports = getPackageStats
