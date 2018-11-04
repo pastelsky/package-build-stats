@@ -70,7 +70,7 @@ function makeWebpackConfig({ entryPoint, externals }) {
       modules: ["node_modules"],
       symlinks: false,
       cacheWithContext: false,
-      extensions: ['.js', '.mjs', '.css', '.sass', '.scss'],
+      extensions: ['.mjs', '.js', '.css', '.sass', '.scss'],
       mainFields: ['browser', 'module', 'main', 'style'],
     },
     module: {

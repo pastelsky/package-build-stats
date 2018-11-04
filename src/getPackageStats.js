@@ -147,8 +147,6 @@ async function buildPackage({ name, installPath, externals, options }) {
     modulesSort: "depth",
   }) : {}
 
-  fs.writeFileSync('/Users/skanodia/dev/package-build-stats/json.json', JSON.stringify(jsonStats, null, 2), 'utf8')
-
   if ((err && err.details) && !stats) {
     throw new CustomError("BuildError", err.details, {
       name: err.name,
