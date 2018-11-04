@@ -64,7 +64,7 @@ function makeWebpackConfig({ entryPoint, externals }) {
         filename: "[name].bundle.css",
         chunkFilename: "[id].bundle.css"
       }),
-      new WriteFilePlugin()
+      // new WriteFilePlugin()
     ],
     resolve: {
       modules: ["node_modules"],
