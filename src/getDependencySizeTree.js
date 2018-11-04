@@ -59,7 +59,7 @@ function bundleSizeTree(stats) {
     }
   }
 
-  const topLevelExports = stats.modules.find(module => module.depth === 1).providedExports
+  const topLevelExports = stats.modules.find(module => module.depth === 1).providedExports || []
 
   stats.modules
     .filter(mod => !mod.name.startsWith('external'))
