@@ -186,7 +186,7 @@ function bundleSizeTree(stats) {
 
   return {
     topLevelExports,
-    dependencySize: results,
+    dependencySizes: results,
   }
 }
 
