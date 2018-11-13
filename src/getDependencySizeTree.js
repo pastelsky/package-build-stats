@@ -59,8 +59,6 @@ function bundleSizeTree(stats) {
     }
   }
 
-  const topLevelExports = stats.modules.find(module => module.depth === 1).providedExports || []
-
   stats.modules
     .filter(mod => !mod.name.startsWith('external'))
     .forEach(mod => {
@@ -184,10 +182,7 @@ function bundleSizeTree(stats) {
       }
     })
 
-  return {
-    topLevelExports,
-    dependencySizes: results,
-  }
+  return results
 }
 
 module.exports = bundleSizeTree

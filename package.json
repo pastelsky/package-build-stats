@@ -16,6 +16,7 @@
   "main": "src/getPackageStats.js",
   "scripts": {
     "start": "node index.js",
+    "dev": "dEBUG=bp* node index.js",
     "test": "ava",
     "deploy": "yarn run replace-sass-bindings && sls deploy && yarn run restore-sass-bindings"
   },

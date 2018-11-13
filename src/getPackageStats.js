@@ -123,6 +123,9 @@ function compilePackage({ entryPoint, externals }) {
 
 async function buildPackage({ name, installPath, externals, options }) {
   const entryPoint = createEntryPoint(name, installPath, options.customImports)
+  const installedNPMPath = path.join(installPath, 'node_modules', parsePackageString(name).name)
+  const topLevelExports = Object.keys(require(installedNPMPath))
+
   debug("build start %s", name)
   const { stats, err, memoryFileSystem } = await compilePackage({ entryPoint, externals })
   debug("build end %s", name)
@@ -210,7 +213,8 @@ async function buildPackage({ name, installPath, externals, options }) {
       size,
       gzip,
       parse: parseTimes,
-      ...(!options.customImports && getDependencySizes(jsonStats)),
+      topLevelExports,
+      ...(!options.customImports && { dependencySizes: getDependencySizes(jsonStats) }),
     }
   }
 }
