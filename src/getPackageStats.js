@@ -124,7 +124,11 @@ function compilePackage({ entryPoint, externals }) {
 async function buildPackage({ name, installPath, externals, options }) {
   const entryPoint = createEntryPoint(name, installPath, options.customImports)
   const installedNPMPath = path.join(installPath, 'node_modules', parsePackageString(name).name)
-  const topLevelExports = Object.keys(require(installedNPMPath))
+  let topLevelExports = []
+  try {
+    topLevelExports = Object.keys(require(installedNPMPath))
+  } catch (e) {
+  }
 
   debug("build start %s", name)
   const { stats, err, memoryFileSystem } = await compilePackage({ entryPoint, externals })
@@ -223,7 +227,7 @@ async function buildPackageWithRetries({ name, externals, installPath, options }
   try {
     return await buildPackage({ name, externals, installPath, options });
   } catch (e) {
-    if (e.name === 'MissingDependencyError' &&  e.extra.missingModules.length <= 6) {
+    if (e.name === 'MissingDependencyError' && e.extra.missingModules.length <= 6) {
       const { missingModules } = e.extra
       const newExternals = externals.concat(missingModules)
       debug('%s has missing dependencies, rebuilding without %o', name, missingModules)
