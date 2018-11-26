@@ -70,7 +70,7 @@ function makeWebpackConfig({ entryPoint, externals }) {
       modules: ["node_modules"],
       symlinks: false,
       cacheWithContext: false,
-      extensions: ['.mjs', '.js', '.css', '.sass', '.scss'],
+      extensions: ['.web.mjs', '.mjs', '.web.js', '.js', '.mjs', '.json', '.css', '.sass', '.scss'],
       mainFields: ['browser', 'module', 'main', 'style'],
     },
     module: {
@@ -79,6 +79,12 @@ function makeWebpackConfig({ entryPoint, externals }) {
         {
           test: /\.css$/,
           use: [MiniCssExtractPlugin.loader, 'css-loader'],
+        },
+        // see https://github.com/apollographql/react-apollo/issues/1737
+        {
+          type: 'javascript/auto',
+          test: /\.mjs$/,
+          use: []
         },
         {
           test: /\.(scss|sass)$/,

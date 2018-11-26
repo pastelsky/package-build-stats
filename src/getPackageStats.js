@@ -12,6 +12,7 @@ const pify = require('pify')
 const webpack = require("webpack")
 const MemoryFS = require("memory-fs")
 const rimraf = require('rimraf')
+const isValidNPMName = require('is-valid-npm-name')
 
 const { exec, getExternals, parsePackageString } = require("../utils/server.utils")
 const getDependencySizes = require('./getDependencySizeTree')
@@ -20,10 +21,12 @@ const mkdir = require('mkdir-promise')
 const config = require('./config')
 const CustomError = require("./CustomError")
 const sanitize = require("sanitize-filename")
+const shortId = require('shortid')
 const makeWebpackConfig = require('./webpack.config')
 
 function getInstallPath(packageName) {
-  return path.join(config.tmp, 'packages', sanitize(`build-${packageName}`))
+  const id = shortId.generate().slice(0, 3)
+  return path.join(config.tmp, 'packages', sanitize(`build-${packageName}-${id}`))
 }
 
 function createEntryPoint(name, installPath, customImports) {
@@ -33,11 +36,11 @@ function createEntryPoint(name, installPath, customImports) {
 
   if (customImports) {
     importStatement = `
-    import { ${customImports.join(', ')} } from '${name}/'; 
+    import { ${customImports.join(', ')} } from '${name}'; 
     console.log(${customImports.join(', ')})
      `
   } else {
-    importStatement = `const p = require('${name}/'); console.log(p)`
+    importStatement = `const p = require('${name}'); console.log(p)`
   }
 
   try {
@@ -70,7 +73,7 @@ async function installPackage(
     if (networkConcurrency) {
       flags.push(`network-concurrency ${networkConcurrency}`)
     }
-    command = `yarn add ${packageName} ${additionalPackages.join} --${flags.join(" --")}`
+    command = `yarn add ${packageName} ${additionalPackages.join(' ')} --${flags.join(" --")}`
   } else {
     flags = [
       // Setting cache is required for concurrent `npm install`s to work
@@ -84,19 +87,21 @@ async function installPackage(
       "loglevel error",
       "ignore-scripts",
       "save-exact",
+      "production",
       //"fetch-retry-factor 0",
       //"fetch-retries 0",
       "json"
     ]
 
-    command = `npm install ${packageName} --${flags.join(" --")}`
+    command = `npm install ${packageName} ${additionalPackages.join(' ')} --${flags.join(" --")}`
   }
 
   debug("install start %s", packageName)
 
   try {
     await exec(command, {
-      cwd: installPath
+      cwd: installPath,
+      maxBuffer: 1024 * 500
     })
     debug("install finish %s", packageName)
   } catch (err) {
@@ -172,7 +177,9 @@ async function buildPackage({ name, installPath, externals, options }) {
         return matches[1]
       })
 
-      const uniqueMissingModules = Array.from(new Set(missingModules))
+      let uniqueMissingModules = Array.from(new Set(missingModules))
+      uniqueMissingModules = uniqueMissingModules
+        .filter(mod => !mod.startsWith(`${uniqueMissingModules[0]}/`))
 
       // If the only missing dependency is the package itself,
       // it means that no valid entry points were found
@@ -185,7 +192,7 @@ async function buildPackage({ name, installPath, externals, options }) {
         throw new CustomError(
           "MissingDependencyError",
           stats.compilation.errors.map(err => err.toString()),
-          { missingModules: Array.from(new Set(missingModules)) }
+          { missingModules: uniqueMissingModules }
         )
       }
     } else if (jsonStats.errors && (jsonStats.errors.length > 0)) {
@@ -227,7 +234,11 @@ async function buildPackageWithRetries({ name, externals, installPath, options }
   try {
     return await buildPackage({ name, externals, installPath, options });
   } catch (e) {
-    if (e.name === 'MissingDependencyError' && e.extra.missingModules.length <= 6) {
+    if (
+      e.name === 'MissingDependencyError' &&
+      e.extra.missingModules.length <= 6 &&
+      e.extra.missingModules.every(mod => isValidNPMName(mod) === true)
+    ) {
       const { missingModules } = e.extra
       const newExternals = externals.concat(missingModules)
       debug('%s has missing dependencies, rebuilding without %o', name, missingModules)
