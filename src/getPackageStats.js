@@ -130,10 +130,10 @@ async function buildPackage({ name, installPath, externals, options }) {
   const entryPoint = createEntryPoint(name, installPath, options.customImports)
   const installedNPMPath = path.join(installPath, 'node_modules', parsePackageString(name).name)
   let topLevelExports = []
-  try {
-    topLevelExports = Object.keys(require(installedNPMPath))
-  } catch (e) {
-  }
+  // try {
+  //   topLevelExports = Object.keys(require(installedNPMPath))
+  // } catch (e) {
+  // }
 
   debug("build start %s", name)
   const { stats, err, memoryFileSystem } = await compilePackage({ entryPoint, externals })
