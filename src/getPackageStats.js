@@ -222,11 +222,61 @@ async function buildPackage({ name, installPath, externals, options }) {
     debug("build result %O", { size, gzip })
     return {
       size,
+      sizes: getSizes(size),
       gzip,
+      gzips: getSizes(gzip),
+      downloadTimes: getTimeFromSize(gzip),
       parse: parseTimes,
       topLevelExports,
       ...(!options.customImports && { dependencySizes: getDependencySizes(jsonStats) }),
     }
+  }
+}
+
+/**
+ * Convert/format raw size to an object with B, kB, and mB properties for easier client use
+ * @param {Number} value - the original size in bytes
+ * @return {Object} sizes of form: {B: Number, kB: Number, mB: Number}
+ */
+function getSizes (value) {
+  const sizes = {
+    B: value,
+    kB: value / 1024,
+  }
+  sizes.mB = sizes.kB / 1024
+
+  return sizes
+}
+
+/**
+ *
+ * @param {Number} value in seconds
+ * @return {Object} of form: {ms: Number, s: Number}
+ */
+const getTimes = (value) => {
+  return {
+    m: Math.round(value * 1000),
+    s: value
+  }
+}
+
+// Picked up from http://www.webpagetest.org/
+// Speed in KB/s
+const DownloadSpeed = {
+  TWO_G: 30,     // 2G Edge
+  THREE_G: 50    // Emerging markets 3G
+}
+
+/**
+ * Convert byte number to different download speeds for a more real world metric about the package
+ * @param {Number} sizeInBytes
+ * @return {Object} with nested objects 'twoG' and 'threeG' which both have a 'ms' and 's' property
+ */
+function getTimeFromSize (sizeInBytes) {
+  const sizeInKB = sizeInBytes / 1024
+  return {
+    twoG: getTimes( sizeInKB / DownloadSpeed.TWO_G),
+    threeG: getTimes(sizeInKB / DownloadSpeed.THREE_G),
   }
 }
 
