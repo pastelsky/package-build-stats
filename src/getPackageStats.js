@@ -1,5 +1,5 @@
 /**
- * Code heavily inspired from the `import-cost` project
+ * Parts of the code are inspired from the `import-cost` project
  * @see https://github.com/wix/import-cost/blob/master/packages/import-cost/src/webpack.js
  */
 
