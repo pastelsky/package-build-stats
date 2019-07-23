@@ -1,5 +1,5 @@
 const path = require('path')
-const UglifyJS = require("terser")
+const Terser = require("terser")
 
 /**
  * A fork of `webpack-bundle-size-analyzer`.
@@ -123,7 +123,7 @@ function bundleSizeTree(stats) {
     .filter(treeItem => treeItem.sources.length)
     .map(treeItem => {
       const size = treeItem.sources.reduce((acc, source) => {
-        const uglifiedSource = UglifyJS.minify(source, {
+        const uglifiedSource = Terser.minify(source, {
           mangle: false,
           compress: {
             arrows: true,

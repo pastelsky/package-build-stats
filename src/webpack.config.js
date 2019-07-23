@@ -8,7 +8,6 @@ const escapeRegex = require('escape-string-regexp')
 const builtinModules = require('builtin-modules')
 const webpack = require("webpack")
 
-
 function makeWebpackConfig({ entryPoint, externals }) {
   const externalsRegex = makeExternalsRegex(externals)
   debug('externals %o', externalsRegex);
@@ -46,7 +45,6 @@ function makeWebpackConfig({ entryPoint, externals }) {
         new TerserPlugin({
           parallel: true,
           terserOptions: {
-            ecma: 8,
             ie8: false,
             output: {
               comments: false,
@@ -121,7 +119,7 @@ function makeWebpackConfig({ entryPoint, externals }) {
     node: builtInNode,
     output: {
       filename: "bundle.js",
-      pathinfo: true,
+      pathinfo: false,
     },
     externals: externals.length ? (
       function (context, request, callback) {
