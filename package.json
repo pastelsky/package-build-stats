@@ -28,8 +28,7 @@
   "devDependencies": {
     "ava": "^0.22.0",
     "dotenv": "^4.0.0",
-    "p-series": "^1.0.0",
-    "write-file-webpack-plugin": "^4.1.0"
+    "p-series": "^1.0.0"
   },
   "dependencies": {
     "autoprefixer": "^9.6.1",
@@ -61,6 +60,7 @@
     "vm2": "^3.8.2",
     "vue-loader": "^15.7.1",
     "vue-template-compiler": "^2.6.10",
-    "webpack": "^4.37.0"
+    "webpack": "^4.37.0",
+    "write-file-webpack-plugin": "^4.5.0"
   }
 }
