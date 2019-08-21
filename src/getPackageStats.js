@@ -174,7 +174,13 @@ async function buildPackage({ name, installPath, externals, options }) {
 
       const missingModules = missingModuleErrors.map(err => {
         const matches = err.error.toString().match(missingModuleRegex)
-        return matches[1]
+        const missingFilePath = matches[1]
+
+        if (missingFilePath.startsWith('@')) {
+          return missingFilePath.match(/@[^\/]+\/[^\/]+/)[0] // @babel/runtime/object/create -> @babel/runtime
+        } else {
+          return missingFilePath.match(/[^\/]+/)[0] // babel-runtime/object/create -> babel-runtime
+        }
       })
 
       let uniqueMissingModules = Array.from(new Set(missingModules))
