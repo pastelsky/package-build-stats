@@ -85,6 +85,10 @@ function makeWebpackConfig({ entryPoint, externals }) {
           use: []
         },
         {
+          test: /\.js$/,
+          use: ['shebang-loader'] // support CLI tools that start with a #!/usr/bin/node
+        },
+        {
           test: /\.(scss|sass)$/,
           loader: [
             MiniCssExtractPlugin.loader,
