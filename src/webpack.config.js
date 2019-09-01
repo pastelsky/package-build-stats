@@ -1,16 +1,16 @@
 const autoprefixer = require('autoprefixer')
 const TerserPlugin = require('terser-webpack-plugin')
-const MiniCssExtractPlugin = require("mini-css-extract-plugin")
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const CssoWebpackPlugin = require('csso-webpack-plugin').default
 const WriteFilePlugin = require('write-file-webpack-plugin')
-const debug = require("debug")("bp:webpack")
+const debug = require('debug')('bp:webpack')
 const escapeRegex = require('escape-string-regexp')
 const builtinModules = require('builtin-modules')
-const webpack = require("webpack")
+const webpack = require('webpack')
 
-function makeWebpackConfig({ entryPoint, externals }) {
+function makeWebpackConfig({ entry, externals }) {
   const externalsRegex = makeExternalsRegex(externals)
-  debug('externals %o', externalsRegex);
+  debug('externals %o', externalsRegex)
 
   const builtInNode = {}
   builtinModules.forEach(mod => {
@@ -18,28 +18,26 @@ function makeWebpackConfig({ entryPoint, externals }) {
   })
 
   builtInNode['setImmediate'] = false
-  builtInNode['console'] = false
-  builtInNode['process'] = false
+  builtInNode['console'] = 'mock'
+  builtInNode['process'] = 'mock'
   builtInNode['Buffer'] = false
 
   return {
-    entry: {
-      main: entryPoint
-    },
-    mode: "production",
+    entry: entry,
+    mode: 'production',
     // bail: true,
     optimization: {
       namedChunks: true,
-      runtimeChunk: { name: "runtime" },
+      runtimeChunk: { name: 'runtime' },
       splitChunks: {
         cacheGroups: {
           styles: {
             name: 'main',
             test: /\.css$/,
             chunks: 'all',
-            enforce: true
-          }
-        }
+            enforce: true,
+          },
+        },
       },
       minimizer: [
         new TerserPlugin({
@@ -48,8 +46,8 @@ function makeWebpackConfig({ entryPoint, externals }) {
             ie8: false,
             output: {
               comments: false,
-            }
-          }
+            },
+          },
         }),
         new CssoWebpackPlugin({ restructure: false }),
       ],
@@ -59,16 +57,26 @@ function makeWebpackConfig({ entryPoint, externals }) {
       new MiniCssExtractPlugin({
         // Options similar to the same options in webpackOptions.output
         // both options are optional
-        filename: "[name].bundle.css",
-        chunkFilename: "[id].bundle.css"
+        filename: '[name].bundle.css',
+        chunkFilename: '[id].bundle.css',
       }),
       // new WriteFilePlugin()
     ],
     resolve: {
-      modules: ["node_modules"],
+      modules: ['node_modules'],
       symlinks: false,
       cacheWithContext: false,
-      extensions: ['.web.mjs', '.mjs', '.web.js', '.js', '.mjs', '.json', '.css', '.sass', '.scss'],
+      extensions: [
+        '.web.mjs',
+        '.mjs',
+        '.web.js',
+        '.js',
+        '.mjs',
+        '.json',
+        '.css',
+        '.sass',
+        '.scss',
+      ],
       mainFields: ['browser', 'module', 'main', 'style'],
     },
     module: {
@@ -82,34 +90,35 @@ function makeWebpackConfig({ entryPoint, externals }) {
         {
           type: 'javascript/auto',
           test: /\.mjs$/,
-          use: []
+          use: [],
         },
         {
           test: /\.js$/,
-          use: ['shebang-loader'] // support CLI tools that start with a #!/usr/bin/node
+          use: ['shebang-loader'], // support CLI tools that start with a #!/usr/bin/node
         },
         {
           test: /\.(scss|sass)$/,
           loader: [
             MiniCssExtractPlugin.loader,
-            'css-loader', {
+            'css-loader',
+            {
               loader: 'postcss-loader',
               options: {
                 plugins: () => [
                   autoprefixer({
                     browsers: [
-                      "last 5 Chrome versions",
-                      "last 5 Firefox versions",
-                      "Safari >= 8",
-                      "Explorer >= 10",
-                      "edge >= 12"
-                    ]
-                  })
-                ]
-              }
+                      'last 5 Chrome versions',
+                      'last 5 Firefox versions',
+                      'Safari >= 8',
+                      'Explorer >= 10',
+                      'edge >= 12',
+                    ],
+                  }),
+                ],
+              },
             },
-            'sass-loader'
-          ]
+            'sass-loader',
+          ],
         },
         {
           test: /\.(woff|woff2|eot|ttf|svg|png|jpeg|jpg|gif|webp)/,
@@ -118,24 +127,23 @@ function makeWebpackConfig({ entryPoint, externals }) {
             emitFile: true,
           },
         },
-      ]
+      ],
     },
     node: builtInNode,
     output: {
-      filename: "bundle.js",
+      filename: 'bundle.js',
       pathinfo: false,
     },
-    externals: externals.length ? (
-      function (context, request, callback) {
-        if (externalsRegex.test(request)) {
-          return callback(null, 'commonjs ' + request)
+    externals: externals.length
+      ? function(context, request, callback) {
+          if (externalsRegex.test(request)) {
+            return callback(null, 'commonjs ' + request)
+          }
+          callback()
         }
-        callback()
-      }
-    ) : []
+      : [],
   }
 }
-
 
 function makeExternalsRegex(externals) {
   let externalsRegex = externals

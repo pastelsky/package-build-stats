@@ -1,18 +1,17 @@
 const childProcess = require('child_process')
 const path = require('path')
 
-const config = require('../src/config')
+const config = require('../config')
 
 function exec(command, options) {
   return new Promise((resolve, reject) => {
-    childProcess
-      .exec(command, options, function (error, stdout, stderr) {
-        if (error) {
-          reject(stderr)
-        } else {
-          resolve(stdout)
-        }
-      })
+    childProcess.exec(command, options, function(error, stdout, stderr) {
+      if (error) {
+        reject(stderr)
+      } else {
+        resolve(stdout)
+      }
+    })
   })
 }
 
@@ -22,18 +21,25 @@ function exec(command, options) {
  * /(^dep-a$|^dep-a\/|^dep-b$|^dep-b\/)\//
  */
 function getExternals(packageName, installPath) {
-  const packageJSONPath = path.join(installPath, 'node_modules', packageName, 'package.json')
+  const packageJSONPath = path.join(
+    installPath,
+    'node_modules',
+    packageName,
+    'package.json'
+  )
   const packageJSON = require(packageJSONPath)
 
   if (!packageJSON.peerDependencies) {
     return []
   }
-  return Object.keys(packageJSON.peerDependencies);
+  return Object.keys(packageJSON.peerDependencies)
 }
 
 function parsePackageString(packageString) {
   // Scoped packages
-  let name, version, scoped = false
+  let name,
+    version,
+    scoped = false
   const lastAtIndex = packageString.lastIndexOf('@')
 
   if (packageString.startsWith('@')) {
@@ -61,5 +67,5 @@ function parsePackageString(packageString) {
 module.exports = {
   exec,
   getExternals,
-  parsePackageString
+  parsePackageString,
 }

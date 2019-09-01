@@ -1,11 +1,14 @@
 const fs = require('fs')
 const path = require('path')
-const baseScript = fs.readFileSync(path.join(__dirname, '../fixtures/base.js'), 'utf8')
+const baseScript = fs.readFileSync(
+  path.join(__dirname, '../fixtures/base.js'),
+  'utf8'
+)
 
 const { VMScript } = require('vm2')
 const now = require('performance-now')
-const stats = require("stats-lite")
-const debug = require("debug")("bp:worker")
+const stats = require('stats-lite')
+const debug = require('debug')('bp:worker')
 
 function getParseTime(currentScript, trialCount = 5) {
   let baseVMScript, currentVMScript
@@ -36,14 +39,22 @@ function getParseTime(currentScript, trialCount = 5) {
     const baseMedian = stats.median(baseResults)
     const currentMedian = stats.median(currentResults)
 
-    debug('base parse time: %d | script parse time: %d', baseMedian, currentMedian)
-    debug('base deviation: %d | script deviation: %d', stats.stdev(baseResults), stats.stdev(currentResults))
+    debug(
+      'base parse time: %d | script parse time: %d',
+      baseMedian,
+      currentMedian
+    )
+    debug(
+      'base deviation: %d | script deviation: %d',
+      stats.stdev(baseResults),
+      stats.stdev(currentResults)
+    )
 
     debug('parse time ratio', currentMedian / baseMedian)
 
     return {
       baseParseTime: baseMedian,
-      scriptParseTime: currentMedian
+      scriptParseTime: currentMedian,
     }
   } catch (err) {
     console.error('Failed to get parsed times, is this a valid JS file?')
@@ -52,4 +63,3 @@ function getParseTime(currentScript, trialCount = 5) {
 }
 
 module.exports = getParseTime
-
