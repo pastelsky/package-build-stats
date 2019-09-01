@@ -54,7 +54,7 @@ const popularPackages = [
   },
   {
     name: 'bluebird@3.5.0',
-    size: 79.55 * 1024,
+    size: 75.65 * 1024,
   },
   {
     name: 'jquery@3.2.1',
