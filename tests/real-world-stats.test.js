@@ -66,7 +66,7 @@ const popularPackages = [
   // },
   {
     name: 'moment@2.18.1',
-    size: 213.54 * 1024,
+    size: 240 * 1024,
   },
   {
     name: 'redux@3.7.2',
