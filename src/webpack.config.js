@@ -18,8 +18,8 @@ function makeWebpackConfig({ entry, externals }) {
   })
 
   builtInNode['setImmediate'] = false
-  builtInNode['console'] = 'mock'
-  builtInNode['process'] = 'mock'
+  builtInNode['console'] = false
+  builtInNode['process'] = false
   builtInNode['Buffer'] = false
 
   return {

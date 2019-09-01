@@ -29,8 +29,6 @@ const InstallationUtils = {
       JSON.stringify({ dependencies: {} })
     )
 
-    console.log('installPath', installPath)
-
     return installPath
   },
 

@@ -114,15 +114,11 @@ const BuildUtils = {
       })
     }
 
-    console.log('entry points created da', entry)
-
     debug('build start %s', name)
     const { stats, err, memoryFileSystem } = await BuildUtils.compilePackage({
       entry,
       externals,
     })
-
-    console.log('compiled da')
 
     debug('build end %s', name)
 
@@ -149,13 +145,11 @@ const BuildUtils = {
       : {}
 
     if (err && err.details && !stats) {
-      console.log(err)
       throw new CustomError('BuildError', err.details, {
         name: err.name,
         message: err.error,
       })
     } else if (stats.compilation.errors && stats.compilation.errors.length) {
-      console.log(stats.compilation.errors)
       const missingModules = BuildUtils._parseMissingModules(
         stats.compilation.errors
       )

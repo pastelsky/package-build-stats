@@ -88,7 +88,6 @@ async function getAllExports(context, lookupPath) {
     const code = await fs.readFile(resolvedPath, 'utf8')
     const { exports, exportAllLocations } = getExportsDetails(code)
 
-    console.log('CONTEXT: ', context, 'resolvedPath', resolvedPath)
     exports.forEach(exp => {
       const relativePath = resolvedPath.substring(
         resolvedPath.indexOf(context) + context.length + 1
