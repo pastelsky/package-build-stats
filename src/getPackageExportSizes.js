@@ -19,7 +19,16 @@ async function getAllPackageExports(packageString, options = {}) {
 }
 
 async function getPackageExportSizes(packageString, options = {}) {
-  const exportMap = getAllPackageExports(packageString, options)
+  const packageName = parsePackageString(packageString).name
+  const installPath = await InstallationUtils.preparePath(packageString)
+
+  await InstallationUtils.installPackage(packageString, installPath, {
+    client: options.client,
+    limitConcurrency: options.limitConcurrency,
+    networkConcurrency: options.networkConcurrency,
+  })
+
+  const exportMap = getAllExports(packageString, options)
   const exports = Object.keys(exportMap).filter(exp => !(exp === 'default'))
   debug('Got %d exports for %s', exports.length, packageString)
 
