@@ -5,7 +5,8 @@ const { getAllExports } = require('./utils/exports.utils')
 const InstallationUtils = require('./utils/installation.utils')
 const BuildUtils = require('./utils/build.utils')
 
-async function getAllPackageExports(packageString, options = {}) {
+
+async function installPackage(packageString, options) {
   const packageName = parsePackageString(packageString).name
   const installPath = await InstallationUtils.preparePath(packageString)
 
@@ -15,20 +16,18 @@ async function getAllPackageExports(packageString, options = {}) {
     networkConcurrency: options.networkConcurrency,
   })
 
+  return  { installPath, packageName }
+}
+
+async function getAllPackageExports(packageString, options = {}) {
+  const { packageName, installPath } = await installPackage(packageString, options)
   return await getAllExports(installPath, packageName)
 }
 
 async function getPackageExportSizes(packageString, options = {}) {
-  const packageName = parsePackageString(packageString).name
-  const installPath = await InstallationUtils.preparePath(packageString)
+  const { packageName, installPath } = await installPackage(packageString, options)
 
-  await InstallationUtils.installPackage(packageString, installPath, {
-    client: options.client,
-    limitConcurrency: options.limitConcurrency,
-    networkConcurrency: options.networkConcurrency,
-  })
-
-  const exportMap = getAllExports(packageString, options)
+  const exportMap = await getAllExports(installPath, packageName)
   const exports = Object.keys(exportMap).filter(exp => !(exp === 'default'))
   debug('Got %d exports for %s', exports.length, packageString)
 
