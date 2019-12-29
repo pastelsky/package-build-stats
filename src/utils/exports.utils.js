@@ -58,7 +58,10 @@ function getExportsDetails(code) {
   }
 }
 
-const webpackConfig = makeWebpackConfig({ entryPoint: '', externals: [] })
+const webpackConfig = makeWebpackConfig({
+  entryPoint: '',
+  externals: { externalPackages: [], externalBuiltIns: [] }
+})
 const resolver = enhancedResolve.create({
   extensions: webpackConfig.resolve.extensions,
   modules: webpackConfig.resolve.modules,

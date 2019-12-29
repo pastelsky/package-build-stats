@@ -9,8 +9,11 @@ const builtinModules = require('builtin-modules')
 const webpack = require('webpack')
 
 function makeWebpackConfig({ entry, externals }) {
-  const externalsRegex = makeExternalsRegex(externals)
-  debug('externals %o', externalsRegex)
+  const externalsRegex = makeExternalsRegex(externals.externalPackages)
+  const isExternalRequest = (request) =>
+    externalsRegex.test(request) || externals.externalBuiltIns.includes(request)
+
+  debug('external packages %o', externalsRegex)
 
   const builtInNode = {}
   builtinModules.forEach(mod => {
@@ -134,14 +137,8 @@ function makeWebpackConfig({ entry, externals }) {
       filename: 'bundle.js',
       pathinfo: false,
     },
-    externals: externals.length
-      ? function(context, request, callback) {
-          if (externalsRegex.test(request)) {
-            return callback(null, 'commonjs ' + request)
-          }
-          callback()
-        }
-      : [],
+    externals: (context, request, callback) =>
+      isExternalRequest(request) ? callback(null, 'commonjs ' + request) : callback()
   }
 }
 

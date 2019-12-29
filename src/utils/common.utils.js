@@ -1,5 +1,6 @@
 const childProcess = require('child_process')
 const path = require('path')
+const builtInModules = require('builtin-modules')
 
 const config = require('../config')
 
@@ -28,11 +29,16 @@ function getExternals(packageName, installPath) {
     'package.json'
   )
   const packageJSON = require(packageJSONPath)
+  const dependencies = Object.keys(packageJSON.dependencies || {})
+  const peerDependencies = Object.keys(packageJSON.peerDependencies || {})
 
-  if (!packageJSON.peerDependencies) {
-    return []
+  // All packages with name same as a built-in node module, but
+  // haven't explicitly been added as an npm dependency are externals
+  const builtInExternals = builtInModules.filter(mod => !dependencies.includes(mod))
+  return {
+    externalPackages: peerDependencies,
+    externalBuiltIns: builtInExternals
   }
-  return Object.keys(packageJSON.peerDependencies)
 }
 
 function parsePackageString(packageString) {
