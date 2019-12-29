@@ -121,7 +121,7 @@ function makeWebpackConfig({ entry, externals }) {
           ],
         },
         {
-          test: /\.(woff|woff2|eot|ttf|svg|png|jpeg|jpg|gif|webp)/,
+          test: /\.(woff|woff2|eot|ttf|svg|png|jpeg|jpg|gif|webp)$/,
           loader: 'file-loader',
           query: {
             emitFile: true,
