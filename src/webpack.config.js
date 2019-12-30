@@ -10,8 +10,11 @@ const webpack = require('webpack')
 
 function makeWebpackConfig({ entry, externals }) {
   const externalsRegex = makeExternalsRegex(externals.externalPackages)
-  const isExternalRequest = (request) =>
-    externalsRegex.test(request) || externals.externalBuiltIns.includes(request)
+  const isExternalRequest = (request) => {
+    const isPeerDep = externals.externalPackages.length ? externalsRegex.test(request) : false
+    const isBuiltIn = externals.externalBuiltIns.includes(request)
+    return isPeerDep || isBuiltIn
+  }
 
   debug('external packages %o', externalsRegex)
 
