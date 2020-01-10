@@ -39,7 +39,7 @@ function getPackageJSONDetails(packageName, installPath) {
 
 async function getPackageStats(packageString, options = {}) {
   const packageName = parsePackageString(packageString).name
-  const installPath = await InstallationUtils.preparePath(packageString)
+  const installPath = await InstallationUtils.preparePath(packageName)
 
   await InstallationUtils.installPackage(packageString, installPath, {
     client: options.client,
