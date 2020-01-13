@@ -38,7 +38,7 @@ function getPackageJSONDetails(packageName, installPath) {
 }
 
 async function getPackageStats(packageString, options = {}) {
-  const packageName = parsePackageString(packageString).name
+  const { name: packageName, isLocal } = parsePackageString(packageString)
   const installPath = await InstallationUtils.preparePath(packageName)
 
   await InstallationUtils.installPackage(packageString, installPath, {
@@ -55,6 +55,7 @@ async function getPackageStats(packageString, options = {}) {
         name: packageName,
         installPath,
         externals,
+        isLocal,
         options: {
           customImports: options.customImports,
         },

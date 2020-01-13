@@ -94,7 +94,7 @@ const BuildUtils = {
     return uniqueMissingModules
   },
 
-  async buildPackage({ name, installPath, externals, options }) {
+  async buildPackage({ name, installPath, externals, isLocal, options }) {
     let entry = {}
     if (options.splitCustomImports) {
       if (!options.customImports.length) {
@@ -209,7 +209,7 @@ const BuildUtils = {
       return {
         assets: assetStats,
         ...(!options.customImports && {
-          dependencySizes: getDependencySizes(jsonStats),
+          dependencySizes: getDependencySizes(jsonStats, isLocal),
         }),
       }
     }
@@ -219,6 +219,7 @@ const BuildUtils = {
     name,
     externals,
     installPath,
+    isLocal,
     options,
   }) {
     try {
@@ -226,6 +227,7 @@ const BuildUtils = {
         name,
         externals,
         installPath,
+        isLocal,
         options,
       })
     } catch (e) {
@@ -237,7 +239,7 @@ const BuildUtils = {
         const { missingModules } = e.extra
         const newExternals = {
           ...externals,
-          externalPackages: externals.externalPackages.concat(missingModules)
+          externalPackages: externals.externalPackages.concat(missingModules),
         }
         debug(
           '%s has missing dependencies, rebuilding without %o',

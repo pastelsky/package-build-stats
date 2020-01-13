@@ -38,7 +38,7 @@ function getByteLen(normal_val) {
   return byteLen
 }
 
-function bundleSizeTree(stats) {
+function bundleSizeTree(stats, isLocal) {
   let statsTree = {
     packageName: '<root>',
     sources: [],
@@ -105,7 +105,17 @@ function bundleSizeTree(stats) {
       }
       packages.push(lastPackageName)
     }
+    // Removes the `/tmp/tmp-build...` from the split list
     packages.shift()
+    if (isLocal) {
+      // If this is a local install, the file structure is slightly different.
+      // Remote: `/tmp/tmp-build/<installPath>/node_modules` contains all the modules
+      // in a flat directory.
+      // Local: `/tmp/tmp-build/<installPath>/node_modules` is a link to the local module
+      // (named <packageName>),which also contains a `node_modules` directory (the one with the deps). This means
+      // there is an extra `node_modules` in the path that we need to account for.
+      packages.shift()
+    }
 
     let parent = statsTree
     parent.sources.push(mod.source)
