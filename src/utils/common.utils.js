@@ -1,7 +1,6 @@
 const childProcess = require('child_process')
 const path = require('path')
 const builtInModules = require('builtin-modules')
-const fs = require('fs')
 
 const config = require('../config')
 
@@ -42,58 +41,33 @@ function getExternals(packageName, installPath) {
   }
 }
 
-function isLocalPackageString(packageString) {
-  const packageJsonPath = path.resolve(packageString, 'package.json')
-  try {
-    if (fs.existsSync(packageJsonPath)) {
-      return true
-    }
-  } catch (err) {
-    return false
-  }
-}
-
 function parsePackageString(packageString) {
   // Scoped packages
   let name,
     version,
-    scoped = false,
-    isLocal = false
+    scoped = false
+  const lastAtIndex = packageString.lastIndexOf('@')
 
-  if (isLocalPackageString(packageString)) {
-    const fullPath = path.resolve(packageString, 'package.json')
-    const packageJSON = require(fullPath)
-    name = packageJSON.name
-    version = packageJSON.version
-    isLocal = true
-
-    if (name.startsWith('@')) {
-      scope = true
+  if (packageString.startsWith('@')) {
+    scoped = true
+    if (lastAtIndex === 0) {
+      name = packageString
+      version = null
+    } else {
+      name = packageString.substring(0, lastAtIndex)
+      version = packageString.substring(lastAtIndex + 1)
     }
   } else {
-    const lastAtIndex = packageString.lastIndexOf('@')
-
-    if (packageString.startsWith('@')) {
-      scoped = true
-      if (lastAtIndex === 0) {
-        name = packageString
-        version = null
-      } else {
-        name = packageString.substring(0, lastAtIndex)
-        version = packageString.substring(lastAtIndex + 1)
-      }
+    if (lastAtIndex === -1) {
+      name = packageString
+      version = null
     } else {
-      if (lastAtIndex === -1) {
-        name = packageString
-        version = null
-      } else {
-        name = packageString.substring(0, lastAtIndex)
-        version = packageString.substring(lastAtIndex + 1)
-      }
+      name = packageString.substring(0, lastAtIndex)
+      version = packageString.substring(lastAtIndex + 1)
     }
   }
 
-  return { name, version, scoped, isLocal }
+  return { name, version, scoped }
 }
 
 module.exports = {

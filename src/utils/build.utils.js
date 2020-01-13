@@ -235,10 +235,7 @@ const BuildUtils = {
         e.extra.missingModules.every(mod => isValidNPMName(mod) === true)
       ) {
         const { missingModules } = e.extra
-        const newExternals = {
-          ...externals,
-          externalPackages: externals.externalPackages.concat(missingModules)
-        }
+        const newExternals = externals.concat(missingModules)
         debug(
           '%s has missing dependencies, rebuilding without %o',
           name,

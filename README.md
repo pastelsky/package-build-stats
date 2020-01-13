@@ -7,7 +7,7 @@
 ```js
 const getBuiltPackageStats = require('package-build-stats');
 
-getBuiltPackageStats('packageName|pathToLocalPackage', { options })
+getBuiltPackageStats('packageName', { options })
     .then((result) => console.log(result))
 ```
 

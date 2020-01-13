@@ -19,9 +19,8 @@ const InstallationUtils = {
     )
   },
 
-  async preparePath(packageName) {
-    const installPath = InstallationUtils.getInstallPath(packageName)
-
+  async preparePath(packageString) {
+    const installPath = InstallationUtils.getInstallPath(packageString)
     await mkdir(config.tmp)
     await mkdir(installPath)
 
