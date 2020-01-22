@@ -9,6 +9,8 @@ const CustomError = require('../CustomError')
 const { exec } = require('./common.utils')
 const config = require('../config')
 
+const wrapPackCommand = packagePath => `$(npm pack ${packagePath} | tail -1)`
+
 const InstallationUtils = {
   getInstallPath(packageName) {
     const id = shortId.generate().slice(0, 3)
@@ -34,9 +36,15 @@ const InstallationUtils = {
   },
 
   async installPackage(
-    packageName,
+    packageString,
     installPath,
-    { client, limitConcurrency, networkConcurrency, additionalPackages = [] }
+    {
+      client,
+      limitConcurrency,
+      networkConcurrency,
+      additionalPackages = [],
+      isLocal,
+    }
   ) {
     let flags, command
 
@@ -60,7 +68,7 @@ const InstallationUtils = {
       if (networkConcurrency) {
         flags.push(`network-concurrency ${networkConcurrency}`)
       }
-      command = `yarn add ${packageName} ${additionalPackages.join(
+      command = `yarn add ${packageString} ${additionalPackages.join(
         ' '
       )} --${flags.join(' --')}`
     } else {
@@ -82,19 +90,19 @@ const InstallationUtils = {
         'json',
       ]
 
-      command = `npm install ${packageName} ${additionalPackages.join(
-        ' '
-      )} --${flags.join(' --')}`
+      command = `npm install ${
+        isLocal ? wrapPackCommand(packageString) : packageString
+      } ${additionalPackages.join(' ')} --${flags.join(' --')}`
     }
 
-    debug('install start %s', packageName)
+    debug('install start %s', packageString)
 
     try {
       await exec(command, {
         cwd: installPath,
         maxBuffer: 1024 * 500,
       })
-      debug('install finish %s', packageName)
+      debug('install finish %s', packageString)
     } catch (err) {
       console.log(err)
       if (err.includes('code E404')) {

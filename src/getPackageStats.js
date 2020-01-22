@@ -38,10 +38,11 @@ function getPackageJSONDetails(packageName, installPath) {
 }
 
 async function getPackageStats(packageString, options = {}) {
-  const packageName = parsePackageString(packageString).name
+  const { name: packageName, isLocal } = parsePackageString(packageString)
   const installPath = await InstallationUtils.preparePath(packageName)
 
   await InstallationUtils.installPackage(packageString, installPath, {
+    isLocal,
     client: options.client,
     limitConcurrency: options.limitConcurrency,
     networkConcurrency: options.networkConcurrency,
@@ -67,7 +68,7 @@ async function getPackageStats(packageString, options = {}) {
         asset.name === 'main' && asset.type === (hasCSSAsset ? 'css' : 'js')
     )
 
-    InstallationUtils.cleaupPath(installPath)
+    // InstallationUtils.cleaupPath(installPath)
     return {
       ...pacakgeJSONDetails,
       ...builtDetails,
