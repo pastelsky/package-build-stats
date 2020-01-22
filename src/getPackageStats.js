@@ -68,7 +68,7 @@ async function getPackageStats(packageString, options = {}) {
         asset.name === 'main' && asset.type === (hasCSSAsset ? 'css' : 'js')
     )
 
-    // InstallationUtils.cleaupPath(installPath)
+    InstallationUtils.cleaupPath(installPath)
     return {
       ...pacakgeJSONDetails,
       ...builtDetails,
