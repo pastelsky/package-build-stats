@@ -28,6 +28,8 @@ function makeWebpackConfig({ entry, externals }) {
   builtInNode['process'] = false
   builtInNode['Buffer'] = false
 
+  const mainFields = ['browser', 'module', 'main', 'style'];
+
   return {
     entry: entry,
     mode: 'production',
@@ -83,7 +85,7 @@ function makeWebpackConfig({ entry, externals }) {
         '.sass',
         '.scss',
       ],
-      mainFields: ['browser', 'module', 'main', 'style'],
+      mainFields,
     },
     module: {
       noParse: [/\.min\.js$/],
@@ -96,6 +98,7 @@ function makeWebpackConfig({ entry, externals }) {
         {
           type: 'javascript/auto',
           test: /\.mjs$/,
+          resolve: { mainFields },
           use: [],
         },
         {
