@@ -5,12 +5,12 @@ const { getAllExports } = require('./utils/exports.utils')
 const InstallationUtils = require('./utils/installation.utils')
 const BuildUtils = require('./utils/build.utils')
 
-
 async function installPackage(packageString, options) {
   const { name: packageName, isLocal } = parsePackageString(packageString)
   const installPath = await InstallationUtils.preparePath(packageName)
 
   await InstallationUtils.installPackage(packageString, installPath, {
+    isLocal,
     client: options.client,
     limitConcurrency: options.limitConcurrency,
     networkConcurrency: options.networkConcurrency,
