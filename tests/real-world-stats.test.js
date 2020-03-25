@@ -120,7 +120,7 @@ expect.extend({
 })
 jest.setTimeout(70000)
 
-describe('real world stats', () => {
+describe.skip('real world stats', () => {
   let testPackages = async (packages, done) => {
     const promises = packages.map(pack => async () => {
       const res = await fetch(
