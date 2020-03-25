@@ -8,7 +8,7 @@ const { getPackageExportSizes } = require('../src/getPackageExportSizes')
 
 require('dotenv').config()
 
-jest.setTimeout(10000)
+jest.setTimeout(15000)
 describe('getPackageStats', () => {
   test('Size of local build', async() => {
     const result = await getPackageStats(
