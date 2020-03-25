@@ -13,19 +13,21 @@ describe('getPackageStats', () => {
     const result = await getPackageStats(
       path.resolve('./fixtures/node_modules/resolve-test')
     )
-    expect(result.size).toEqual(425)
+    expect(result.size).toEqual(434)
     done()
   })
-  test('dependencySizes', async done => {
+
+  test('dependencySizes', async () => {
     const result = await getPackageStats(
       path.resolve('./fixtures/node_modules/resolve-test')
     )
+
     expect(result.dependencySizes.length).toEqual(2)
-    expect(result.dependencySizes[0].name).toEqual(
-      'resolve-test/nested-folder/another-nested-folder'
-    )
-    expect(result.dependencySizes[1].name).toEqual('resolve-test')
-    done()
+    expect(result.dependencySizes).toEqual(expect.arrayContaining([{ name: 'resolve-test', approximateSize: 258 }]))
+    expect(result.dependencySizes).toEqual(expect.arrayContaining([{
+      name: 'resolve-test/nested-folder/another-nested-folder',
+      approximateSize: 85
+    }]))
   })
 })
 

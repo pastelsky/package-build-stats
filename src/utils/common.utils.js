@@ -2,8 +2,9 @@ const childProcess = require('child_process')
 const path = require('path')
 const builtInModules = require('builtin-modules')
 const fs = require('fs')
+const os = require('os');
 
-const config = require('../config')
+const homeDirectory = os.homedir();
 
 function exec(command, options) {
   return new Promise((resolve, reject) => {
@@ -42,6 +43,10 @@ function getExternals(packageName, installPath) {
   }
 }
 
+function expandTilde(pathString) {
+  return homeDirectory ? pathString.replace(/^~(?=$|\/|\\)/, homeDirectory) : pathString;
+}
+
 function isLocalPackageString(packageString) {
   const packageJsonPath = path.resolve(packageString, 'package.json')
   try {
@@ -53,47 +58,52 @@ function isLocalPackageString(packageString) {
   }
 }
 
-function parsePackageString(packageString) {
-  // Scoped packages
-  let name,
-    version,
-    scoped = false,
-    isLocal = false
+function isScopedPackageString(packageString) {
+  return packageString.startsWith('@')
+}
 
-  if (isLocalPackageString(packageString)) {
-    const fullPath = path.resolve(packageString, 'package.json')
-    const packageJSON = require(fullPath)
-    name = packageJSON.name
-    version = packageJSON.version
-    isLocal = true
+function parseLocalPackageString(packageString) {
+  const fullPath = path.resolve(packageString, 'package.json')
+  const packageJSON = require(fullPath)
 
-    if (name.startsWith('@')) {
-      scope = true
-    }
-  } else {
-    const lastAtIndex = packageString.lastIndexOf('@')
-
-    if (packageString.startsWith('@')) {
-      scoped = true
-      if (lastAtIndex === 0) {
-        name = packageString
-        version = null
-      } else {
-        name = packageString.substring(0, lastAtIndex)
-        version = packageString.substring(lastAtIndex + 1)
-      }
-    } else {
-      if (lastAtIndex === -1) {
-        name = packageString
-        version = null
-      } else {
-        name = packageString.substring(0, lastAtIndex)
-        version = packageString.substring(lastAtIndex + 1)
-      }
-    }
+  return {
+    name: packageJSON.name,
+    version: packageJSON.version,
+    scope: packageJSON.name.startsWith('@'),
+    isLocal: true
   }
+}
 
-  return { name, version, scoped, isLocal }
+function parseScopedPackageString(packageString) {
+  const lastAtIndex = packageString.lastIndexOf('@')
+  return {
+    name: lastAtIndex === 0 ? packageString : packageString.substring(0, lastAtIndex),
+    version: lastAtIndex === 0 ? null : packageString.substring(lastAtIndex + 1),
+    scoped: true,
+    isLocal: false,
+  }
+}
+
+function parseUnscopedPackageString(packageString) {
+  const lastAtIndex = packageString.lastIndexOf('@')
+  return {
+    name: lastAtIndex === -1 ? packageString : packageString.substring(0, lastAtIndex),
+    version: lastAtIndex === -1 ? null : packageString.substring(lastAtIndex + 1),
+    scoped: false,
+    isLocal: false,
+  }
+}
+
+function parsePackageString(packageString) {
+  const normalPackageString = expandTilde(packageString)
+
+  if (isLocalPackageString(normalPackageString)) {
+    return parseLocalPackageString(normalPackageString)
+  } else if (isScopedPackageString(normalPackageString)) {
+    return parseScopedPackageString(normalPackageString)
+  } else {
+    return parseUnscopedPackageString(normalPackageString)
+  }
 }
 
 module.exports = {

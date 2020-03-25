@@ -9,6 +9,8 @@ const CustomError = require('../CustomError')
 const { exec } = require('./common.utils')
 const config = require('../config')
 
+// When operating on a local directory, force npm to copy directory structure
+// and all dependencies instead of just symlinking files
 const wrapPackCommand = packagePath => `$(npm pack ${packagePath} | tail -1)`
 
 const InstallationUtils = {
@@ -85,8 +87,6 @@ const InstallationUtils = {
         'ignore-scripts',
         'save-exact',
         'production',
-        //"fetch-retry-factor 0",
-        //"fetch-retries 0",
         'json',
       ]
 
