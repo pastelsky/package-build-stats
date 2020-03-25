@@ -5,9 +5,8 @@ const { getAllExports } = require('./utils/exports.utils')
 const InstallationUtils = require('./utils/installation.utils')
 const BuildUtils = require('./utils/build.utils')
 
-async function installPackage(packageString, options) {
-  const { name: packageName, isLocal } = parsePackageString(packageString)
-  const installPath = await InstallationUtils.preparePath(packageName)
+async function installPackage(packageString, installPath, options) {
+  const { isLocal } = parsePackageString(packageString)
 
   await InstallationUtils.installPackage(packageString, installPath, {
     isLocal,
@@ -15,34 +14,45 @@ async function installPackage(packageString, options) {
     limitConcurrency: options.limitConcurrency,
     networkConcurrency: options.networkConcurrency,
   })
-
-  return { installPath, packageName, isLocal }
 }
 
 async function getAllPackageExports(packageString, options = {}) {
-  const { packageName, installPath, isLocal } = await installPackage(
-    packageString,
-    options
-  )
-  return await getAllExports(isLocal ? packageString : installPath, packageName)
+  const { name: packageName, isLocal } = parsePackageString(packageString)
+  const installPath = await InstallationUtils.preparePath(packageName)
+
+  try {
+    await installPackage(
+      packageString,
+      installPath,
+      options
+    )
+    return await getAllExports(isLocal ? installPath : packageString, packageName)
+  } finally {
+    await InstallationUtils.cleaupPath(installPath)
+  }
 }
 
 async function getPackageExportSizes(packageString, options = {}) {
-  const { packageName, installPath, isLocal } = await installPackage(
-    packageString,
-    options
-  )
+  const { name: packageName, isLocal } = parsePackageString(packageString)
+  const installPath = await InstallationUtils.preparePath(packageName)
 
-  const exportMap = await getAllExports(
-    isLocal ? packageString : installPath,
-    packageName
-  )
-
-  const exports = Object.keys(exportMap).filter(exp => !(exp === 'default'))
-  debug('Got %d exports for %s', exports.length, packageString)
-
-  const externals = getExternals(packageName, installPath)
   try {
+    await installPackage(
+      packageString,
+      installPath,
+      options
+    )
+
+    const exportMap = await getAllExports(
+      isLocal ? installPath : packageString,
+      packageName
+    )
+
+    const exports = Object.keys(exportMap).filter(exp => !(exp === 'default'))
+    debug('Got %d exports for %s', exports.length, packageString)
+
+    const externals = getExternals(packageName, installPath)
+
     const builtDetails = await BuildUtils.buildPackageIgnoringMissingDeps({
       name: packageName,
       installPath,
@@ -53,7 +63,6 @@ async function getPackageExportSizes(packageString, options = {}) {
       },
     })
 
-    InstallationUtils.cleaupPath(installPath)
     return {
       ...builtDetails,
       assets: builtDetails.assets.map(asset => ({
@@ -61,9 +70,8 @@ async function getPackageExportSizes(packageString, options = {}) {
         path: exportMap[asset.name],
       })),
     }
-  } catch (err) {
+  } finally {
     await InstallationUtils.cleaupPath(installPath)
-    throw err
   }
 }
 

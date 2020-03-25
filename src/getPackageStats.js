@@ -12,6 +12,7 @@ const InstallationUtils = require('./utils/installation.utils')
 const BuildUtils = require('./utils/build.utils')
 
 function getPackageJSONDetails(packageName, installPath) {
+  console.log('installPath', installPath)
   const packageJSONPath = path.join(
     installPath,
     'node_modules',
@@ -68,7 +69,6 @@ async function getPackageStats(packageString, options = {}) {
         asset.name === 'main' && asset.type === (hasCSSAsset ? 'css' : 'js')
     )
 
-    InstallationUtils.cleaupPath(installPath)
     return {
       ...pacakgeJSONDetails,
       ...builtDetails,
@@ -76,9 +76,8 @@ async function getPackageStats(packageString, options = {}) {
       gzip: mainAsset.gzip,
       parse: mainAsset.parse,
     }
-  } catch (err) {
+  } finally {
     await InstallationUtils.cleaupPath(installPath)
-    throw err
   }
 }
 
