@@ -69,7 +69,8 @@ function parseLocalPackageString(packageString) {
   return {
     name: packageJSON.name,
     version: packageJSON.version,
-    scope: packageJSON.name.startsWith('@'),
+    scoped: packageJSON.name.startsWith('@'),
+    normalPath: packageString,
     isLocal: true
   }
 }

@@ -17,7 +17,7 @@ async function installPackage(packageString, installPath, options) {
 }
 
 async function getAllPackageExports(packageString, options = {}) {
-  const { name: packageName, isLocal } = parsePackageString(packageString)
+  const { name: packageName, isLocal, normalPath } = parsePackageString(packageString)
   const installPath = await InstallationUtils.preparePath(packageName)
 
   try {
@@ -26,14 +26,14 @@ async function getAllPackageExports(packageString, options = {}) {
       installPath,
       options
     )
-    return await getAllExports(isLocal ? installPath : packageString, packageName)
+    return await getAllExports(isLocal ? normalPath : installPath, packageName)
   } finally {
     await InstallationUtils.cleaupPath(installPath)
   }
 }
 
 async function getPackageExportSizes(packageString, options = {}) {
-  const { name: packageName, isLocal } = parsePackageString(packageString)
+  const { name: packageName, isLocal, normalPath } = parsePackageString(packageString)
   const installPath = await InstallationUtils.preparePath(packageName)
 
   try {
@@ -44,7 +44,7 @@ async function getPackageExportSizes(packageString, options = {}) {
     )
 
     const exportMap = await getAllExports(
-      isLocal ? installPath : packageString,
+      isLocal ? normalPath : installPath,
       packageName
     )
 
