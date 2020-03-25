@@ -10,8 +10,10 @@ const webpack = require('webpack')
 
 function makeWebpackConfig({ entry, externals }) {
   const externalsRegex = makeExternalsRegex(externals.externalPackages)
-  const isExternalRequest = (request) => {
-    const isPeerDep = externals.externalPackages.length ? externalsRegex.test(request) : false
+  const isExternalRequest = request => {
+    const isPeerDep = externals.externalPackages.length
+      ? externalsRegex.test(request)
+      : false
     const isBuiltIn = externals.externalBuiltIns.includes(request)
     return isPeerDep || isBuiltIn
   }
@@ -141,7 +143,9 @@ function makeWebpackConfig({ entry, externals }) {
       pathinfo: false,
     },
     externals: (context, request, callback) =>
-      isExternalRequest(request) ? callback(null, 'commonjs ' + request) : callback()
+      isExternalRequest(request)
+        ? callback(null, 'commonjs ' + request)
+        : callback(),
   }
 }
 

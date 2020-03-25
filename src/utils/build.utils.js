@@ -237,7 +237,7 @@ const BuildUtils = {
         const { missingModules } = e.extra
         const newExternals = {
           ...externals,
-          externalPackages: externals.externalPackages.concat(missingModules)
+          externalPackages: externals.externalPackages.concat(missingModules),
         }
         debug(
           '%s has missing dependencies, rebuilding without %o',

@@ -113,8 +113,9 @@ expect.extend({
     return {
       pass: isDeltaOk(original, comparison),
       message: () =>
-        `Size delta too large, EXPECTED: ${comparison}, GOT: ${original}, DIFF: ${original -
-          comparison}, FOR: ${name}`,
+        `Size delta too large, EXPECTED: ${comparison}, GOT: ${original}, DIFF: ${
+          original - comparison
+        }, FOR: ${name}`,
     }
   },
 })

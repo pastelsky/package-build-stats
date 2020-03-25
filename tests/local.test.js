@@ -10,7 +10,7 @@ require('dotenv').config()
 
 jest.setTimeout(15000)
 describe('getPackageStats', () => {
-  test('Size of local build', async() => {
+  test('Size of local build', async () => {
     const result = await getPackageStats(
       path.resolve('./fixtures/node_modules/resolve-test')
     )
@@ -23,11 +23,17 @@ describe('getPackageStats', () => {
     )
 
     expect(result.dependencySizes.length).toEqual(2)
-    expect(result.dependencySizes).toEqual(expect.arrayContaining([{ name: 'resolve-test', approximateSize: 258 }]))
-    expect(result.dependencySizes).toEqual(expect.arrayContaining([{
-      name: 'resolve-test/nested-folder/another-nested-folder',
-      approximateSize: 85
-    }]))
+    expect(result.dependencySizes).toEqual(
+      expect.arrayContaining([{ name: 'resolve-test', approximateSize: 258 }])
+    )
+    expect(result.dependencySizes).toEqual(
+      expect.arrayContaining([
+        {
+          name: 'resolve-test/nested-folder/another-nested-folder',
+          approximateSize: 85,
+        },
+      ])
+    )
   })
 })
 
