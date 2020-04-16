@@ -1,5 +1,5 @@
 const path = require('path')
-const debug = require('debug')('bp:worker')
+const log = require('debug')('bp:worker')
 const webpack = require('webpack')
 const MemoryFS = require('memory-fs')
 const isValidNPMName = require('is-valid-npm-name')
@@ -50,8 +50,8 @@ const BuildUtils = {
     }
   },
 
-  compilePackage({ entry, externals }) {
-    const compiler = webpack(makeWebpackConfig({ entry, externals }))
+  compilePackage({ entry, externals, debug }) {
+    const compiler = webpack(makeWebpackConfig({ entry, externals, debug }))
     const memoryFileSystem = new MemoryFS()
     compiler.outputFileSystem = memoryFileSystem
 
@@ -114,13 +114,14 @@ const BuildUtils = {
       })
     }
 
-    debug('build start %s', name)
+    log('build start %s', name)
     const { stats, err, memoryFileSystem } = await BuildUtils.compilePackage({
       entry,
       externals,
+      debug: options.debug
     })
 
-    debug('build end %s', name)
+    log('build end %s', name)
 
     let jsonStats = stats
       ? stats.toJson({
@@ -205,7 +206,7 @@ const BuildUtils = {
         .filter(asset => !asset.name.endsWith('LICENSE.txt'))
         .map(getAssetStats)
 
-      debug('build result %O', assetStats)
+      log('build result %O', assetStats)
       return {
         assets: assetStats,
         ...(!options.customImports && {
@@ -239,7 +240,7 @@ const BuildUtils = {
           ...externals,
           externalPackages: externals.externalPackages.concat(missingModules),
         }
-        debug(
+        log(
           '%s has missing dependencies, rebuilding without %o',
           name,
           missingModules

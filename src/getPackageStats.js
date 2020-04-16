@@ -58,6 +58,7 @@ async function getPackageStats(packageString, options = {}) {
         installPath,
         externals,
         options: {
+          debug: options.debug,
           customImports: options.customImports,
         },
       }),

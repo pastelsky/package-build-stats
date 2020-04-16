@@ -1,5 +1,6 @@
 const path = require('path')
 const Terser = require('terser')
+const CustomError = require('./CustomError')
 
 /**
  * A fork of `webpack-bundle-size-analyzer`.
@@ -26,14 +27,14 @@ function getByteLen(normal_val) {
         : c < 1 << 11
         ? 2
         : c < 1 << 16
-        ? 3
-        : c < 1 << 21
-        ? 4
-        : c < 1 << 26
-        ? 5
-        : c < 1 << 31
-        ? 6
-        : Number.NaN
+          ? 3
+          : c < 1 << 21
+            ? 4
+            : c < 1 << 26
+              ? 5
+              : c < 1 << 31
+                ? 6
+                : Number.NaN
   }
   return byteLen
 }
@@ -181,7 +182,12 @@ function bundleSizeTree(stats) {
         })
 
         if (uglifiedSource.error) {
-          throw new Error('Uglifying failed' + uglifiedSource.error)
+          const filePath = treeItem.path.match(/.+node_modules\/(.+)/)[1]
+          throw new CustomError('MinifyError', uglifiedSource.error, {
+            name: uglifiedSource.error.name,
+            message: uglifiedSource.error.message,
+            filePath,
+          })
         }
 
         return acc + getByteLen(uglifiedSource.code)

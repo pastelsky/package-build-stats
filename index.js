@@ -13,7 +13,7 @@ server({ port: 3000 }, [
     const packageString = decodeURIComponent(ctx.query.p)
 
     try {
-      const result = await getBuiltPackageStats(packageString)
+      const result = await getBuiltPackageStats(packageString, { debug: !!ctx.query.debug })
       return json(result)
     } catch (err) {
       console.log(err)
@@ -27,7 +27,7 @@ server({ port: 3000 }, [
     const packageString = decodeURIComponent(ctx.query.p)
 
     try {
-      const result = await getPackageExportSizes(packageString)
+      const result = await getPackageExportSizes(packageString, { debug: !!ctx.query.debug })
       return json(result)
     } catch (err) {
       console.log(err)
@@ -41,7 +41,7 @@ server({ port: 3000 }, [
     const packageString = decodeURIComponent(ctx.query.p)
 
     try {
-      const result = await getAllPackageExports(packageString)
+      const result = await getAllPackageExports(packageString, { debug: !!ctx.query.debug })
       return json(result)
     } catch (err) {
       console.log(err)

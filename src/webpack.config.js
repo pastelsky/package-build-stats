@@ -3,12 +3,12 @@ const TerserPlugin = require('terser-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const CssoWebpackPlugin = require('csso-webpack-plugin').default
 const WriteFilePlugin = require('write-file-webpack-plugin')
-const debug = require('debug')('bp:webpack')
+const log = require('debug')('bp:webpack')
 const escapeRegex = require('escape-string-regexp')
 const builtinModules = require('builtin-modules')
 const webpack = require('webpack')
 
-function makeWebpackConfig({ entry, externals }) {
+function makeWebpackConfig({ entry, externals, debug }) {
   const externalsRegex = makeExternalsRegex(externals.externalPackages)
   const isExternalRequest = request => {
     const isPeerDep = externals.externalPackages.length
@@ -18,7 +18,7 @@ function makeWebpackConfig({ entry, externals }) {
     return isPeerDep || isBuiltIn
   }
 
-  debug('external packages %o', externalsRegex)
+  log('external packages %o', externalsRegex)
 
   const builtInNode = {}
   builtinModules.forEach(mod => {
@@ -37,6 +37,7 @@ function makeWebpackConfig({ entry, externals }) {
     optimization: {
       namedChunks: true,
       runtimeChunk: { name: 'runtime' },
+      minimize: !debug,
       splitChunks: {
         cacheGroups: {
           styles: {
@@ -68,7 +69,7 @@ function makeWebpackConfig({ entry, externals }) {
         filename: '[name].bundle.css',
         chunkFilename: '[id].bundle.css',
       }),
-      // new WriteFilePlugin()
+      ...(debug ? [new WriteFilePlugin()] : [])
     ],
     resolve: {
       modules: ['node_modules'],
