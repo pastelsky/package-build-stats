@@ -69,7 +69,7 @@ function makeWebpackConfig({ entry, externals, debug }) {
         filename: '[name].bundle.css',
         chunkFilename: '[id].bundle.css',
       }),
-      ...(debug ? [new WriteFilePlugin()] : [])
+      ...(debug ? [new WriteFilePlugin()] : []),
     ],
     resolve: {
       modules: ['node_modules'],
@@ -100,6 +100,19 @@ function makeWebpackConfig({ entry, externals, debug }) {
           type: 'javascript/auto',
           test: /\.mjs$/,
           use: [],
+        },
+        {
+          test: /(react-native|@react-native-community).+\.js$/,
+          use: [
+            {
+              loader: 'babel-loader',
+              options: {
+                babelrc: false,
+                configFile: false,
+                presets: [require.resolve('metro-react-native-babel-preset')],
+              },
+            },
+          ],
         },
         {
           test: /\.js$/,
