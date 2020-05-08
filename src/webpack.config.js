@@ -102,6 +102,19 @@ function makeWebpackConfig({ entry, externals, debug }) {
           use: [],
         },
         {
+          test: /expo-.+\.js$/,
+          use: [
+            {
+              loader: 'babel-loader',
+              options: {
+                babelrc: false,
+                configFile: false,
+                presets: [require.resolve('babel-preset-expo')],
+              },
+            },
+          ],
+        },
+        {
           test: /(react-native|@react-native-community).+\.js$/,
           use: [
             {
