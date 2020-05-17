@@ -25,8 +25,10 @@ const results = await getBuiltPackageStats('moment@2.24.0')
 
 ##### Building local packages (beta)
 
+Local package must have a `package.json` with at least `name`, `version`, and `main`.
+
 ```js
-const results = await getBuiltPackageStats('~/dev/my-npm-package') // must have a package.json
+const results = await getBuiltPackageStats('~/dev/my-npm-package') 
 ```
 
 #### Passing options to the build
