@@ -8,7 +8,7 @@ const escapeRegex = require('escape-string-regexp')
 const builtinModules = require('builtin-modules')
 const webpack = require('webpack')
 
-function makeWebpackConfig({ entry, externals, debug }) {
+function makeWebpackConfig ({ entry, externals, debug }) {
   const externalsRegex = makeExternalsRegex(externals.externalPackages)
   const isExternalRequest = request => {
     const isPeerDep = externals.externalPackages.length
@@ -25,10 +25,10 @@ function makeWebpackConfig({ entry, externals, debug }) {
     builtInNode[mod] = 'empty'
   })
 
-  builtInNode['setImmediate'] = false
-  builtInNode['console'] = false
-  builtInNode['process'] = false
-  builtInNode['Buffer'] = false
+  builtInNode.setImmediate = false
+  builtInNode.console = false
+  builtInNode.process = false
+  builtInNode.Buffer = false
 
   return {
     entry: entry,
@@ -44,9 +44,9 @@ function makeWebpackConfig({ entry, externals, debug }) {
             name: 'main',
             test: /\.css$/,
             chunks: 'all',
-            enforce: true,
-          },
-        },
+            enforce: true
+          }
+        }
       },
       minimizer: [
         new TerserPlugin({
@@ -54,12 +54,12 @@ function makeWebpackConfig({ entry, externals, debug }) {
           terserOptions: {
             ie8: false,
             output: {
-              comments: false,
-            },
-          },
+              comments: false
+            }
+          }
         }),
-        new CssoWebpackPlugin({ restructure: false }),
-      ],
+        new CssoWebpackPlugin({ restructure: false })
+      ]
     },
     plugins: [
       new webpack.IgnorePlugin(/^electron$/),
@@ -67,7 +67,7 @@ function makeWebpackConfig({ entry, externals, debug }) {
         // Options similar to the same options in webpackOptions.output
         // both options are optional
         filename: '[name].bundle.css',
-        chunkFilename: '[id].bundle.css',
+        chunkFilename: '[id].bundle.css'
       }),
       ...(debug ? [new WriteFilePlugin()] : [])
     ],
@@ -84,26 +84,26 @@ function makeWebpackConfig({ entry, externals, debug }) {
         '.json',
         '.css',
         '.sass',
-        '.scss',
+        '.scss'
       ],
-      mainFields: ['browser', 'module', 'main', 'style'],
+      mainFields: ['browser', 'module', 'main', 'style']
     },
     module: {
       noParse: [/\.min\.js$/],
       rules: [
         {
           test: /\.css$/,
-          use: [MiniCssExtractPlugin.loader, 'css-loader'],
+          use: [MiniCssExtractPlugin.loader, 'css-loader']
         },
         // see https://github.com/apollographql/react-apollo/issues/1737
         {
           type: 'javascript/auto',
           test: /\.mjs$/,
-          use: [],
+          use: []
         },
         {
           test: /\.js$/,
-          use: ['shebang-loader'], // support CLI tools that start with a #!/usr/bin/node
+          use: ['shebang-loader'] // support CLI tools that start with a #!/usr/bin/node
         },
         {
           test: /\.(scss|sass)$/,
@@ -120,37 +120,37 @@ function makeWebpackConfig({ entry, externals, debug }) {
                       'last 5 Firefox versions',
                       'Safari >= 8',
                       'Explorer >= 10',
-                      'edge >= 12',
-                    ],
-                  }),
-                ],
-              },
+                      'edge >= 12'
+                    ]
+                  })
+                ]
+              }
             },
-            'sass-loader',
-          ],
+            'sass-loader'
+          ]
         },
         {
           test: /\.(woff|woff2|eot|ttf|svg|png|jpeg|jpg|gif|webp)$/,
           loader: 'file-loader',
           query: {
-            emitFile: true,
-          },
-        },
-      ],
+            emitFile: true
+          }
+        }
+      ]
     },
     node: builtInNode,
     output: {
       filename: 'bundle.js',
-      pathinfo: false,
+      pathinfo: false
     },
     externals: (context, request, callback) =>
       isExternalRequest(request)
         ? callback(null, 'commonjs ' + request)
-        : callback(),
+        : callback()
   }
 }
 
-function makeExternalsRegex(externals) {
+function makeExternalsRegex (externals) {
   let externalsRegex = externals
     .map(dep => `^${escapeRegex(dep)}$|^${escapeRegex(dep)}\\/`)
     .join('|')
