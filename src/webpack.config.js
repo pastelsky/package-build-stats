@@ -1,11 +1,9 @@
-const autoprefixer = require('autoprefixer')
-const TerserPlugin = require('terser-webpack-plugin')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const CssoWebpackPlugin = require('csso-webpack-plugin').default
+const path = require('path')
+const LessPluginCleanCSS = require('less-plugin-clean-css')
+const LessPluginAutoprefixer = require('less-plugin-autoprefix')
 const WriteFilePlugin = require('write-file-webpack-plugin')
 const log = require('debug')('bp:webpack')
 const escapeRegex = require('escape-string-regexp')
-const builtinModules = require('builtin-modules')
 const webpack = require('webpack')
 
 function makeWebpackConfig ({ entry, externals, debug }) {
@@ -20,127 +18,85 @@ function makeWebpackConfig ({ entry, externals, debug }) {
 
   log('external packages %o', externalsRegex)
 
-  const builtInNode = {}
-  builtinModules.forEach(mod => {
-    builtInNode[mod] = 'empty'
-  })
-
-  builtInNode.setImmediate = false
-  builtInNode.console = false
-  builtInNode.process = false
-  builtInNode.Buffer = false
+  const alias = {
+    jquery: '@qubit/jquery',
+    exit_checker: '@qubit/exit-checker'
+  }
 
   return {
     entry: entry,
-    mode: 'production',
-    // bail: true,
-    optimization: {
-      namedChunks: true,
-      runtimeChunk: { name: 'runtime' },
-      minimize: !debug,
-      splitChunks: {
-        cacheGroups: {
-          styles: {
-            name: 'main',
-            test: /\.css$/,
-            chunks: 'all',
-            enforce: true
-          }
-        }
-      },
-      minimizer: [
-        new TerserPlugin({
-          parallel: true,
-          terserOptions: {
-            ie8: false,
-            output: {
-              comments: false
-            }
-          }
-        }),
-        new CssoWebpackPlugin({ restructure: false })
-      ]
+    profile: false,
+    bail: false,
+    amd: { jQuery: true },
+    node: { // Disable all node shims or it fucks with global variables
+      console: false,
+      global: false,
+      process: false,
+      Buffer: false,
+      __filename: 'mock',
+      __dirname: 'mock',
+      setImmediate: false
     },
     plugins: [
-      new webpack.IgnorePlugin(/^electron$/),
-      new MiniCssExtractPlugin({
-        // Options similar to the same options in webpackOptions.output
-        // both options are optional
-        filename: '[name].bundle.css',
-        chunkFilename: '[id].bundle.css'
+      new webpack.LoaderOptionsPlugin({
+        options: {
+          lessLoader: {
+            lessPlugins: [
+              new LessPluginAutoprefixer({ cascade: false }),
+              new LessPluginCleanCSS()
+            ]
+          }
+        }
       }),
+      new webpack.DefinePlugin({
+        'process.env': {
+          NODE_ENV: JSON.stringify('production')
+        }
+      }),
+      new webpack.IgnorePlugin(/^electron$/),
       ...(debug ? [new WriteFilePlugin()] : [])
     ],
     resolve: {
+      extensions: ['.js', '.css'],
       modules: ['node_modules'],
-      symlinks: false,
       cacheWithContext: false,
-      extensions: [
-        '.web.mjs',
-        '.mjs',
-        '.web.js',
-        '.js',
-        '.mjs',
-        '.json',
-        '.css',
-        '.sass',
-        '.scss'
-      ],
-      mainFields: ['browser', 'module', 'main', 'style']
+      symlinks: false,
+      alias
     },
     module: {
-      noParse: [/\.min\.js$/],
-      rules: [
-        {
-          test: /\.css$/,
-          use: [MiniCssExtractPlugin.loader, 'css-loader']
-        },
-        // see https://github.com/apollographql/react-apollo/issues/1737
-        {
-          type: 'javascript/auto',
-          test: /\.mjs$/,
-          use: []
-        },
-        {
-          test: /\.js$/,
-          use: ['shebang-loader'] // support CLI tools that start with a #!/usr/bin/node
-        },
-        {
-          test: /\.(scss|sass)$/,
-          loader: [
-            MiniCssExtractPlugin.loader,
-            'css-loader',
-            {
-              loader: 'postcss-loader',
-              options: {
-                plugins: () => [
-                  autoprefixer({
-                    browsers: [
-                      'last 5 Chrome versions',
-                      'last 5 Firefox versions',
-                      'Safari >= 8',
-                      'Explorer >= 10',
-                      'edge >= 12'
-                    ]
-                  })
-                ]
-              }
-            },
-            'sass-loader'
-          ]
-        },
-        {
-          test: /\.(woff|woff2|eot|ttf|svg|png|jpeg|jpg|gif|webp)$/,
-          loader: 'file-loader',
-          query: {
-            emitFile: true
-          }
+      loaders: [{
+        include: [/.js$/],
+        loader: 'buble',
+        query: {
+          objectAssign: '__assign__',
+          transforms: {
+            dangerousForOf: true,
+            dangerousTaggedTemplateString: true
+          },
+          jsx: 'React.createElement'
         }
-      ]
+      }, {
+        // Be very careful if you change this to include all CSS files, not just experience/aura ones.
+        // It may break things where we are doing inline loaders (e.g. some of the deliver-lib modules).
+        include: [/experiences\/experience-.+?\.css$/, /aura\/aura\.css$/],
+        loader: 'css!less'
+      }, {
+        include: /\.json$/,
+        loader: 'json'
+      }]
     },
-    node: builtInNode,
+    resolveLoader: {
+      modules: [
+        path.join(__dirname, '..', 'loaders')
+      ],
+      alias: {
+        '@qubit/css': 'css',
+        '@qubit/text': 'text'
+      }
+    },
     output: {
-      filename: 'bundle.js',
+      path: path.join(process.cwd(), 'dist'),
+      filename: '[name].bundle.js',
       pathinfo: false
     },
     externals: (context, request, callback) =>
