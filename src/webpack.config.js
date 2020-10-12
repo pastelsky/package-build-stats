@@ -89,7 +89,6 @@ function makeWebpackConfig({ entry, externals, debug }) {
       mainFields: ['browser', 'module', 'main', 'style'],
     },
     module: {
-      noParse: [/\.min\.js$/],
       rules: [
         {
           test: /\.css$/,
