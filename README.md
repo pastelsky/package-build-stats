@@ -5,7 +5,7 @@ This is the function that powers the core of building, minifying and gzipping of
 ## Usage
 
 ```js
-const getBuiltPackageStats = require('package-build-stats')
+const { getBuiltPackageStats } = require('package-build-stats')
 ```
 
 #### Building packages from npm
