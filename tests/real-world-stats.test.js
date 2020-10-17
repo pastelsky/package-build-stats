@@ -1,4 +1,4 @@
-const { default: getPackageStats } = require('../src')
+const { getPackageStats } = require('../src')
 const pSeries = require('p-series')
 
 require('dotenv').config()
