@@ -3,6 +3,7 @@ node_modules
 jspm_packages
 build
 dist
+docs
 .env
 yarn-error.log
 !*fixtures/node_modules
