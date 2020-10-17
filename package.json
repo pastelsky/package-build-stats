@@ -15,7 +15,7 @@
     "build",
     "src"
   ],
-  "main": "build/getPackageStats.js",
+  "main": "build/index.js",
   "scripts": {
     "start": "ts-node --files index.js",
     "dev": "DEBUG=bp* ts-node-dev --files index.js",

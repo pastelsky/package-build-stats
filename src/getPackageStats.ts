@@ -44,7 +44,7 @@ type GetPackageStatsOptions = {
   customImports?: Array<string>
 }
 
-async function getPackageStats(
+export default async function getPackageStats(
   packageString: string,
   options: GetPackageStatsOptions = {}
 ) {
@@ -96,5 +96,3 @@ async function getPackageStats(
     await InstallationUtils.cleaupPath(installPath)
   }
 }
-
-module.exports = getPackageStats

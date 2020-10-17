@@ -21,7 +21,7 @@ async function installPackage(
   })
 }
 
-async function getAllPackageExports(
+export async function getAllPackageExports(
   packageString: string,
   options: InstallPackageOptions = {}
 ) {
@@ -36,7 +36,7 @@ async function getAllPackageExports(
   }
 }
 
-async function getPackageExportSizes(packageString: string, options = {}) {
+export async function getPackageExportSizes(packageString: string, options = {}) {
   const { name: packageName, normalPath } = parsePackageString(packageString)
   const installPath = await InstallationUtils.preparePath(packageName)
 
@@ -74,5 +74,3 @@ async function getPackageExportSizes(packageString: string, options = {}) {
     await InstallationUtils.cleaupPath(installPath)
   }
 }
-
-module.exports = { getPackageExportSizes, getAllPackageExports }
