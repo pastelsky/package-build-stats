@@ -13,7 +13,7 @@ import { InstallPackageOptions } from '../common.types'
 // When operating on a local directory, force npm to copy directory structure
 // and all dependencies instead of just symlinking files
 const wrapPackCommand = (packagePath: string) =>
-  `$(npm pack ${packagePath} | tail -1)`
+  `$(npm pack --ignore-scripts ${packagePath} | tail -1)`
 
 const InstallationUtils = {
   getInstallPath(packageName: string) {
