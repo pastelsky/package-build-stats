@@ -37,7 +37,7 @@ export type GetPackageStatsOptions = Pick<
   | 'networkConcurrency'
   | 'debug'
   | 'customImports'
-  >
+>
 
 export type Externals = {
   externalPackages: Array<string>

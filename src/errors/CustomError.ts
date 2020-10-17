@@ -43,7 +43,6 @@ export class PackageNotFoundError extends CustomError {
   }
 }
 
-
 export class CLIBuildError extends CustomError {
   constructor(originalError: any, extra?: any) {
     super('CLIBuildError', originalError, extra)
