@@ -30,6 +30,15 @@ export type InstallPackageOptions = Pick<
   | 'isLocal'
 >
 
+export type GetPackageStatsOptions = Pick<
+  AllOptions,
+  | 'client'
+  | 'limitConcurrency'
+  | 'networkConcurrency'
+  | 'debug'
+  | 'customImports'
+  >
+
 export type Externals = {
   externalPackages: Array<string>
   externalBuiltIns: Array<string>

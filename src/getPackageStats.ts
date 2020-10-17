@@ -9,6 +9,7 @@ import { getExternals, parsePackageString } from './utils/common.utils'
 import InstallationUtils from './utils/installation.utils'
 import BuildUtils from './utils/build.utils'
 import { UnexpectedBuildError } from './errors/CustomError'
+import { GetPackageStatsOptions } from './common.types'
 
 function getPackageJSONDetails(packageName: string, installPath: string) {
   const packageJSONPath = path.join(
@@ -34,14 +35,6 @@ function getPackageJSONDetails(packageName: string, installPath: string) {
           : [],
     }
   })
-}
-
-type GetPackageStatsOptions = {
-  client?: 'npm' | 'yarn'
-  limitConcurrency?: boolean
-  networkConcurrency?: number
-  debug?: boolean
-  customImports?: Array<string>
 }
 
 export default async function getPackageStats(

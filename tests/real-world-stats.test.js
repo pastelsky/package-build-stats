@@ -1,4 +1,4 @@
-const fetch = require('node-fetch')
+const { default: getPackageStats } = require('../src')
 const pSeries = require('p-series')
 
 require('dotenv').config()
@@ -124,11 +124,8 @@ jest.setTimeout(70000)
 describe('real world stats', () => {
   let testPackages = async (packages, done) => {
     const promises = packages.map(pack => async () => {
-      const res = await fetch(
-        `${process.env.SERVER_ENDPOINT}/size?p=${encodeURIComponent(pack.name)}`
-      )
-      const json = await res.json()
-      expect(json.size).toBeWithinDeltaOf(pack.size, pack.name)
+      const res = await getPackageStats(pack.name)
+      expect(res.size).toBeWithinDeltaOf(pack.size, pack.name)
     })
 
     await pSeries(promises)
