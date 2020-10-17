@@ -3,8 +3,8 @@ const path = require('path')
  * @jest-environment node
  */
 
-const getPackageStats = require('../src/getPackageStats.js')
-const { getPackageExportSizes } = require('../src/getPackageExportSizes')
+const { default: getPackageStats } = require('../src')
+const { getPackageExportSizes } = require('../src')
 
 require('dotenv').config()
 

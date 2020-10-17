@@ -1,5 +1,4 @@
-  <img src="https://img.shields.io/npm/v/package-build-stats.svg" /> 
-  <img src="https://img.shields.io/npm/l/package-build-stats.svg" />
+  <img src="https://img.shields.io/npm/v/package-build-stats.svg" /> <img src="https://img.shields.io/npm/l/package-build-stats.svg" /> <img src="https://img.shields.io/github/workflow/status/pastelsky/package-build-stats/CI/master"/>
   
 This is the function that powers the core of building, minifying and gzipping of packages in bundlephobia.
 

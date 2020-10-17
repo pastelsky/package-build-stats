@@ -1,14 +1,14 @@
-const childProcess = require('child_process')
-const path = require('path')
-const builtInModules = require('builtin-modules')
-const fs = require('fs')
-const os = require('os')
+import childProcess from 'child_process'
+import path from 'path'
+import builtInModules from 'builtin-modules'
+import fs from 'fs'
+import os from 'os'
 
 const homeDirectory = os.homedir()
 
-function exec(command, options) {
+export function exec(command: string, options: any) {
   return new Promise((resolve, reject) => {
-    childProcess.exec(command, options, function (error, stdout, stderr) {
+    childProcess.exec(command, options, (error, stdout, stderr) => {
       if (error) {
         reject(stderr)
       } else {
@@ -23,7 +23,7 @@ function exec(command, options) {
  * part of the build in a regex format -
  * /(^dep-a$|^dep-a\/|^dep-b$|^dep-b\/)\//
  */
-function getExternals(packageName, installPath) {
+export function getExternals(packageName: string, installPath: string) {
   const packageJSONPath = path.join(
     installPath,
     'node_modules',
@@ -45,13 +45,13 @@ function getExternals(packageName, installPath) {
   }
 }
 
-function expandTilde(pathString) {
+function expandTilde(pathString: string) {
   return homeDirectory
     ? pathString.replace(/^~(?=$|\/|\\)/, homeDirectory)
     : pathString
 }
 
-function isLocalPackageString(packageString) {
+function isLocalPackageString(packageString: string) {
   const packageJsonPath = path.resolve(packageString, 'package.json')
   try {
     if (fs.existsSync(packageJsonPath)) {
@@ -62,11 +62,19 @@ function isLocalPackageString(packageString) {
   }
 }
 
-function isScopedPackageString(packageString) {
+function isScopedPackageString(packageString: string) {
   return packageString.startsWith('@')
 }
 
-function parseLocalPackageString(packageString) {
+type ParsePackageResult = {
+  name: string
+  version: string | null
+  scoped: boolean
+  isLocal?: boolean
+  normalPath?: string
+}
+
+function parseLocalPackageString(packageString: string): ParsePackageResult {
   const fullPath = path.resolve(packageString, 'package.json')
   const packageJSON = require(fullPath)
 
@@ -79,7 +87,7 @@ function parseLocalPackageString(packageString) {
   }
 }
 
-function parseScopedPackageString(packageString) {
+function parseScopedPackageString(packageString: string): ParsePackageResult {
   const lastAtIndex = packageString.lastIndexOf('@')
   return {
     name:
@@ -89,11 +97,10 @@ function parseScopedPackageString(packageString) {
     version:
       lastAtIndex === 0 ? null : packageString.substring(lastAtIndex + 1),
     scoped: true,
-    isLocal: false,
   }
 }
 
-function parseUnscopedPackageString(packageString) {
+function parseUnscopedPackageString(packageString: string): ParsePackageResult {
   const lastAtIndex = packageString.lastIndexOf('@')
   return {
     name:
@@ -103,11 +110,10 @@ function parseUnscopedPackageString(packageString) {
     version:
       lastAtIndex === -1 ? null : packageString.substring(lastAtIndex + 1),
     scoped: false,
-    isLocal: false,
   }
 }
 
-function parsePackageString(packageString) {
+export function parsePackageString(packageString: string): ParsePackageResult {
   const normalPackageString = expandTilde(packageString)
 
   if (isLocalPackageString(normalPackageString)) {
@@ -117,10 +123,4 @@ function parsePackageString(packageString) {
   } else {
     return parseUnscopedPackageString(normalPackageString)
   }
-}
-
-module.exports = {
-  exec,
-  getExternals,
-  parsePackageString,
 }

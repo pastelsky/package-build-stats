@@ -71,13 +71,41 @@ describe('renaming exports', () => {
 })
 
 describe('exporting destructured assignments', () => {
-  test('', () => {
+  test('object', () => {
     const exportsA = getExportsDetails(
       `export const { name1, name2: bar } = o;`
     )
     expect(exportsA).toStrictEqual({
       exportAllLocations: [],
       exports: ['name1', 'bar'],
+    })
+  })
+
+  test('array', () => {
+    const exportsA = getExportsDetails(
+      `export const [name1, name2, ...rest ] = o;`
+    )
+    expect(exportsA).toStrictEqual({
+      exportAllLocations: [],
+      exports: ['name1', 'name2', 'rest'],
+    })
+  })
+
+  test('complex destructuring & assignments', () => {
+    const exportsA = getExportsDetails(
+      ` export const [arr1,arr2, [nestedArr], {obj1, ...objRest}, assignedArr=3, ...restArr] = o`
+    )
+    expect(exportsA).toStrictEqual({
+      exportAllLocations: [],
+      exports: [
+        'arr1',
+        'arr2',
+        'nestedArr',
+        'obj1',
+        'objRest',
+        'assignedArr',
+        'restArr',
+      ],
     })
   })
 })
@@ -148,6 +176,14 @@ describe('aggregating modules', () => {
     expect(exportsA).toStrictEqual({
       exportAllLocations: [],
       exports: ['name1', 'name2', 'nameN'],
+    })
+  })
+
+  test('named re-export', () => {
+    const exportsA = getExportsDetails(`export * as new from './some-file';`)
+    expect(exportsA).toStrictEqual({
+      exportAllLocations: [],
+      exports: ['new'],
     })
   })
 })

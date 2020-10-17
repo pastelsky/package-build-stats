@@ -1,20 +1,22 @@
-const shortId = require('shortid')
-const mkdir = require('mkdir-promise')
-const rimraf = require('rimraf')
-const path = require('path')
-const fs = require('fs')
-const sanitize = require('sanitize-filename')
+import shortId from 'shortid'
+import rimraf from 'rimraf'
+import path from 'path'
+import { promises as fs } from 'fs'
+import sanitize from 'sanitize-filename'
+
 const debug = require('debug')('bp:worker')
-const CustomError = require('../CustomError')
-const { exec } = require('./common.utils')
-const config = require('../config')
+import { InstallError, PackageNotFoundError } from '../errors/CustomError'
+import { exec } from './common.utils'
+import config from '../config/config'
+import { InstallPackageOptions } from '../common.types'
 
 // When operating on a local directory, force npm to copy directory structure
 // and all dependencies instead of just symlinking files
-const wrapPackCommand = packagePath => `$(npm pack --ignore-scripts ${packagePath} | tail -1)`
+const wrapPackCommand = (packagePath: string) =>
+  `$(npm pack --ignore-scripts ${packagePath} | tail -1)`
 
 const InstallationUtils = {
-  getInstallPath(packageName) {
+  getInstallPath(packageName: string) {
     const id = shortId.generate().slice(0, 3)
     return path.join(
       config.tmp,
@@ -23,13 +25,13 @@ const InstallationUtils = {
     )
   },
 
-  async preparePath(packageName) {
+  async preparePath(packageName: string) {
     const installPath = InstallationUtils.getInstallPath(packageName)
 
-    await mkdir(config.tmp)
-    await mkdir(installPath)
+    await fs.mkdir(config.tmp, { recursive: true })
+    await fs.mkdir(installPath, { recursive: true })
 
-    fs.writeFileSync(
+    await fs.writeFile(
       path.join(installPath, 'package.json'),
       JSON.stringify({ dependencies: {} })
     )
@@ -38,15 +40,15 @@ const InstallationUtils = {
   },
 
   async installPackage(
-    packageString,
-    installPath,
+    packageString: string,
+    installPath: string,
     {
       client,
       limitConcurrency,
       networkConcurrency,
       additionalPackages = [],
       isLocal,
-    }
+    }: InstallPackageOptions
   ) {
     let flags, command
 
@@ -106,17 +108,17 @@ const InstallationUtils = {
     } catch (err) {
       console.log(err)
       if (err.includes('code E404')) {
-        throw new CustomError('PackageNotFoundError', err)
+        throw new PackageNotFoundError(err)
       } else {
-        throw new CustomError('InstallError', err)
+        throw new InstallError(err)
       }
     }
   },
 
-  async cleaupPath(installPath) {
+  async cleaupPath(installPath: string) {
     const noop = () => {}
     await rimraf(installPath, noop)
   },
 }
 
-module.exports = InstallationUtils
+export default InstallationUtils

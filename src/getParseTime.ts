@@ -1,16 +1,16 @@
-const fs = require('fs')
-const path = require('path')
+import fs from 'fs'
+import path from 'path'
 const baseScript = fs.readFileSync(
   path.join(__dirname, '../fixtures/base.js'),
   'utf8'
 )
 
-const { VMScript } = require('vm2')
-const now = require('performance-now')
-const stats = require('stats-lite')
+import { VMScript } from 'vm2'
+import now from 'performance-now'
+import stats from 'stats-lite'
 const debug = require('debug')('bp:worker')
 
-function getParseTime(currentScript, trialCount = 5) {
+function getParseTime(currentScript: string, trialCount = 5) {
   let baseVMScript, currentVMScript
 
   let baseCounter = 0
@@ -62,4 +62,4 @@ function getParseTime(currentScript, trialCount = 5) {
   }
 }
 
-module.exports = getParseTime
+export default getParseTime

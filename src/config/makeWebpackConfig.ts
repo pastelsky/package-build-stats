@@ -1,16 +1,35 @@
-const autoprefixer = require('autoprefixer')
-const TerserPlugin = require('terser-webpack-plugin')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const CssoWebpackPlugin = require('csso-webpack-plugin').default
-const WriteFilePlugin = require('write-file-webpack-plugin')
-const log = require('debug')('bp:webpack')
-const escapeRegex = require('escape-string-regexp')
-const builtinModules = require('builtin-modules')
-const webpack = require('webpack')
+import autoprefixer from 'autoprefixer'
+import TerserPlugin from 'terser-webpack-plugin'
+import MiniCssExtractPlugin from 'mini-css-extract-plugin'
+import CssoWebpackPlugin from 'csso-webpack-plugin'
+import WriteFilePlugin from 'write-file-webpack-plugin'
 
-function makeWebpackConfig({ entry, externals, debug }) {
+const log = require('debug')('bp:webpack')
+import escapeRegex from 'escape-string-regexp'
+import builtinModules from 'builtin-modules'
+import webpack, { Entry } from 'webpack'
+// @ts-ignore
+import VueLoaderPlugin from 'vue-loader/lib/plugin'
+
+import { Externals } from '../common.types'
+
+type MakeWebpackConfigOptions = {
+  externals: Externals
+  debug?: boolean
+  entry: string | string[] | Entry
+}
+
+type NodeBuiltIn = {
+  [key: string]: boolean | 'empty'
+}
+
+export default function makeWebpackConfig({
+  entry,
+  externals,
+  debug,
+}: MakeWebpackConfigOptions): webpack.Configuration {
   const externalsRegex = makeExternalsRegex(externals.externalPackages)
-  const isExternalRequest = request => {
+  const isExternalRequest = (request: string) => {
     const isPeerDep = externals.externalPackages.length
       ? externalsRegex.test(request)
       : false
@@ -20,7 +39,7 @@ function makeWebpackConfig({ entry, externals, debug }) {
 
   log('external packages %o', externalsRegex)
 
-  const builtInNode = {}
+  const builtInNode: NodeBuiltIn = {}
   builtinModules.forEach(mod => {
     builtInNode[mod] = 'empty'
   })
@@ -30,6 +49,8 @@ function makeWebpackConfig({ entry, externals, debug }) {
   builtInNode['process'] = false
   builtInNode['Buffer'] = false
 
+  // @ts-ignore
+  // @ts-ignore
   return {
     entry: entry,
     mode: 'production',
@@ -37,7 +58,7 @@ function makeWebpackConfig({ entry, externals, debug }) {
     optimization: {
       namedChunks: true,
       runtimeChunk: { name: 'runtime' },
-      minimize: !debug,
+      minimize: true,
       splitChunks: {
         cacheGroups: {
           styles: {
@@ -58,18 +79,20 @@ function makeWebpackConfig({ entry, externals, debug }) {
             },
           },
         }),
+        // @ts-ignore: Appears that the library might have incorrect definitions
         new CssoWebpackPlugin({ restructure: false }),
       ],
     },
     plugins: [
       new webpack.IgnorePlugin(/^electron$/),
+      new VueLoaderPlugin(),
       new MiniCssExtractPlugin({
         // Options similar to the same options in webpackOptions.output
         // both options are optional
         filename: '[name].bundle.css',
         chunkFilename: '[id].bundle.css',
       }),
-      ...(debug ? [new WriteFilePlugin()] : [])
+      ...(debug ? [new WriteFilePlugin()] : []),
     ],
     resolve: {
       modules: ['node_modules'],
@@ -105,6 +128,19 @@ function makeWebpackConfig({ entry, externals, debug }) {
           use: ['shebang-loader'], // support CLI tools that start with a #!/usr/bin/node
         },
         {
+          test: /\.(html|svelte)$/,
+          use: {
+            loader: 'svelte-loader',
+            options: {
+              emitCss: true,
+            },
+          },
+        },
+        {
+          test: /\.vue$/,
+          loader: 'vue-loader',
+        },
+        {
           test: /\.(scss|sass)$/,
           loader: [
             MiniCssExtractPlugin.loader,
@@ -131,7 +167,8 @@ function makeWebpackConfig({ entry, externals, debug }) {
         {
           test: /\.(woff|woff2|eot|ttf|svg|png|jpeg|jpg|gif|webp)$/,
           loader: 'file-loader',
-          query: {
+          options: {
+            name: '[name].bundle.[ext]',
             emitFile: true,
           },
         },
@@ -149,7 +186,7 @@ function makeWebpackConfig({ entry, externals, debug }) {
   }
 }
 
-function makeExternalsRegex(externals) {
+function makeExternalsRegex(externals: string[]) {
   let externalsRegex = externals
     .map(dep => `^${escapeRegex(dep)}$|^${escapeRegex(dep)}\\/`)
     .join('|')
@@ -158,5 +195,3 @@ function makeExternalsRegex(externals) {
 
   return new RegExp(externalsRegex)
 }
-
-module.exports = makeWebpackConfig

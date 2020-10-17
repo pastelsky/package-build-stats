@@ -1,7 +1,7 @@
 // Use ES6 supported by Node v6.10 only!
 
-const path = require('path')
+import path from 'path'
 
-module.exports = {
+export default {
   tmp: path.join('/tmp', 'tmp-build'),
 }
