@@ -3,23 +3,21 @@
  * @see https://github.com/wix/import-cost/blob/master/packages/import-cost/src/webpack.js
  */
 
-const fs = require('fs')
-const path = require('path')
-const pify = require('pify')
+import { promises as fs } from 'fs'
+import path from 'path'
+import { getExternals, parsePackageString } from './utils/common.utils'
+import InstallationUtils from './utils/installation.utils'
+import BuildUtils from './utils/build.utils'
+import { UnexpectedBuildError } from './errors/CustomError'
 
-const { getExternals, parsePackageString } = require('./utils/common.utils')
-const InstallationUtils = require('./utils/installation.utils')
-const BuildUtils = require('./utils/build.utils')
-
-function getPackageJSONDetails(packageName, installPath) {
-  console.log('installPath', installPath)
+function getPackageJSONDetails(packageName: string, installPath: string) {
   const packageJSONPath = path.join(
     installPath,
     'node_modules',
     packageName,
     'package.json'
   )
-  return pify(fs.readFile)(packageJSONPath, 'utf8').then(contents => {
+  return fs.readFile(packageJSONPath, 'utf8').then((contents: string) => {
     const parsedJSON = JSON.parse(contents)
     return {
       dependencyCount:
@@ -38,7 +36,18 @@ function getPackageJSONDetails(packageName, installPath) {
   })
 }
 
-async function getPackageStats(packageString, options = {}) {
+type GetPackageStatsOptions = {
+  client?: 'npm' | 'yarn'
+  limitConcurrency?: boolean
+  networkConcurrency?: number
+  debug?: boolean
+  customImports?: Array<string>
+}
+
+async function getPackageStats(
+  packageString: string,
+  options: GetPackageStatsOptions = {}
+) {
   const { name: packageName, isLocal } = parsePackageString(packageString)
   const installPath = await InstallationUtils.preparePath(packageName)
 
@@ -69,6 +78,12 @@ async function getPackageStats(packageString, options = {}) {
       asset =>
         asset.name === 'main' && asset.type === (hasCSSAsset ? 'css' : 'js')
     )
+
+    if (!mainAsset) {
+      throw new UnexpectedBuildError(
+        'Did not find a main asset in the built bundle'
+      )
+    }
 
     return {
       ...pacakgeJSONDetails,

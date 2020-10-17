@@ -1,24 +1,62 @@
-const path = require('path')
-const log = require('debug')('bp:worker')
-const webpack = require('webpack')
-const MemoryFS = require('memory-fs')
-const isValidNPMName = require('is-valid-npm-name')
-const { gzipSync } = require('zlib')
-const fs = require('fs')
+import path from 'path'
 
-const getDependencySizes = require('../getDependencySizeTree')
-const getParseTime = require('../getParseTime')
-const makeWebpackConfig = require('../webpack.config')
-const CustomError = require('../CustomError')
+const log = require('debug')('bp:worker')
+import webpack, { Entry } from 'webpack'
+import MemoryFS from 'memory-fs'
+import isValidNPMName from 'is-valid-npm-name'
+import { gzipSync } from 'zlib'
+import fs from 'fs'
+import getDependencySizes from '../getDependencySizeTree'
+import getParseTime from '../getParseTime'
+import makeWebpackConfig from '../config/makeWebpackConfig'
+
+import {
+  BuildError,
+  CLIBuildError,
+  EntryPointError,
+  MissingDependencyError,
+  UnexpectedBuildError,
+} from '../errors/CustomError'
+import {
+  Externals,
+  WebpackError,
+  BuildPackageOptions,
+  CreateEntryPointOptions,
+} from '../common.types'
+
+type CompilePackageArgs = {
+  externals: Externals
+  entry: Entry
+  debug?: boolean
+}
+
+type CompilePackageReturn = {
+  stats: webpack.Stats
+  error: WebpackError
+  memoryFileSystem: MemoryFS
+}
+
+type BuildPackageArgs = {
+  name: string
+  installPath: string
+  externals: Externals
+  options: BuildPackageOptions
+}
+
+type WebpackStatsAsset = NonNullable<webpack.Stats.ToJsonOutput['assets']>[0]
 
 const BuildUtils = {
-  createEntryPoint(packageName, installPath, options) {
+  createEntryPoint(
+    packageName: string,
+    installPath: string,
+    options: CreateEntryPointOptions
+  ) {
     const entryPath = path.join(
       installPath,
       options.entryFilename || 'index.js'
     )
 
-    let importStatement
+    let importStatement: string
 
     if (options.esm) {
       if (options.customImports) {
@@ -46,24 +84,25 @@ const BuildUtils = {
       fs.writeFileSync(entryPath, importStatement, 'utf-8')
       return entryPath
     } catch (err) {
-      throw new CustomError('EntryPointError', err)
+      throw new EntryPointError(err)
     }
   },
 
-  compilePackage({ entry, externals, debug }) {
+  compilePackage({ entry, externals, debug }: CompilePackageArgs) {
     const compiler = webpack(makeWebpackConfig({ entry, externals, debug }))
     const memoryFileSystem = new MemoryFS()
     compiler.outputFileSystem = memoryFileSystem
 
-    return new Promise((resolve, reject) => {
+    return new Promise<CompilePackageReturn>(resolve => {
       compiler.run((err, stats) => {
+        const error = (err as unknown) as WebpackError // Webpack types incorrect
         // stats object can be empty if there are build errors
-        resolve({ stats, err, memoryFileSystem })
+        resolve({ stats, error, memoryFileSystem })
       })
     })
   },
 
-  _parseMissingModules(errors) {
+  _parseMissingModules(errors: Array<WebpackError>) {
     const missingModuleErrors = errors.filter(
       error => error.name === 'ModuleNotFoundError'
     )
@@ -77,13 +116,28 @@ const BuildUtils = {
 
     const missingModules = missingModuleErrors.map(err => {
       const matches = err.error.toString().match(missingModuleRegex)
-      const missingFilePath = matches[1]
 
-      if (missingFilePath.startsWith('@')) {
-        return missingFilePath.match(/@[^\/]+\/[^\/]+/)[0] // @babel/runtime/object/create -> @babel/runtime
-      } else {
-        return missingFilePath.match(/[^\/]+/)[0] // babel-runtime/object/create -> babel-runtime
+      if (!matches) {
+        throw new UnexpectedBuildError(
+          'Expected to find a file path in the module not found error, but found none. Regex for this might be out of date.'
+        )
       }
+
+      const missingFilePath = matches[1]
+      let packageNameMatch
+      if (missingFilePath.startsWith('@')) {
+        packageNameMatch = missingFilePath.match(/@[^\/]+\/[^\/]+/) // @babel/runtime/object/create -> @babel/runtime
+      } else {
+        packageNameMatch = missingFilePath.match(/[^\/]+/) // babel-runtime/object/create -> babel-runtime
+      }
+
+      if (!packageNameMatch) {
+        throw new UnexpectedBuildError(
+          'Failed to resolve the missing package name. Regex for this might be out of date.'
+        )
+      }
+
+      return packageNameMatch[0]
     })
 
     let uniqueMissingModules = Array.from(new Set(missingModules))
@@ -94,10 +148,16 @@ const BuildUtils = {
     return uniqueMissingModules
   },
 
-  async buildPackage({ name, installPath, externals, options }) {
-    let entry = {}
+  async buildPackage({
+    name,
+    installPath,
+    externals,
+    options,
+  }: BuildPackageArgs) {
+    let entry: Entry = {}
+
     if (options.splitCustomImports) {
-      if (!options.customImports.length) {
+      if (!options.customImports || !options.customImports.length) {
         return { assets: [] }
       }
       options.customImports.forEach(importt => {
@@ -115,41 +175,42 @@ const BuildUtils = {
     }
 
     log('build start %s', name)
-    const { stats, err, memoryFileSystem } = await BuildUtils.compilePackage({
+    const { stats, error, memoryFileSystem } = await BuildUtils.compilePackage({
       entry,
       externals,
-      debug: options.debug
+      debug: options.debug,
     })
 
     log('build end %s', name)
 
-    let jsonStats = stats
-      ? stats.toJson({
-          assets: true,
-          children: false,
-          chunks: false,
-          chunkGroups: false,
-          chunkModules: false,
-          chunkOrigins: false,
-          modules: true,
-          errorDetails: false,
-          entrypoints: false,
-          reasons: false,
-          maxModules: 500,
-          performance: false,
-          source: true,
-          depth: true,
-          providedExports: true,
-          warnings: false,
-          modulesSort: 'depth',
-        })
-      : {}
+    let jsonStats = stats.toJson({
+      assets: true,
+      children: false,
+      chunks: false,
+      chunkGroups: false,
+      chunkModules: false,
+      chunkOrigins: false,
+      modules: true,
+      errorDetails: false,
+      entrypoints: false,
+      reasons: false,
+      maxModules: 500,
+      performance: false,
+      source: true,
+      depth: true,
+      providedExports: true,
+      warnings: false,
+      modulesSort: 'depth',
+    })
 
-    if (err && err.details && !stats) {
-      throw new CustomError('BuildError', err.details, {
-        name: err.name,
-        message: err.error,
-      })
+    if (!jsonStats) {
+      throw new UnexpectedBuildError(
+        'Expected webpack json stats to be non-null, but was null'
+      )
+    }
+
+    if (error && !stats) {
+      throw new BuildError(error)
     } else if (stats.compilation.errors && stats.compilation.errors.length) {
       const missingModules = BuildUtils._parseMissingModules(
         stats.compilation.errors
@@ -157,13 +218,11 @@ const BuildUtils = {
 
       if (missingModules.length) {
         if (missingModules.length === 1 && missingModules[0] === name) {
-          throw new CustomError(
-            'EntryPointError',
+          throw new EntryPointError(
             stats.compilation.errors.map(err => err.toString())
           )
         } else {
-          throw new CustomError(
-            'MissingDependencyError',
+          throw new MissingDependencyError(
             stats.compilation.errors.map(err => err.toString()),
             { missingModules }
           )
@@ -174,13 +233,17 @@ const BuildUtils = {
             error.includes("Unexpected character '#'")
           )
         ) {
-          throw new CustomError('CLIBuildError', jsonStats.errors)
+          throw new CLIBuildError(jsonStats.errors)
         } else {
-          throw new CustomError('BuildError', jsonStats.errors)
+          throw new BuildError(jsonStats.errors)
         }
+      } else {
+        throw new UnexpectedBuildError(
+          'The webpack stats object was unexpectedly empty'
+        )
       }
     } else {
-      const getAssetStats = asset => {
+      const getAssetStats = (asset: WebpackStatsAsset) => {
         const bundle = path.join(process.cwd(), 'dist', asset.name)
         const bundleContents = memoryFileSystem.readFileSync(bundle)
         let parseTimes = null
@@ -189,9 +252,18 @@ const BuildUtils = {
         }
 
         const gzip = gzipSync(bundleContents, {}).length
-        const [fullName, entryName, extension] = asset.name.match(
-          /(.+?)\.bundle\.(.+)$/
-        )
+        const matches = asset.name.match(/(.+?)\.bundle\.(.+)$/)
+
+        if (!matches) {
+          throw new UnexpectedBuildError(
+            'Found an asset without the `.bundle` suffix. ' +
+              'A loader customization might be needed to recognize this asset type' +
+              asset.name
+          )
+        }
+
+        const [, entryName, extension] = matches
+
         return {
           name: entryName,
           type: extension,
@@ -201,27 +273,26 @@ const BuildUtils = {
         }
       }
 
-      const assetStats = jsonStats.assets
-        .filter(asset => !asset.chunkNames.includes('runtime'))
+      const assetStats = jsonStats?.assets
+        ?.filter(asset => !asset.chunkNames.includes('runtime'))
         .filter(asset => !asset.name.endsWith('LICENSE.txt'))
         .map(getAssetStats)
 
       log('build result %O', assetStats)
       return {
-        assets: assetStats,
+        assets: assetStats || [],
         ...(!options.customImports && {
-          dependencySizes: getDependencySizes(jsonStats),
+          dependencySizes: await getDependencySizes(jsonStats),
         }),
       }
     }
   },
-
   async buildPackageIgnoringMissingDeps({
     name,
     externals,
     installPath,
     options,
-  }) {
+  }: BuildPackageArgs) {
     try {
       return await BuildUtils.buildPackage({
         name,
@@ -231,9 +302,9 @@ const BuildUtils = {
       })
     } catch (e) {
       if (
-        e.name === 'MissingDependencyError' &&
-        e.extra.missingModules.length <= 6 &&
-        e.extra.missingModules.every(mod => isValidNPMName(mod) === true)
+        e instanceof MissingDependencyError &&
+        e.missingModules.length <= 6 &&
+        e.missingModules.every(mod => isValidNPMName(mod))
       ) {
         const { missingModules } = e.extra
         const newExternals = {
@@ -261,5 +332,4 @@ const BuildUtils = {
     }
   },
 }
-
-module.exports = BuildUtils
+export default BuildUtils

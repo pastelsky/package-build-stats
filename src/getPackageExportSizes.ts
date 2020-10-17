@@ -1,11 +1,16 @@
 const debug = require('debug')('bp:worker')
 
-const { getExternals, parsePackageString } = require('./utils/common.utils')
-const { getAllExports } = require('./utils/exports.utils')
-const InstallationUtils = require('./utils/installation.utils')
-const BuildUtils = require('./utils/build.utils')
+import { getExternals, parsePackageString } from './utils/common.utils'
+import { getAllExports } from './utils/exports.utils'
+import InstallationUtils from './utils/installation.utils'
+import BuildUtils from './utils/build.utils'
+import { InstallPackageOptions } from './common.types'
 
-async function installPackage(packageString, installPath, options) {
+async function installPackage(
+  packageString: string,
+  installPath: string,
+  options: InstallPackageOptions
+) {
   const { isLocal } = parsePackageString(packageString)
 
   await InstallationUtils.installPackage(packageString, installPath, {
@@ -16,31 +21,30 @@ async function installPackage(packageString, installPath, options) {
   })
 }
 
-async function getAllPackageExports(packageString, options = {}) {
-  const { name: packageName, isLocal, normalPath } = parsePackageString(
-    packageString
-  )
+async function getAllPackageExports(
+  packageString: string,
+  options: InstallPackageOptions = {}
+) {
+  const { name: packageName, normalPath } = parsePackageString(packageString)
   const installPath = await InstallationUtils.preparePath(packageName)
 
   try {
     await installPackage(packageString, installPath, options)
-    return await getAllExports(isLocal ? normalPath : installPath, packageName)
+    return await getAllExports(normalPath || installPath, packageName)
   } finally {
     await InstallationUtils.cleaupPath(installPath)
   }
 }
 
-async function getPackageExportSizes(packageString, options = {}) {
-  const { name: packageName, isLocal, normalPath } = parsePackageString(
-    packageString
-  )
+async function getPackageExportSizes(packageString: string, options = {}) {
+  const { name: packageName, normalPath } = parsePackageString(packageString)
   const installPath = await InstallationUtils.preparePath(packageName)
 
   try {
     await installPackage(packageString, installPath, options)
 
     const exportMap = await getAllExports(
-      isLocal ? normalPath : installPath,
+      normalPath || installPath,
       packageName
     )
 
