@@ -19,7 +19,7 @@
   "scripts": {
     "start": "ts-node --files index.js",
     "dev": "DEBUG=bp* ts-node-dev --files index.js",
-    "build": "tsc",
+    "build": "tsc && cp -r src/fixed build/fixed",
     "test": "jest",
     "test:ci": "yarn test --colors",
     "prettier": "prettier --write '**/*.{html,js,ts,json,css,scss,jsx,flow,md,yml,yaml}'",

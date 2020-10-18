@@ -1,4 +1,5 @@
-/*! jQuery v3.2.1 | (c) JS Foundation and other contributors | jquery.org/license */
+// @ts-nocheck
+// ! jQuery v3.2.1 | (c) JS Foundation and other contributors | jquery.org/license */
 !(function (a, b) {
   'use strict'
   'object' == typeof module && 'object' == typeof module.exports

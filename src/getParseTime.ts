@@ -1,9 +1,5 @@
 import fs from 'fs'
 import path from 'path'
-const baseScript = fs.readFileSync(
-  path.join(__dirname, './parseReference.js'),
-  'utf8'
-)
 
 import { VMScript } from 'vm2'
 import now from 'performance-now'
@@ -18,6 +14,11 @@ function getParseTime(currentScript: string, trialCount = 5) {
 
   let currentCounter = 0
   let currentResults = []
+
+  const baseScript = fs.readFileSync(
+    path.join(__dirname, 'fixed', 'parseReference.js'),
+    'utf8'
+  )
 
   try {
     while (baseCounter++ < trialCount) {
