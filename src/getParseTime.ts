@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 const baseScript = fs.readFileSync(
-  path.join(__dirname, '../fixtures/base.js'),
+  path.join(__dirname, './parseReference.js'),
   'utf8'
 )
 
