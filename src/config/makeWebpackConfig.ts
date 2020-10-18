@@ -115,7 +115,7 @@ export default function makeWebpackConfig({
       rules: [
         {
           test: /\.css$/,
-          use: [MiniCssExtractPlugin.loader, 'css-loader'],
+          use: [MiniCssExtractPlugin.loader, require.resolve('css-loader')],
         },
         // see https://github.com/apollographql/react-apollo/issues/1737
         {
@@ -125,12 +125,12 @@ export default function makeWebpackConfig({
         },
         {
           test: /\.js$/,
-          use: ['shebang-loader'], // support CLI tools that start with a #!/usr/bin/node
+          use: [require.resolve('shebang-loader')], // support CLI tools that start with a #!/usr/bin/node
         },
         {
           test: /\.(html|svelte)$/,
           use: {
-            loader: 'svelte-loader',
+            loader: require.resolve('svelte-loader'),
             options: {
               emitCss: true,
             },
@@ -138,15 +138,15 @@ export default function makeWebpackConfig({
         },
         {
           test: /\.vue$/,
-          loader: 'vue-loader',
+          loader: require.resolve('vue-loader'),
         },
         {
           test: /\.(scss|sass)$/,
           loader: [
             MiniCssExtractPlugin.loader,
-            'css-loader',
+            require.resolve('css-loader'),
             {
-              loader: 'postcss-loader',
+              loader: require.resolve('postcss-loader'),
               options: {
                 plugins: () => [
                   autoprefixer({
@@ -161,12 +161,12 @@ export default function makeWebpackConfig({
                 ],
               },
             },
-            'sass-loader',
+            require.resolve('sass-loader'),
           ],
         },
         {
           test: /\.(woff|woff2|eot|ttf|svg|png|jpeg|jpg|gif|webp)$/,
-          loader: 'file-loader',
+          loader: require.resolve('file-loader'),
           options: {
             name: '[name].bundle.[ext]',
             emitFile: true,

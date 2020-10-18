@@ -5,7 +5,7 @@ This is the function that powers the core of building, minifying and gzipping of
 ## Usage
 
 ```js
-const { getBuiltPackageStats } = require('package-build-stats')
+const { getPackageStats } = require('package-build-stats')
 ```
 
 #### Building packages from npm
@@ -13,19 +13,19 @@ const { getBuiltPackageStats } = require('package-build-stats')
 ##### Building the latest stable version
 
 ```js
-const results = await getBuiltPackageStats('moment')
+const results = await getPackageStats('moment')
 ```
 
 ##### Building a specific version / tag
 
 ```js
-const results = await getBuiltPackageStats('moment@2.24.0')
+const results = await getPackageStats('moment@2.24.0')
 ```
 
 ##### Building local packages (beta)
 
 ```js
-const results = await getBuiltPackageStats('~/dev/my-npm-package') // must have a package.json
+const results = await getPackageStats('~/dev/my-npm-package') // must have a package.json
 ```
 
 #### Passing options to the build

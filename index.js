@@ -2,11 +2,11 @@ const server = require('server')
 const { get } = server.router
 const { json, status } = server.reply
 
-const getBuiltPackageStats = require('./src/getPackageStats')
 const {
+  getPackageStats,
   getPackageExportSizes,
   getAllPackageExports,
-} = require('./src/getPackageExportSizes')
+} = require('./src')
 
 const PORT = 3000
 console.log(`Starting at port ${PORT}`)
@@ -16,7 +16,7 @@ server({ port: PORT }, [
     const packageString = decodeURIComponent(ctx.query.p)
 
     try {
-      const result = await getBuiltPackageStats(packageString, {
+      const result = await getPackageStats(packageString, {
         debug: !!ctx.query.debug,
       })
       return json(result)
