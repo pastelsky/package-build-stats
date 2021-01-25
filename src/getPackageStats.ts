@@ -66,10 +66,11 @@ export default async function getPackageStats(
       }),
     ])
 
-    const hasCSSAsset = builtDetails.assets.some(asset => asset.type === 'css')
+    const hasJSAsset = builtDetails.assets.some(asset => asset.type === 'js')
+
     const mainAsset = builtDetails.assets.find(
       asset =>
-        asset.name === 'main' && asset.type === (hasCSSAsset ? 'css' : 'js')
+        asset.name === 'main' && asset.type === (hasJSAsset ? 'js' : 'css')
     )
 
     if (!mainAsset) {
