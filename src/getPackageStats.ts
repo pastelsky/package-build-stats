@@ -27,6 +27,7 @@ function getPackageJSONDetails(packageName: string, installPath: string) {
           : 0,
       hasJSNext: parsedJSON['jsnext:main'] || false,
       hasJSModule: parsedJSON['module'] || false,
+      isModuleType: parsedJSON['type'] === 'module',
       hasSideEffects:
         'sideEffects' in parsedJSON ? parsedJSON['sideEffects'] : true,
       peerDependencies:
