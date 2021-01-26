@@ -173,6 +173,35 @@ export default function makeWebpackConfig({
           ],
         },
         {
+          test: /\.less$/,
+          loader: [
+            MiniCssExtractPlugin.loader,
+            require.resolve('css-loader'),
+            {
+              loader: require.resolve('postcss-loader'),
+              options: {
+                plugins: () => [
+                  autoprefixer({
+                    browsers: [
+                      'last 5 Chrome versions',
+                      'last 5 Firefox versions',
+                      'Safari >= 8',
+                      'Explorer >= 10',
+                      'edge >= 12',
+                    ],
+                  }),
+                ],
+              },
+            },
+            {
+              loader: require.resolve('less-loader'),
+              options: {
+                webpackImporter: true,
+              },
+            },
+          ],
+        },
+        {
           test: /\.(woff|woff2|eot|ttf|svg|png|jpeg|jpg|gif|webp)$/,
           loader: require.resolve('file-loader'),
           options: {
