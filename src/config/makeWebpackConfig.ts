@@ -14,6 +14,7 @@ import VueLoaderPlugin from 'vue-loader/lib/plugin'
 import { Externals } from '../common.types'
 
 type MakeWebpackConfigOptions = {
+  packageName: string
   externals: Externals
   debug?: boolean
   entry: string | string[] | Entry
@@ -24,6 +25,7 @@ type NodeBuiltIn = {
 }
 
 export default function makeWebpackConfig({
+  packageName,
   entry,
   externals,
   debug,
@@ -48,6 +50,12 @@ export default function makeWebpackConfig({
   builtInNode['console'] = false
   builtInNode['process'] = false
   builtInNode['Buffer'] = false
+
+  // Don't mark an import as built in if it is the name of the package itself
+  // eg. `events`
+  if (builtInNode[packageName]) {
+    builtInNode[packageName] = false
+  }
 
   // @ts-ignore
   // @ts-ignore

@@ -210,6 +210,7 @@ export function getExportsDetails(code: string) {
 }
 
 const webpackConfig = makeWebpackConfig({
+  packageName: '',
   entry: '',
   externals: { externalPackages: [], externalBuiltIns: [] },
 })

@@ -25,6 +25,7 @@ import {
 } from '../common.types'
 
 type CompilePackageArgs = {
+  name: string
   externals: Externals
   entry: Entry
   debug?: boolean
@@ -88,8 +89,10 @@ const BuildUtils = {
     }
   },
 
-  compilePackage({ entry, externals, debug }: CompilePackageArgs) {
-    const compiler = webpack(makeWebpackConfig({ entry, externals, debug }))
+  compilePackage({ name, entry, externals, debug }: CompilePackageArgs) {
+    const compiler = webpack(
+      makeWebpackConfig({ packageName: name, entry, externals, debug })
+    )
     const memoryFileSystem = new MemoryFS()
     compiler.outputFileSystem = memoryFileSystem
 
@@ -176,6 +179,7 @@ const BuildUtils = {
 
     log('build start %s', name)
     const { stats, error, memoryFileSystem } = await BuildUtils.compilePackage({
+      name,
       entry,
       externals,
       debug: options.debug,

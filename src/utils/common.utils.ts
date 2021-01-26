@@ -35,9 +35,10 @@ export function getExternals(packageName: string, installPath: string) {
   const peerDependencies = Object.keys(packageJSON.peerDependencies || {})
 
   // All packages with name same as a built-in node module, but
-  // haven't explicitly been added as an npm dependency are externals
+  // haven't explicitly been added as an npm dependency or aren't the package itself
+  // are externals
   const builtInExternals = builtInModules.filter(
-    mod => !dependencies.includes(mod)
+    mod => !dependencies.includes(mod) && mod !== packageName
   )
   return {
     externalPackages: peerDependencies,
