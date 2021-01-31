@@ -5244,73 +5244,75 @@
         })
       },
     }),
-    r.each({ scrollLeft: 'pageXOffset', scrollTop: 'pageYOffset' }, function (
-      a,
-      b
-    ) {
-      var c = 'pageYOffset' === b
-      r.fn[a] = function (d) {
-        return T(
-          this,
-          function (a, d, e) {
-            var f
-            return (
-              r.isWindow(a) ? (f = a) : 9 === a.nodeType && (f = a.defaultView),
-              void 0 === e
-                ? f
-                  ? f[b]
-                  : a[d]
-                : void (f
-                    ? f.scrollTo(c ? f.pageXOffset : e, c ? e : f.pageYOffset)
-                    : (a[d] = e))
-            )
-          },
-          a,
-          d,
-          arguments.length
-        )
+    r.each(
+      { scrollLeft: 'pageXOffset', scrollTop: 'pageYOffset' },
+      function (a, b) {
+        var c = 'pageYOffset' === b
+        r.fn[a] = function (d) {
+          return T(
+            this,
+            function (a, d, e) {
+              var f
+              return (
+                r.isWindow(a)
+                  ? (f = a)
+                  : 9 === a.nodeType && (f = a.defaultView),
+                void 0 === e
+                  ? f
+                    ? f[b]
+                    : a[d]
+                  : void (f
+                      ? f.scrollTo(c ? f.pageXOffset : e, c ? e : f.pageYOffset)
+                      : (a[d] = e))
+              )
+            },
+            a,
+            d,
+            arguments.length
+          )
+        }
       }
-    }),
+    ),
     r.each(['top', 'left'], function (a, b) {
       r.cssHooks[b] = Pa(o.pixelPosition, function (a, c) {
         if (c) return (c = Oa(a, b)), Ma.test(c) ? r(a).position()[b] + 'px' : c
       })
     }),
     r.each({ Height: 'height', Width: 'width' }, function (a, b) {
-      r.each({ padding: 'inner' + a, content: b, '': 'outer' + a }, function (
-        c,
-        d
-      ) {
-        r.fn[d] = function (e, f) {
-          var g = arguments.length && (c || 'boolean' != typeof e),
-            h = c || (e === !0 || f === !0 ? 'margin' : 'border')
-          return T(
-            this,
-            function (b, c, e) {
-              var f
-              return r.isWindow(b)
-                ? 0 === d.indexOf('outer')
-                  ? b['inner' + a]
-                  : b.document.documentElement['client' + a]
-                : 9 === b.nodeType
-                ? ((f = b.documentElement),
-                  Math.max(
-                    b.body['scroll' + a],
-                    f['scroll' + a],
-                    b.body['offset' + a],
-                    f['offset' + a],
-                    f['client' + a]
-                  ))
-                : void 0 === e
-                ? r.css(b, c, h)
-                : r.style(b, c, e, h)
-            },
-            b,
-            g ? e : void 0,
-            g
-          )
+      r.each(
+        { padding: 'inner' + a, content: b, '': 'outer' + a },
+        function (c, d) {
+          r.fn[d] = function (e, f) {
+            var g = arguments.length && (c || 'boolean' != typeof e),
+              h = c || (e === !0 || f === !0 ? 'margin' : 'border')
+            return T(
+              this,
+              function (b, c, e) {
+                var f
+                return r.isWindow(b)
+                  ? 0 === d.indexOf('outer')
+                    ? b['inner' + a]
+                    : b.document.documentElement['client' + a]
+                  : 9 === b.nodeType
+                  ? ((f = b.documentElement),
+                    Math.max(
+                      b.body['scroll' + a],
+                      f['scroll' + a],
+                      b.body['offset' + a],
+                      f['offset' + a],
+                      f['client' + a]
+                    ))
+                  : void 0 === e
+                  ? r.css(b, c, h)
+                  : r.style(b, c, e, h)
+              },
+              b,
+              g ? e : void 0,
+              g
+            )
+          }
         }
-      })
+      )
     }),
     r.fn.extend({
       bind: function (a, b, c) {
