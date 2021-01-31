@@ -1,15 +1,14 @@
 import autoprefixer from 'autoprefixer'
-import TerserPlugin from 'terser-webpack-plugin'
+// import TerserPlugin from 'terser-webpack-plugin'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import CssoWebpackPlugin from 'csso-webpack-plugin'
-import WriteFilePlugin from 'write-file-webpack-plugin'
+// import WriteFilePlugin from 'write-file-webpack-plugin'
 
 const log = require('debug')('bp:webpack')
 import escapeRegex from 'escape-string-regexp'
-import builtinModules from 'builtin-modules'
+// import builtinModules from 'builtin-modules'
 import webpack, { Entry } from 'webpack'
-// @ts-ignore
-import VueLoaderPlugin from 'vue-loader/lib/plugin'
+import VueLoaderPlugin from 'vue-loader/dist/plugin'
 
 import { Externals } from '../common.types'
 
@@ -41,30 +40,29 @@ export default function makeWebpackConfig({
 
   log('external packages %o', externalsRegex)
 
-  const builtInNode: NodeBuiltIn = {}
-  builtinModules.forEach(mod => {
-    builtInNode[mod] = 'empty'
-  })
+  // const builtInNode: NodeBuiltIn = {}
+  // builtinModules.forEach(mod => {
+  //   builtInNode[mod] = false;
+  // })
 
-  builtInNode['setImmediate'] = false
-  builtInNode['console'] = false
-  builtInNode['process'] = false
-  builtInNode['Buffer'] = false
+  // builtInNode['setImmediate'] = false
+  // builtInNode['console'] = false
+  // builtInNode['process'] = false
+  // builtInNode['Buffer'] = false
 
   // Don't mark an import as built in if it is the name of the package itself
   // eg. `events`
-  if (builtInNode[packageName]) {
-    builtInNode[packageName] = false
-  }
+  // if (builtInNode[packageName]) {
+  //   builtInNode[packageName] = false
+  // }
 
-  // @ts-ignore
-  // @ts-ignore
   return {
     entry: entry,
     mode: 'production',
     // bail: true,
     optimization: {
-      namedChunks: true,
+      chunkIds: 'named',
+      // namedChunks: true,
       runtimeChunk: { name: 'runtime' },
       minimize: true,
       splitChunks: {
@@ -78,29 +76,29 @@ export default function makeWebpackConfig({
         },
       },
       minimizer: [
-        new TerserPlugin({
-          parallel: true,
-          terserOptions: {
-            ie8: false,
-            output: {
-              comments: false,
-            },
-          },
-        }),
+        // new TerserPlugin({
+        //   parallel: true,
+        //   terserOptions: {
+        //     ie8: false,
+        //     output: {
+        //       comments: false,
+        //     },
+        //   },
+        // }),
         // @ts-ignore: Appears that the library might have incorrect definitions
         new CssoWebpackPlugin({ restructure: false }),
       ],
     },
     plugins: [
-      new webpack.IgnorePlugin(/^electron$/),
+      new webpack.IgnorePlugin({ resourceRegExp: /^electron$/ }),
       new VueLoaderPlugin(),
       new MiniCssExtractPlugin({
         // Options similar to the same options in webpackOptions.output
         // both options are optional
         filename: '[name].bundle.css',
         chunkFilename: '[id].bundle.css',
-      }),
-      ...(debug ? [new WriteFilePlugin()] : []),
+      }) as any,
+      // ...(debug ? [new WriteFilePlugin()] : []),
     ],
     resolve: {
       modules: ['node_modules'],
@@ -138,7 +136,7 @@ export default function makeWebpackConfig({
         {
           test: /\.(html|svelte)$/,
           use: {
-            loader: require.resolve('svelte-loader'),
+            loader: 'svelte-loader',
             options: {
               emitCss: true,
             },
@@ -146,11 +144,11 @@ export default function makeWebpackConfig({
         },
         {
           test: /\.vue$/,
-          loader: require.resolve('vue-loader'),
+          use: 'vue-loader',
         },
         {
           test: /\.(scss|sass)$/,
-          loader: [
+          use: [
             MiniCssExtractPlugin.loader,
             require.resolve('css-loader'),
             {
@@ -174,7 +172,7 @@ export default function makeWebpackConfig({
         },
         {
           test: /\.less$/,
-          loader: [
+          use: [
             MiniCssExtractPlugin.loader,
             require.resolve('css-loader'),
             {
@@ -211,14 +209,14 @@ export default function makeWebpackConfig({
         },
       ],
     },
-    node: builtInNode,
+    node: false,
     output: {
       filename: 'bundle.js',
       pathinfo: false,
     },
-    externals: (context, request, callback) =>
-      isExternalRequest(request)
-        ? callback(null, 'commonjs ' + request)
+    externals: ({ context, request }, callback) =>
+      isExternalRequest(request!)
+        ? callback(undefined, 'commonjs ' + request)
         : callback(),
   }
 }

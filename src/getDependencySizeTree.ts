@@ -104,41 +104,50 @@ type StatsTree = {
   children: StatsChild[]
 }
 
-async function bundleSizeTree(stats: webpack.Stats.ToJsonOutput) {
+async function bundleSizeTree(stats: webpack.Stats) {
+  // const stats = statsObj.toJson();
   let statsTree: StatsTree = {
     packageName: '<root>',
     sources: [],
     children: [],
   }
 
-  if (!stats.modules) return []
+  if (!stats.compilation.modules) return []
 
   // extract source path for each module
   let modules: MakeModule[] = []
-  const makeModule = (mod: webpack.Stats.FnModules): MakeModule => {
+  const makeModule = (mod: webpack.Module): MakeModule => {
     // Uglifier cannot minify a json file, hence we need
     // to make it valid javascript syntax
-    const isJSON = mod.identifier.endsWith('.json')
-    const source = isJSON ? `$a$=${mod.source}` : mod.source
+    const isJSON = mod.identifier().endsWith('.json')
+    const rawSource = mod
+      .source(
+        stats.compilation.dependencyTemplates,
+        stats.compilation.runtimeTemplate
+      )
+      .source()
+      .toString()
+    const source = isJSON ? `$a$=${rawSource}` : rawSource
 
     return {
-      path: modulePath(mod.identifier),
+      path: modulePath(mod.identifier()),
       sources: [source || ''],
       source: source || '',
     }
   }
 
-  stats.modules
-    .filter(mod => !mod.name.startsWith('external'))
-    .forEach(mod => {
-      if (mod.modules) {
-        mod.modules.forEach(subMod => {
-          modules.push(makeModule(subMod))
-        })
-      } else {
-        modules.push(makeModule(mod))
-      }
-    })
+  for (const mod of stats.compilation.modules) {
+    if (mod.nameForCondition()?.startsWith('external')) {
+      continue
+    }
+    // if (mod.modules) {
+    //   mod.modules.forEach(subMod => {
+    //     modules.push(makeModule(subMod))
+    //   })
+    // } else {
+    modules.push(makeModule(mod))
+    // }
+  }
 
   modules.sort((a, b) => {
     if (a === b) {
