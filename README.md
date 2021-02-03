@@ -52,7 +52,7 @@ const results = await getBuiltPackageStats('moment', options)
 To start the server, run –
 
 ```bash
-yarn run start
+yarn dev
 ```
 
 The server runs at port `3000`.
