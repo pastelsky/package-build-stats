@@ -4,7 +4,7 @@ import { getExternals, parsePackageString } from './utils/common.utils'
 import { getAllExports } from './utils/exports.utils'
 import InstallationUtils from './utils/installation.utils'
 import BuildUtils from './utils/build.utils'
-import { InstallPackageOptions } from './common.types'
+import { GetPackageStatsOptions, InstallPackageOptions } from './common.types'
 
 async function installPackage(
   packageString: string,
@@ -38,7 +38,9 @@ export async function getAllPackageExports(
 
 export async function getPackageExportSizes(
   packageString: string,
-  options = {}
+  options: GetPackageStatsOptions = {
+    minifier: 'terser',
+  }
 ) {
   const { name: packageName, normalPath } = parsePackageString(packageString)
   const installPath = await InstallationUtils.preparePath(packageName)
@@ -63,6 +65,8 @@ export async function getPackageExportSizes(
       options: {
         customImports: exports,
         splitCustomImports: true,
+        includeDependencySizes: false,
+        minifier: options.minifier || 'terser',
       },
     })
 

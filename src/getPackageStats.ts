@@ -40,10 +40,22 @@ function getPackageJSONDetails(packageName: string, installPath: string) {
 
 export default async function getPackageStats(
   packageString: string,
-  options: GetPackageStatsOptions = {}
+  optionsRaw: GetPackageStatsOptions
 ) {
+  const startTime = performance.now()
+  const defaultMinifier: 'terser' = 'terser'
+
+  const options = {
+    minifier: defaultMinifier,
+    ...optionsRaw,
+  }
+
   const { name: packageName, isLocal } = parsePackageString(packageString)
   const installPath = await InstallationUtils.preparePath(packageName)
+
+  if (options.debug) {
+    console.log('Install path:', installPath)
+  }
 
   await InstallationUtils.installPackage(packageString, installPath, {
     isLocal,
@@ -63,6 +75,8 @@ export default async function getPackageStats(
         options: {
           debug: options.debug,
           customImports: options.customImports,
+          minifier: options.minifier,
+          includeDependencySizes: true,
         },
       }),
     ])
@@ -87,6 +101,8 @@ export default async function getPackageStats(
       parse: mainAsset.parse,
     }
   } finally {
-    await InstallationUtils.cleaupPath(installPath)
+    if (!options.debug) {
+      await InstallationUtils.cleaupPath(installPath)
+    }
   }
 }

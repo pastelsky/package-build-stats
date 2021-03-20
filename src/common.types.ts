@@ -1,3 +1,5 @@
+type Minifier = 'esbuild' | 'terser'
+
 type AllOptions = {
   customImports?: Array<string>
   splitCustomImports?: boolean
@@ -15,7 +17,10 @@ type AllOptions = {
 export type BuildPackageOptions = Pick<
   AllOptions,
   'customImports' | 'splitCustomImports' | 'debug' | 'calcParse'
->
+> & {
+  includeDependencySizes: boolean
+  minifier: Minifier
+}
 
 export type CreateEntryPointOptions = Pick<
   AllOptions,
@@ -37,7 +42,9 @@ export type GetPackageStatsOptions = Pick<
   | 'networkConcurrency'
   | 'debug'
   | 'customImports'
->
+> & {
+  minifier?: Minifier
+}
 
 export type Externals = {
   externalPackages: Array<string>

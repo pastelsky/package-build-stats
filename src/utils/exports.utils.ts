@@ -213,6 +213,7 @@ const webpackConfig = makeWebpackConfig({
   packageName: '',
   entry: '',
   externals: { externalPackages: [], externalBuiltIns: [] },
+  minifier: 'terser',
 })
 
 const resolver = enhancedResolve.create({
@@ -224,7 +225,7 @@ const resolver = enhancedResolve.create({
 
 const resolve = async (context: string, path: string): Promise<string> =>
   new Promise((resolve, reject) => {
-    resolver(context, path, (err, result: string) => {
+    resolver(context, path, (err: Error, result: string) => {
       if (err) {
         reject(err)
       } else {

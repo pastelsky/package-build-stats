@@ -43,13 +43,14 @@ const InstallationUtils = {
     packageString: string,
     installPath: string,
     {
-      client,
+      client = 'npm',
       limitConcurrency,
       networkConcurrency,
       additionalPackages = [],
       isLocal,
     }: InstallPackageOptions
   ) {
+    console.log('client is', client)
     let flags, command
 
     if (client === 'yarn') {
@@ -63,6 +64,8 @@ const InstallationUtils = {
         'silent',
         'no-lockfile',
         'no-bin-links',
+        'no-audit',
+        'no-fund',
         'ignore-optional',
       ]
       if (limitConcurrency) {
@@ -75,7 +78,8 @@ const InstallationUtils = {
       command = `yarn add ${packageString} ${additionalPackages.join(
         ' '
       )} --${flags.join(' --')}`
-    } else {
+    } else if (client === 'npm') {
+      console.log('using npm')
       flags = [
         // Setting cache is required for concurrent `npm install`s to work
         `cache=${path.join(config.tmp, 'cache')}`,
@@ -83,7 +87,6 @@ const InstallationUtils = {
         'no-shrinkwrap',
         'no-optional',
         'no-bin-links',
-        'prefer-offline',
         'progress false',
         'loglevel error',
         'ignore-scripts',
@@ -95,6 +98,15 @@ const InstallationUtils = {
       command = `npm install ${
         isLocal ? wrapPackCommand(packageString) : packageString
       } ${additionalPackages.join(' ')} --${flags.join(' --')}`
+    } else if (client === 'pnpm') {
+      flags = ['no-optional', 'loglevel error', 'ignore-scripts', 'save-exact']
+
+      command = `pnpm add ${packageString} ${additionalPackages.join(
+        ' '
+      )} --${[].join(' --')}`
+    } else {
+      console.error('No valid client specified')
+      process.exit(1)
     }
 
     debug('install start %s', packageString)

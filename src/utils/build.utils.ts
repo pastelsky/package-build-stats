@@ -9,6 +9,7 @@ import fs from 'fs'
 import getDependencySizes from '../getDependencySizeTree'
 import getParseTime from '../getParseTime'
 import makeWebpackConfig from '../config/makeWebpackConfig'
+import { performance } from 'perf_hooks'
 
 import {
   BuildError,
@@ -23,12 +24,14 @@ import {
   BuildPackageOptions,
   CreateEntryPointOptions,
 } from '../common.types'
+import Telemetry from './telemetry.utils'
 
 type CompilePackageArgs = {
   name: string
   externals: Externals
   entry: Entry
   debug?: boolean
+  minifier: 'terser' | 'esbuild'
 }
 
 type CompilePackageReturn = {
@@ -89,9 +92,22 @@ const BuildUtils = {
     }
   },
 
-  compilePackage({ name, entry, externals, debug }: CompilePackageArgs) {
+  compilePackage({
+    name,
+    entry,
+    externals,
+    debug,
+    minifier,
+  }: CompilePackageArgs) {
+    const startTime = performance.now()
     const compiler = webpack(
-      makeWebpackConfig({ packageName: name, entry, externals, debug })
+      makeWebpackConfig({
+        packageName: name,
+        entry,
+        externals,
+        debug,
+        minifier,
+      })
     )
     const memoryFileSystem = new MemoryFS()
     compiler.outputFileSystem = memoryFileSystem
@@ -100,7 +116,14 @@ const BuildUtils = {
       compiler.run((err, stats) => {
         const error = (err as unknown) as WebpackError // Webpack types incorrect
         // stats object can be empty if there are build errors
+        console.log(error)
         resolve({ stats, error, memoryFileSystem })
+
+        if (error) {
+          Telemetry.compilePackage(name, false, startTime, { minifier }, error)
+        } else {
+          Telemetry.compilePackage(name, true, startTime, { minifier })
+        }
       })
     })
   },
@@ -183,10 +206,12 @@ const BuildUtils = {
       entry,
       externals,
       debug: options.debug,
+      minifier: options.minifier,
     })
 
     log('build end %s', name)
 
+    const jsonStatsStartTime = performance.now()
     let jsonStats = stats.toJson({
       assets: true,
       children: false,
@@ -208,9 +233,12 @@ const BuildUtils = {
     })
 
     if (!jsonStats) {
+      Telemetry.parseWebpackStats(name, false, jsonStatsStartTime)
       throw new UnexpectedBuildError(
         'Expected webpack json stats to be non-null, but was null'
       )
+    } else {
+      Telemetry.parseWebpackStats(name, true, jsonStatsStartTime)
     }
 
     if (error && !stats) {
@@ -277,16 +305,23 @@ const BuildUtils = {
         }
       }
 
+      const assetsGzipStartTime = performance.now()
       const assetStats = jsonStats?.assets
         ?.filter(asset => !asset.chunkNames.includes('runtime'))
         .filter(asset => !asset.name.endsWith('LICENSE.txt'))
         .map(getAssetStats)
+      Telemetry.assetsGZIPParseTime(name, assetsGzipStartTime)
 
       log('build result %O', assetStats)
+
       return {
         assets: assetStats || [],
-        ...(!options.customImports && {
-          dependencySizes: await getDependencySizes(jsonStats),
+        ...(options.includeDependencySizes && {
+          dependencySizes: await getDependencySizes(
+            name,
+            jsonStats,
+            options.minifier
+          ),
         }),
       }
     }
@@ -297,14 +332,23 @@ const BuildUtils = {
     installPath,
     options,
   }: BuildPackageArgs) {
+    const buildStartTime = performance.now()
+    let buildIteration = 1
+
     try {
-      return await BuildUtils.buildPackage({
+      const buildResult = await BuildUtils.buildPackage({
         name,
         externals,
         installPath,
         options,
       })
+      Telemetry.buildPackage(name, true, buildStartTime, {
+        ...options,
+        buildIteration,
+      })
+      return buildResult
     } catch (e) {
+      buildIteration++
       if (
         e instanceof MissingDependencyError &&
         e.missingModules.length <= 6 &&
@@ -326,11 +370,28 @@ const BuildUtils = {
           installPath,
           options,
         })
+
+        Telemetry.buildPackage(name, true, buildStartTime, {
+          ...options,
+          buildIteration,
+          missingModules,
+        })
+
         return {
           ignoredMissingDependencies: missingModules,
           ...rebuiltResult,
         }
       } else {
+        Telemetry.buildPackage(
+          name,
+          false,
+          buildStartTime,
+          {
+            ...options,
+            buildIteration,
+          },
+          e
+        )
         throw e
       }
     }

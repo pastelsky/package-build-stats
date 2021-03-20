@@ -8,6 +8,7 @@ const log = require('debug')('bp:webpack')
 import escapeRegex from 'escape-string-regexp'
 import builtinModules from 'builtin-modules'
 import webpack, { Entry } from 'webpack'
+import { ESBuildMinifyPlugin } from 'esbuild-loader'
 // @ts-ignore
 import VueLoaderPlugin from 'vue-loader/lib/plugin'
 
@@ -18,6 +19,7 @@ type MakeWebpackConfigOptions = {
   externals: Externals
   debug?: boolean
   entry: string | string[] | Entry
+  minifier: 'esbuild' | 'terser'
 }
 
 type NodeBuiltIn = {
@@ -29,6 +31,7 @@ export default function makeWebpackConfig({
   entry,
   externals,
   debug,
+  minifier,
 }: MakeWebpackConfigOptions): webpack.Configuration {
   const externalsRegex = makeExternalsRegex(externals.externalPackages)
   const isExternalRequest = (request: string) => {
@@ -59,6 +62,7 @@ export default function makeWebpackConfig({
 
   // @ts-ignore
   // @ts-ignore
+  // @ts-ignore
   return {
     entry: entry,
     mode: 'production',
@@ -77,17 +81,25 @@ export default function makeWebpackConfig({
           },
         },
       },
+      // @ts-ignore: Appears that the library CssoWebpackPlugin might have incorrect definitions
       minimizer: [
-        new TerserPlugin({
-          parallel: true,
-          terserOptions: {
-            ie8: false,
-            output: {
-              comments: false,
-            },
-          },
-        }),
-        // @ts-ignore: Appears that the library might have incorrect definitions
+        ...(minifier === 'terser'
+          ? [
+              new TerserPlugin({
+                parallel: true,
+                terserOptions: {
+                  ie8: false,
+                  output: {
+                    comments: false,
+                  },
+                },
+              }),
+            ]
+          : [
+              new ESBuildMinifyPlugin({
+                target: 'esnext',
+              }),
+            ]),
         new CssoWebpackPlugin({ restructure: false }),
       ],
     },
@@ -104,7 +116,6 @@ export default function makeWebpackConfig({
     ],
     resolve: {
       modules: ['node_modules'],
-      symlinks: false,
       cacheWithContext: false,
       extensions: [
         '.web.mjs',
@@ -133,8 +144,24 @@ export default function makeWebpackConfig({
         },
         {
           test: /\.js$/,
-          use: [require.resolve('shebang-loader')], // support CLI tools that start with a #!/usr/bin/node
+          loader: [
+            // support CLI tools that start with a #!/usr/bin/node
+            require.resolve('shebang-loader'),
+            // ESBuild Minifier doesn't auto-remove license comments from code
+            // So, we break ESBuild's heuristic for license comments match. See github.com/privatenumber/esbuild-loader/issues/87
+            {
+              loader: 'string-replace-loader',
+              options: {
+                multiple: [
+                  { search: '@license', replace: '@silence' },
+                  { search: /\/\/!/g, replace: '//' },
+                  { search: /\/\*!/g, replace: '/*' },
+                ],
+              },
+            },
+          ],
         },
+
         {
           test: /\.(html|svelte)$/,
           use: {

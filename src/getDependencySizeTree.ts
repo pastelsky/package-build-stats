@@ -1,6 +1,7 @@
 import webpack from 'webpack'
 import path from 'path'
 import Terser from 'terser'
+import * as esbuild from 'esbuild'
 import { MinifyError } from './errors/CustomError'
 
 /**
@@ -40,49 +41,64 @@ function getByteLen(normal_val: string) {
   return byteLen
 }
 
-function minifyDependencyCode(source: string) {
-  return Terser.minify(source, {
-    mangle: false,
-    compress: {
-      arrows: true,
-      booleans: true,
-      collapse_vars: true,
-      comparisons: true,
-      conditionals: true,
-      dead_code: true,
-      drop_console: false,
-      drop_debugger: true,
-      ecma: 5,
-      evaluate: true,
-      expression: false,
-      global_defs: {},
-      hoist_vars: false,
-      ie8: false,
-      if_return: true,
-      inline: true,
-      join_vars: true,
-      keep_fargs: true,
-      keep_fnames: false,
-      keep_infinity: false,
-      loops: true,
-      negate_iife: true,
-      passes: 1,
-      properties: true,
-      pure_getters: 'strict',
-      reduce_vars: true,
-      sequences: true,
-      side_effects: true,
-      switches: true,
-      top_retain: null,
-      toplevel: false,
-      typeofs: true,
-      unsafe: false,
-      unused: true,
-    },
-    output: {
-      comments: false,
-    },
-  })
+async function minifyDependencyCode(
+  source: string,
+  minifier: 'terser' | 'esbuild' = 'terser'
+) {
+  if (minifier === 'terser') {
+    return Terser.minify(source, {
+      mangle: false,
+      compress: {
+        arrows: true,
+        booleans: true,
+        collapse_vars: true,
+        comparisons: true,
+        conditionals: true,
+        dead_code: true,
+        drop_console: false,
+        drop_debugger: true,
+        ecma: 5,
+        evaluate: true,
+        expression: false,
+        global_defs: {},
+        hoist_vars: false,
+        ie8: false,
+        if_return: true,
+        inline: true,
+        join_vars: true,
+        keep_fargs: true,
+        keep_fnames: false,
+        keep_infinity: false,
+        loops: true,
+        negate_iife: true,
+        passes: 1,
+        properties: true,
+        pure_getters: 'strict',
+        reduce_vars: true,
+        sequences: true,
+        side_effects: true,
+        switches: true,
+        top_retain: null,
+        toplevel: false,
+        typeofs: true,
+        unsafe: false,
+        unused: true,
+      },
+      output: {
+        comments: false,
+      },
+    })
+  } else {
+    return esbuild.transform(
+      // ESBuild Minifier doesn't auto-remove license comments from code
+      // So, we break ESBuild's heuristic for license comments match. See github.com/privatenumber/esbuild-loader/issues/87
+      source
+        .replace(/@license/g, '@silence')
+        .replace(/\/\/!/g, '//')
+        .replace(/\/\*!/g, '//'),
+      { minify: true }
+    )
+  }
 }
 
 type MakeModule = {
@@ -104,7 +120,10 @@ type StatsTree = {
   children: StatsChild[]
 }
 
-async function bundleSizeTree(stats: webpack.Stats.ToJsonOutput) {
+async function bundleSizeTree(
+  stats: webpack.Stats.ToJsonOutput,
+  minifier: 'terser' | 'esbuild'
+) {
   let statsTree: StatsTree = {
     packageName: '<root>',
     sources: [],
@@ -149,8 +168,14 @@ async function bundleSizeTree(stats: webpack.Stats.ToJsonOutput) {
   })
 
   modules.forEach(mod => {
+    // pnpm will serve packages from a global symlink (.pnpm/package@verison/node_modules/package)
+    // needs to be stripped off
+    const pnpmPrefix =
+      '.pnpm\\' + path.sep + '.+\\' + path.sep + 'node_modules\\' + path.sep
     let packages = mod.path.split(
-      new RegExp('\\' + path.sep + 'node_modules\\' + path.sep)
+      new RegExp(
+        '\\' + path.sep + 'node_modules\\' + path.sep + `(?:${pnpmPrefix})?`
+      )
     )
 
     if (packages.length > 1) {
@@ -199,7 +224,11 @@ async function bundleSizeTree(stats: webpack.Stats.ToJsonOutput) {
     }))
     .filter(treeItem => treeItem.sources.length)
     .map(async treeItem => {
-      const sourceMinifiedPromises = treeItem.sources.map(minifyDependencyCode)
+      const sourceMinifiedPromises = treeItem.sources.map(async code => {
+        const start = Date.now()
+        const minified = await minifyDependencyCode(code, minifier)
+        return minified
+      })
 
       try {
         const sources = await Promise.all(sourceMinifiedPromises)
