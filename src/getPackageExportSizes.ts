@@ -68,7 +68,7 @@ export async function getPackageExportSizes(
 
     return {
       ...builtDetails,
-      assets: builtDetails.assets.map(asset => ({
+      assets: builtDetails.assets.map((asset: any) => ({
         ...asset,
         path: exportMap[asset.name],
       })),

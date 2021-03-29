@@ -1,7 +1,7 @@
 import path from 'path'
 
 const log = require('debug')('bp:worker')
-import webpack, { Entry } from 'webpack'
+import webpack, { Entry, StatsCompilation } from 'webpack'
 import MemoryFS from 'memory-fs'
 import isValidNPMName from 'is-valid-npm-name'
 import { gzipSync } from 'zlib'
@@ -9,6 +9,8 @@ import fs from 'fs'
 import getDependencySizes from '../getDependencySizeTree'
 import getParseTime from '../getParseTime'
 import makeWebpackConfig from '../config/makeWebpackConfig'
+
+type StatsAsset = NonNullable<StatsCompilation['assets']>[0];
 
 import {
   BuildError,
@@ -43,8 +45,6 @@ type BuildPackageArgs = {
   externals: Externals
   options: BuildPackageOptions
 }
-
-type WebpackStatsAsset = NonNullable<webpack.Stats.ToJsonOutput['assets']>[0]
 
 const BuildUtils = {
   createEntryPoint(
@@ -94,13 +94,13 @@ const BuildUtils = {
       makeWebpackConfig({ packageName: name, entry, externals, debug })
     )
     const memoryFileSystem = new MemoryFS()
-    compiler.outputFileSystem = memoryFileSystem
+    compiler.outputFileSystem = memoryFileSystem as any
 
     return new Promise<CompilePackageReturn>(resolve => {
       compiler.run((err, stats) => {
         const error = (err as unknown) as WebpackError // Webpack types incorrect
         // stats object can be empty if there are build errors
-        resolve({ stats, error, memoryFileSystem })
+        resolve({ stats: stats!, error, memoryFileSystem })
       })
     })
   },
@@ -164,11 +164,15 @@ const BuildUtils = {
         return { assets: [] }
       }
       options.customImports.forEach(importt => {
-        entry[importt] = BuildUtils.createEntryPoint(name, installPath, {
-          customImports: [importt],
-          entryFilename: importt,
-          esm: true,
-        })
+        ;(entry as any)[importt] = BuildUtils.createEntryPoint(
+          name,
+          installPath,
+          {
+            customImports: [importt],
+            entryFilename: importt,
+            esm: true,
+          }
+        )
       })
     } else {
       entry['main'] = BuildUtils.createEntryPoint(name, installPath, {
@@ -198,7 +202,7 @@ const BuildUtils = {
       errorDetails: false,
       entrypoints: false,
       reasons: false,
-      maxModules: 500,
+      modulesSpace: 500,
       performance: false,
       source: true,
       depth: true,
@@ -217,7 +221,7 @@ const BuildUtils = {
       throw new BuildError(error)
     } else if (stats.compilation.errors && stats.compilation.errors.length) {
       const missingModules = BuildUtils._parseMissingModules(
-        stats.compilation.errors
+        stats.compilation.errors as any
       )
 
       if (missingModules.length) {
@@ -233,7 +237,7 @@ const BuildUtils = {
         }
       } else if (jsonStats.errors && jsonStats.errors.length > 0) {
         if (
-          jsonStats.errors.some(error =>
+          jsonStats.errors.some((error: any) =>
             error.includes("Unexpected character '#'")
           )
         ) {
@@ -247,8 +251,8 @@ const BuildUtils = {
         )
       }
     } else {
-      const getAssetStats = (asset: WebpackStatsAsset) => {
-        const bundle = path.join(process.cwd(), 'dist', asset.name)
+      const getAssetStats = (asset: StatsAsset) => {
+        const bundle = path.join(process.cwd(), 'dist', (asset as any).name)
         const bundleContents = memoryFileSystem.readFileSync(bundle)
         let parseTimes = null
         if (options.calcParse) {
@@ -256,13 +260,13 @@ const BuildUtils = {
         }
 
         const gzip = gzipSync(bundleContents, {}).length
-        const matches = asset.name.match(/(.+?)\.bundle\.(.+)$/)
+        const matches = (asset as any).name.match(/(.+?)\.bundle\.(.+)$/)
 
         if (!matches) {
           throw new UnexpectedBuildError(
             'Found an asset without the `.bundle` suffix. ' +
               'A loader customization might be needed to recognize this asset type' +
-              asset.name
+              (asset as any).name
           )
         }
 
@@ -278,8 +282,8 @@ const BuildUtils = {
       }
 
       const assetStats = jsonStats?.assets
-        ?.filter(asset => !asset.chunkNames.includes('runtime'))
-        .filter(asset => !asset.name.endsWith('LICENSE.txt'))
+        ?.filter((asset: any) => !asset.chunkNames.includes('runtime'))
+        .filter((asset: any) => !asset.name.endsWith('LICENSE.txt'))
         .map(getAssetStats)
 
       log('build result %O', assetStats)
