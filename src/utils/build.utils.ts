@@ -1,7 +1,7 @@
 import path from 'path'
 
 const log = require('debug')('bp:worker')
-import webpack, { Entry } from 'webpack'
+import webpack, { Entry, StatsCompilation } from 'webpack'
 import MemoryFS from 'memory-fs'
 import isValidNPMName from 'is-valid-npm-name'
 import { gzipSync } from 'zlib'
@@ -9,6 +9,8 @@ import fs from 'fs'
 import getDependencySizes from '../getDependencySizeTree'
 import getParseTime from '../getParseTime'
 import makeWebpackConfig from '../config/makeWebpackConfig'
+
+type StatsAsset = NonNullable<StatsCompilation['assets']>[0];
 
 import {
   BuildError,
@@ -43,8 +45,6 @@ type BuildPackageArgs = {
   externals: Externals
   options: BuildPackageOptions
 }
-
-type WebpackStatsAsset = NonNullable<webpack.Stats['compilation']['assets']>[0]
 
 const BuildUtils = {
   createEntryPoint(
@@ -202,7 +202,7 @@ const BuildUtils = {
       errorDetails: false,
       entrypoints: false,
       reasons: false,
-      maxModules: 500,
+      modulesSpace: 500,
       performance: false,
       source: true,
       depth: true,
@@ -251,7 +251,7 @@ const BuildUtils = {
         )
       }
     } else {
-      const getAssetStats = (asset: WebpackStatsAsset) => {
+      const getAssetStats = (asset: StatsAsset) => {
         const bundle = path.join(process.cwd(), 'dist', (asset as any).name)
         const bundleContents = memoryFileSystem.readFileSync(bundle)
         let parseTimes = null

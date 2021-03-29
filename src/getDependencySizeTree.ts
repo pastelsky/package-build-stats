@@ -104,7 +104,7 @@ type StatsTree = {
   children: StatsChild[]
 }
 
-async function bundleSizeTree(stats: webpack.Stats) {
+async function bundleSizeTree(stats: webpack.StatsCompilation) {
   // const stats = statsObj.toJson();
   let statsTree: StatsTree = {
     packageName: '<root>',

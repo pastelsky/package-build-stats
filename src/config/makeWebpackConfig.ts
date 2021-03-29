@@ -1,12 +1,9 @@
 import autoprefixer from 'autoprefixer'
-// import TerserPlugin from 'terser-webpack-plugin'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import CssoWebpackPlugin from 'csso-webpack-plugin'
-// import WriteFilePlugin from 'write-file-webpack-plugin'
 
 const log = require('debug')('bp:webpack')
 import escapeRegex from 'escape-string-regexp'
-// import builtinModules from 'builtin-modules'
 import webpack, { Entry } from 'webpack'
 import VueLoaderPlugin from 'vue-loader/dist/plugin'
 
@@ -40,29 +37,12 @@ export default function makeWebpackConfig({
 
   log('external packages %o', externalsRegex)
 
-  // const builtInNode: NodeBuiltIn = {}
-  // builtinModules.forEach(mod => {
-  //   builtInNode[mod] = false;
-  // })
-
-  // builtInNode['setImmediate'] = false
-  // builtInNode['console'] = false
-  // builtInNode['process'] = false
-  // builtInNode['Buffer'] = false
-
-  // Don't mark an import as built in if it is the name of the package itself
-  // eg. `events`
-  // if (builtInNode[packageName]) {
-  //   builtInNode[packageName] = false
-  // }
-
   return {
     entry: entry,
     mode: 'production',
     // bail: true,
     optimization: {
       chunkIds: 'named',
-      // namedChunks: true,
       runtimeChunk: { name: 'runtime' },
       minimize: true,
       splitChunks: {
@@ -76,15 +56,7 @@ export default function makeWebpackConfig({
         },
       },
       minimizer: [
-        // new TerserPlugin({
-        //   parallel: true,
-        //   terserOptions: {
-        //     ie8: false,
-        //     output: {
-        //       comments: false,
-        //     },
-        //   },
-        // }),
+        '...',
         // @ts-ignore: Appears that the library might have incorrect definitions
         new CssoWebpackPlugin({ restructure: false }),
       ],
@@ -97,8 +69,7 @@ export default function makeWebpackConfig({
         // both options are optional
         filename: '[name].bundle.css',
         chunkFilename: '[id].bundle.css',
-      }) as any,
-      // ...(debug ? [new WriteFilePlugin()] : []),
+      }),
     ],
     resolve: {
       modules: ['node_modules'],
@@ -134,6 +105,12 @@ export default function makeWebpackConfig({
           use: [require.resolve('shebang-loader')], // support CLI tools that start with a #!/usr/bin/node
         },
         {
+          test: /\.vue$/,
+          // NOTE: vue-loader has a side-effect here where it will also match
+          // *.vue.html, so it _must_ come before other .html loaders
+          use: 'vue-loader',
+        },
+        {
           test: /\.(html|svelte)$/,
           use: {
             loader: 'svelte-loader',
@@ -141,10 +118,6 @@ export default function makeWebpackConfig({
               emitCss: true,
             },
           },
-        },
-        {
-          test: /\.vue$/,
-          use: 'vue-loader',
         },
         {
           test: /\.(scss|sass)$/,
@@ -215,7 +188,7 @@ export default function makeWebpackConfig({
       pathinfo: false,
     },
     externals: ({ context, request }, callback) =>
-      isExternalRequest(request!)
+      request && isExternalRequest(request)
         ? callback(undefined, 'commonjs ' + request)
         : callback(),
   }
