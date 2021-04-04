@@ -35,7 +35,15 @@ const InstallationUtils = {
 
     await fs.writeFile(
       path.join(installPath, 'package.json'),
-      JSON.stringify({ dependencies: {} })
+      JSON.stringify({
+        dependencies: {},
+        browserslist: [
+          'last 5 Chrome versions',
+          'last 5 Firefox versions',
+          'Safari >= 9',
+          'edge >= 12',
+        ],
+      })
     )
 
     return installPath

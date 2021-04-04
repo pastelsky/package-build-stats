@@ -89,7 +89,7 @@ const UILibraries = [
   },
   {
     name: 'bulma@0.5.1',
-    size: 146 * 1024,
+    size: 125 * 1024,
   },
   {
     name: 'tachyons@4.8.1',
