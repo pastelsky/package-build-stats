@@ -124,7 +124,7 @@ jest.setTimeout(70000)
 describe('real world stats', () => {
   let testPackages = async (packages, done) => {
     const promises = packages.map(pack => async () => {
-      const res = await getPackageStats(pack.name, { minifier: 'esbuild' })
+      const res = await getPackageStats(pack.name)
       expect(res.size).toBeWithinDeltaOf(pack.size, pack.name)
     })
 
