@@ -42,7 +42,7 @@ const results = await getBuiltPackageStats('moment', options)
 | limitConcurrency   | `true` or `false` | `false` | When using `yarn` as the client, use the network mutex to limit concurrency                                                                                     |
 | networkConcurrency | `number`          | `false` | When using `yarn` as client, limit simultaneous installs to this number.                                                                                        |
 | customImports      | `Array<string>`   | `null`  | By default, the default export is used for calculating sizes. Setting this option allows calculation of package stats based on more granular top-level exports. |
-
+| minifier           |  `terser` or `esbuild` | `terser` | ESbuild is faster, albeit with marginally larger file sizes
 ## Contributing
 
 1. Clone this repo, run yarn install
@@ -52,7 +52,7 @@ const results = await getBuiltPackageStats('moment', options)
 To start the server, run –
 
 ```bash
-yarn run start
+yarn dev
 ```
 
 The server runs at port `3000`.
