@@ -183,17 +183,7 @@ export default function makeWebpackConfig({
             {
               loader: require.resolve('postcss-loader'),
               options: {
-                plugins: () => [
-                  autoprefixer({
-                    browsers: [
-                      'last 5 Chrome versions',
-                      'last 5 Firefox versions',
-                      'Safari >= 8',
-                      'Explorer >= 10',
-                      'edge >= 12',
-                    ],
-                  }),
-                ],
+                plugins: () => [autoprefixer()],
               },
             },
             require.resolve('sass-loader'),

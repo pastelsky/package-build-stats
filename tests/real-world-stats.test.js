@@ -89,7 +89,7 @@ const UILibraries = [
   },
   {
     name: 'bulma@0.5.1',
-    size: 146 * 1024,
+    size: 125 * 1024,
   },
   {
     name: 'tachyons@4.8.1',
@@ -124,7 +124,7 @@ jest.setTimeout(70000)
 describe('real world stats', () => {
   let testPackages = async (packages, done) => {
     const promises = packages.map(pack => async () => {
-      const res = await getPackageStats(pack.name, { minifier: 'esbuild' })
+      const res = await getPackageStats(pack.name)
       expect(res.size).toBeWithinDeltaOf(pack.size, pack.name)
     })
 

@@ -3,6 +3,8 @@ import path from 'path'
 import Terser from 'terser'
 import * as esbuild from 'esbuild'
 import { MinifyError } from './errors/CustomError'
+import Telemetry from './utils/telemetry.utils'
+import { performance } from 'perf_hooks'
 
 /**
  * A fork of `webpack-bundle-size-analyzer`.
@@ -121,9 +123,11 @@ type StatsTree = {
 }
 
 async function bundleSizeTree(
+  packageName: string,
   stats: webpack.Stats.ToJsonOutput,
   minifier: 'terser' | 'esbuild'
 ) {
+  let startTime = performance.now()
   let statsTree: StatsTree = {
     packageName: '<root>',
     sources: [],
@@ -249,7 +253,14 @@ async function bundleSizeTree(
       }
     })
 
-  return Promise.all(resultPromises)
+  try {
+    const results = await Promise.all(resultPromises)
+    Telemetry.dependencySizes(packageName, startTime, true, { minifier })
+    return results
+  } catch (e) {
+    Telemetry.dependencySizes(packageName, startTime, false, { minifier }, e)
+    throw e
+  }
 }
 
 export default bundleSizeTree

@@ -10,32 +10,42 @@ import InstallationUtils from './utils/installation.utils'
 import BuildUtils from './utils/build.utils'
 import { UnexpectedBuildError } from './errors/CustomError'
 import { GetPackageStatsOptions } from './common.types'
+import Telemetry from './utils/telemetry.utils'
+import { performance } from 'perf_hooks'
 
 function getPackageJSONDetails(packageName: string, installPath: string) {
+  const startTime = performance.now()
   const packageJSONPath = path.join(
     installPath,
     'node_modules',
     packageName,
     'package.json'
   )
-  return fs.readFile(packageJSONPath, 'utf8').then((contents: string) => {
-    const parsedJSON = JSON.parse(contents)
-    return {
-      dependencyCount:
-        'dependencies' in parsedJSON
-          ? Object.keys(parsedJSON.dependencies).length
-          : 0,
-      hasJSNext: parsedJSON['jsnext:main'] || false,
-      hasJSModule: parsedJSON['module'] || false,
-      isModuleType: parsedJSON['type'] === 'module',
-      hasSideEffects:
-        'sideEffects' in parsedJSON ? parsedJSON['sideEffects'] : true,
-      peerDependencies:
-        'peerDependencies' in parsedJSON
-          ? Object.keys(parsedJSON.peerDependencies)
-          : [],
+  return fs.readFile(packageJSONPath, 'utf8').then(
+    (contents: string) => {
+      const parsedJSON = JSON.parse(contents)
+      Telemetry.getPackageJSONDetails(packageName, true, startTime)
+
+      return {
+        dependencyCount:
+          'dependencies' in parsedJSON
+            ? Object.keys(parsedJSON.dependencies).length
+            : 0,
+        hasJSNext: parsedJSON['jsnext:main'] || false,
+        hasJSModule: parsedJSON['module'] || false,
+        isModuleType: parsedJSON['type'] === 'module',
+        hasSideEffects:
+          'sideEffects' in parsedJSON ? parsedJSON['sideEffects'] : true,
+        peerDependencies:
+          'peerDependencies' in parsedJSON
+            ? Object.keys(parsedJSON.peerDependencies)
+            : [],
+      }
+    },
+    err => {
+      Telemetry.getPackageJSONDetails(packageName, false, startTime, err)
     }
-  })
+  )
 }
 
 export default async function getPackageStats(
@@ -93,6 +103,12 @@ export default async function getPackageStats(
       )
     }
 
+    Telemetry.packageStats(
+      packageString,
+      true,
+      performance.now() - startTime,
+      options
+    )
     return {
       ...pacakgeJSONDetails,
       ...builtDetails,
@@ -100,6 +116,14 @@ export default async function getPackageStats(
       gzip: mainAsset.gzip,
       parse: mainAsset.parse,
     }
+  } catch (e) {
+    Telemetry.packageStats(
+      packageString,
+      false,
+      performance.now() - startTime,
+      options
+    )
+    throw e
   } finally {
     if (!options.debug) {
       await InstallationUtils.cleaupPath(installPath)

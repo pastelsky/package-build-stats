@@ -10,6 +10,8 @@ import {
   ObjectPattern,
   RestElement,
 } from '@babel/types'
+import Telemetry from './telemetry.utils'
+import { performance } from 'perf_hooks'
 
 const assertUnreachable = (x?: never): never => {
   throw new Error("Didn't expect to get here")
@@ -241,7 +243,12 @@ type ResolvedExports = {
  * Recursively get all exports starting
  * from a given path
  */
-export async function getAllExports(context: string, lookupPath: string) {
+export async function getAllExports(
+  packageString: string,
+  context: string,
+  lookupPath: string
+) {
+  const startTime = performance.now()
   const getAllExportsRecursive = async (ctx: string, lookPath: string) => {
     const resolvedPath = await resolve(ctx, lookPath)
 
@@ -270,5 +277,12 @@ export async function getAllExports(context: string, lookupPath: string) {
     return resolvedExports
   }
 
-  return await getAllExportsRecursive(context, lookupPath)
+  try {
+    const results = await getAllExportsRecursive(context, lookupPath)
+    Telemetry.walkPackageExportsTree(packageString, startTime, true)
+    return results
+  } catch (err) {
+    Telemetry.walkPackageExportsTree(packageString, startTime, false, err)
+    throw err
+  }
 }
