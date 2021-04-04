@@ -191,6 +191,7 @@ describe('aggregating modules', () => {
 describe('getAllExports', () => {
   it('resolved all kinds of paths properly and gives the right results', async () => {
     const exports = await getAllExports(
+      'some-package',
       path.join(__dirname, '../fixtures'),
       'resolve-test'
     )
