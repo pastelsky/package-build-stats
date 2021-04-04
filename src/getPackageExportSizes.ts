@@ -1,3 +1,6 @@
+import Telemetry from './utils/telemetry.utils'
+import { performance } from 'perf_hooks'
+
 const debug = require('debug')('bp:worker')
 
 import { getExternals, parsePackageString } from './utils/common.utils'
@@ -25,12 +28,22 @@ export async function getAllPackageExports(
   packageString: string,
   options: InstallPackageOptions = {}
 ) {
+  const startTime = performance.now()
   const { name: packageName, normalPath } = parsePackageString(packageString)
   const installPath = await InstallationUtils.preparePath(packageName)
 
   try {
     await installPackage(packageString, installPath, options)
-    return await getAllExports(normalPath || installPath, packageName)
+    const results = await getAllExports(
+      packageString,
+      normalPath || installPath,
+      packageName
+    )
+    Telemetry.packageExports(packageString, startTime, true)
+    return results
+  } catch (err) {
+    Telemetry.packageExports(packageString, startTime, false, err)
+    throw err
   } finally {
     await InstallationUtils.cleaupPath(installPath)
   }
@@ -42,6 +55,7 @@ export async function getPackageExportSizes(
     minifier: 'terser',
   }
 ) {
+  const startTime = performance.now()
   const { name: packageName, normalPath } = parsePackageString(packageString)
   const installPath = await InstallationUtils.preparePath(packageName)
 
@@ -49,6 +63,7 @@ export async function getPackageExportSizes(
     await installPackage(packageString, installPath, options)
 
     const exportMap = await getAllExports(
+      packageString,
       normalPath || installPath,
       packageName
     )
@@ -70,6 +85,7 @@ export async function getPackageExportSizes(
       },
     })
 
+    Telemetry.packageExportsSizes(packageString, startTime, true, options)
     return {
       ...builtDetails,
       assets: builtDetails.assets.map(asset => ({
@@ -77,6 +93,9 @@ export async function getPackageExportSizes(
         path: exportMap[asset.name],
       })),
     }
+  } catch (err) {
+    Telemetry.packageExportsSizes(packageString, startTime, false, options, err)
+    throw err
   } finally {
     await InstallationUtils.cleaupPath(installPath)
   }

@@ -3,6 +3,8 @@ import path from 'path'
 import builtInModules from 'builtin-modules'
 import fs from 'fs'
 import os from 'os'
+import { performance } from 'perf_hooks'
+import { Stats } from '../common.types'
 
 const homeDirectory = os.homedir()
 

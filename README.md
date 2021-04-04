@@ -43,40 +43,22 @@ const results = await getBuiltPackageStats('moment', options)
 | networkConcurrency | `number`          | `false` | When using `yarn` as client, limit simultaneous installs to this number.                                                                                        |
 | customImports      | `Array<string>`   | `null`  | By default, the default export is used for calculating sizes. Setting this option allows calculation of package stats based on more granular top-level exports. |
 | minifier           |  `terser` or `esbuild` | `terser` | ESbuild is faster, albeit with marginally larger file sizes
+
+## Listening to events
+`package-build-stats` emits various lifecycle events when building a package. 
+You can listen to these events by subscribing to the event emitter (based on [mitt](https://github.com/developit/mitt)).
+
+```js
+import { eventQueue } from 'package-build-stats';
+
+// Listen to all events
+eventQueue.on('*', callback)
+
+// Listen to specific events
+eventQueue.on('TASK_PACKAGE_BUILD', callback)
+```
+For a list of all events, see [this](src/utils/telemetry.utils.ts).
+
 ## Contributing
+See [contributing guide.](CONTRIBUTING.md)
 
-1. Clone this repo, run yarn install
-2. To make it easier to test changes when develop, you can start an HTTP server
-   that uses REST APIs to report size of packages.
-
-To start the server, run –
-
-```bash
-yarn dev
-```
-
-The server runs at port `3000`.
-
-To build a package and get its build stats, run a curl request like so -
-
-```bash
-curl 'localhost:3000/size?p=<package-name>'
-```
-
-eg.
-
-```bash
-curl 'localhost:3000/size?p=react'
-```
-
-To build a package and get stats about exports that are exposed out of the package –
-
-```bash
-curl 'localhost:3000/exports?p=<package-name>'
-```
-
-To build a package and get stats about size of various exports that are exposed out of the package –
-
-```bash
-curl 'localhost:3000/export-sizes?p=<package-name>'
-```

@@ -9,6 +9,8 @@ import { InstallError, PackageNotFoundError } from '../errors/CustomError'
 import { exec } from './common.utils'
 import config from '../config/config'
 import { InstallPackageOptions } from '../common.types'
+import Telemetry from './telemetry.utils'
+import { performance } from 'perf_hooks'
 
 // When operating on a local directory, force npm to copy directory structure
 // and all dependencies instead of just symlinking files
@@ -42,16 +44,18 @@ const InstallationUtils = {
   async installPackage(
     packageString: string,
     installPath: string,
-    {
+    installOptions: InstallPackageOptions
+  ) {
+    let flags, command
+    let installStartTime = performance.now()
+
+    const {
       client = 'npm',
       limitConcurrency,
       networkConcurrency,
       additionalPackages = [],
       isLocal,
-    }: InstallPackageOptions
-  ) {
-    console.log('client is', client)
-    let flags, command
+    } = installOptions
 
     if (client === 'yarn') {
       flags = [
@@ -79,7 +83,6 @@ const InstallationUtils = {
         ' '
       )} --${flags.join(' --')}`
     } else if (client === 'npm') {
-      console.log('using npm')
       flags = [
         // Setting cache is required for concurrent `npm install`s to work
         `cache=${path.join(config.tmp, 'cache')}`,
@@ -117,8 +120,20 @@ const InstallationUtils = {
         maxBuffer: 1024 * 500,
       })
       debug('install finish %s', packageString)
+      Telemetry.installPackage(
+        packageString,
+        true,
+        installStartTime,
+        installOptions
+      )
     } catch (err) {
       console.log(err)
+      Telemetry.installPackage(
+        packageString,
+        false,
+        installStartTime,
+        installOptions
+      )
       if (err.includes('code E404')) {
         throw new PackageNotFoundError(err)
       } else {
