@@ -116,10 +116,10 @@ const BuildUtils = {
       compiler.run((err, stats) => {
         const error = (err as unknown) as WebpackError // Webpack types incorrect
         // stats object can be empty if there are build errors
-        console.log(error)
         resolve({ stats, error, memoryFileSystem })
 
         if (error) {
+          console.error(error)
           Telemetry.compilePackage(name, false, startTime, { minifier }, error)
         } else {
           Telemetry.compilePackage(name, true, startTime, { minifier })
