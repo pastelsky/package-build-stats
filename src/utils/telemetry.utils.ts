@@ -1,6 +1,5 @@
 import mitt from 'mitt'
 import { parsePackageString } from './common.utils'
-import packageJSON from '../../package.json'
 import { performance } from 'perf_hooks'
 import _ from 'lodash'
 const debug = require('debug')('bp-telemetry')
@@ -11,10 +10,6 @@ export { emitter }
 emitter.on('*', (type, data) => {
   debug('Telementry Event: %s  %o', type, data)
 })
-
-const commonAttributes = {
-  packageBuildStatsVersion: packageJSON.version,
-}
 
 function errorToObject(error: any) {
   if (!error) return
@@ -47,7 +42,6 @@ export default class Telemetry {
       duration: performance.now() - startTime,
       options,
       error: errorToObject(error),
-      ...commonAttributes,
     })
   }
 
@@ -62,7 +56,6 @@ export default class Telemetry {
       isSuccessful,
       duration: performance.now() - startTime,
       error: errorToObject(error),
-      ...commonAttributes,
     })
   }
 
@@ -79,7 +72,6 @@ export default class Telemetry {
       duration: performance.now() - startTime,
       options: _.omit(options, 'customImports'),
       error: errorToObject(error),
-      ...commonAttributes,
     })
   }
 
@@ -96,7 +88,6 @@ export default class Telemetry {
       duration: performance.now() - startTime,
       options,
       error: errorToObject(error),
-      ...commonAttributes,
     })
   }
 
@@ -113,7 +104,6 @@ export default class Telemetry {
       duration: performance.now() - startTime,
       options,
       error: errorToObject(error),
-      ...commonAttributes,
     })
   }
 
@@ -128,7 +118,6 @@ export default class Telemetry {
       isSuccessful,
       duration: performance.now() - startTime,
       error: errorToObject(error),
-      ...commonAttributes,
     })
   }
 
@@ -144,7 +133,6 @@ export default class Telemetry {
       duration: performance.now() - startTime,
       options,
       error: errorToObject(error),
-      ...commonAttributes,
     })
   }
 
@@ -152,7 +140,6 @@ export default class Telemetry {
     emitter.emit('TASK_PACKAGE_ASSETS_GZIP_PARSE_TIME', {
       package: { name: packageName },
       duration: performance.now() - startTime,
-      ...commonAttributes,
     })
   }
 
@@ -166,7 +153,6 @@ export default class Telemetry {
       package: parsePackageString(packageString),
       duration: performance.now() - startTime,
       error: errorToObject(error),
-      ...commonAttributes,
     })
   }
 
@@ -180,7 +166,6 @@ export default class Telemetry {
       package: parsePackageString(packageString),
       duration: performance.now() - startTime,
       error: errorToObject(error),
-      ...commonAttributes,
     })
   }
 
@@ -196,7 +181,6 @@ export default class Telemetry {
       duration: performance.now() - startTime,
       error: errorToObject(error),
       options,
-      ...commonAttributes,
     })
   }
 }

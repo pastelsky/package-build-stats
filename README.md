@@ -36,20 +36,21 @@ const results = await getBuiltPackageStats('moment', options)
 
 ##### Options
 
-| Option             | Values            | Default | Description                                                                                                                                                     |
-| ------------------ | ----------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| client             | `npm` or `yarn`   | `npm`   | Which client to use to install package for building                                                                                                             |
-| limitConcurrency   | `true` or `false` | `false` | When using `yarn` as the client, use the network mutex to limit concurrency                                                                                     |
-| networkConcurrency | `number`          | `false` | When using `yarn` as client, limit simultaneous installs to this number.                                                                                        |
-| customImports      | `Array<string>`   | `null`  | By default, the default export is used for calculating sizes. Setting this option allows calculation of package stats based on more granular top-level exports. |
-| minifier           |  `terser` or `esbuild` | `terser` | ESbuild is faster, albeit with marginally larger file sizes
+| Option             | Values                | Default  | Description                                                                                                                                                     |
+| ------------------ | --------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| client             | `npm` or `yarn`       | `npm`    | Which client to use to install package for building                                                                                                             |
+| limitConcurrency   | `true` or `false`     | `false`  | When using `yarn` as the client, use the network mutex to limit concurrency                                                                                     |
+| networkConcurrency | `number`              | `false`  | When using `yarn` as client, limit simultaneous installs to this number.                                                                                        |
+| customImports      | `Array<string>`       | `null`   | By default, the default export is used for calculating sizes. Setting this option allows calculation of package stats based on more granular top-level exports. |
+| minifier           | `terser` or `esbuild` | `terser` | ESbuild is faster, albeit with marginally larger file sizes                                                                                                     |
 
 ## Listening to events
-`package-build-stats` emits various lifecycle events when building a package. 
+
+`package-build-stats` emits various lifecycle events when building a package.
 You can listen to these events by subscribing to the event emitter (based on [mitt](https://github.com/developit/mitt)).
 
 ```js
-import { eventQueue } from 'package-build-stats';
+import { eventQueue } from 'package-build-stats'
 
 // Listen to all events
 eventQueue.on('*', callback)
@@ -57,8 +58,9 @@ eventQueue.on('*', callback)
 // Listen to specific events
 eventQueue.on('TASK_PACKAGE_BUILD', callback)
 ```
+
 For a list of all events, see [this](src/utils/telemetry.utils.ts).
 
 ## Contributing
-See [contributing guide.](CONTRIBUTING.md)
 
+See [contributing guide.](CONTRIBUTING.md)
