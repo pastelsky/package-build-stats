@@ -150,7 +150,7 @@ export default function makeWebpackConfig({
             // ESBuild Minifier doesn't auto-remove license comments from code
             // So, we break ESBuild's heuristic for license comments match. See github.com/privatenumber/esbuild-loader/issues/87
             {
-              loader: 'string-replace-loader',
+              loader: require.resolve('string-replace-loader'),
               options: {
                 multiple: [
                   { search: '@license', replace: '@silence' },
