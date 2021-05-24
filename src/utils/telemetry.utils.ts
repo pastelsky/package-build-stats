@@ -131,6 +131,7 @@ export default class Telemetry {
     emitter.emit('TASK_PACKAGE_DEPENDENCY_SIZES', {
       package: { name: packageName },
       duration: performance.now() - startTime,
+      isSuccessful,
       options,
       error: errorToObject(error),
     })
@@ -151,6 +152,7 @@ export default class Telemetry {
   ) {
     emitter.emit('TASK_PACKAGE_EXPORTS_TREEWALK', {
       package: parsePackageString(packageString),
+      isSuccessful,
       duration: performance.now() - startTime,
       error: errorToObject(error),
     })
@@ -164,6 +166,7 @@ export default class Telemetry {
   ) {
     emitter.emit('TASK_PACKAGE_EXPORTS', {
       package: parsePackageString(packageString),
+      isSuccessful,
       duration: performance.now() - startTime,
       error: errorToObject(error),
     })
@@ -179,6 +182,7 @@ export default class Telemetry {
     emitter.emit('TASK_PACKAGE_EXPORTS_SIZES', {
       package: parsePackageString(packageString),
       duration: performance.now() - startTime,
+      isSuccessful,
       error: errorToObject(error),
       options,
     })
