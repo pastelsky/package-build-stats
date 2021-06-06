@@ -150,9 +150,13 @@ const InstallationUtils = {
     }
   },
 
-  async cleaupPath(installPath: string) {
+  async cleanupPath(installPath: string) {
     const noop = () => {}
+    try {
     await rimraf(installPath, noop)
+    } catch (err) {
+      console.error('cleaning up path ', installPath, ' failed due to ', err)
+    }
   },
 }
 

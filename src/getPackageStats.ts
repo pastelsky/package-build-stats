@@ -126,7 +126,7 @@ export default async function getPackageStats(
     throw e
   } finally {
     if (!options.debug) {
-      await InstallationUtils.cleaupPath(installPath)
+      await InstallationUtils.cleanupPath(installPath)
     }
   }
 }

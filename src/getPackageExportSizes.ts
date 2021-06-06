@@ -45,7 +45,7 @@ export async function getAllPackageExports(
     Telemetry.packageExports(packageString, startTime, false, err)
     throw err
   } finally {
-    await InstallationUtils.cleaupPath(installPath)
+    await InstallationUtils.cleanupPath(installPath)
   }
 }
 
@@ -97,6 +97,6 @@ export async function getPackageExportSizes(
     Telemetry.packageExportsSizes(packageString, startTime, false, options, err)
     throw err
   } finally {
-    await InstallationUtils.cleaupPath(installPath)
+    await InstallationUtils.cleanupPath(installPath)
   }
 }
