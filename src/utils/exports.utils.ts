@@ -251,9 +251,7 @@ export async function getAllExports(
 ) {
   const startTime = performance.now()
   const getAllExportsRecursive = async (ctx: string, lookPath: string) => {
-    console.log('resolving ...', ctx, lookPath)
     const resolvedPath = await resolve(ctx, lookPath)
-    console.log('resolved')
 
     const resolvedExports: ResolvedExports = {}
     const code = await fs.readFile(resolvedPath, 'utf8')

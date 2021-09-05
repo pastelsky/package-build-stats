@@ -13,10 +13,6 @@ import InstallationUtils from './utils/installation.utils'
 import BuildUtils from './utils/build.utils'
 import { GetPackageStatsOptions, InstallPackageOptions } from './common.types'
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms))
-}
-
 async function installPackage(
   packageString: string,
   installPath: string,
@@ -102,13 +98,9 @@ export async function getPackageExportSizes(
     const results = await Promise.all(promises)
     const allAssets = results.flatMap(result => result.assets)
 
-    console.log('result is', results[0])
-
     Telemetry.packageExportsSizes(packageString, startTime, true, options)
     return {
       buildVersion: require('../package.json').version,
-      // ...builtDetails1,
-      // ...builtDetails2,
       assets: allAssets.map(asset => ({
         ...asset,
         path: exportMap[asset.name],

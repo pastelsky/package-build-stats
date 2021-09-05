@@ -20,7 +20,11 @@ const wrapPackCommand = (packagePath: string) =>
 const InstallationUtils = {
   getInstallPath(packageName: string) {
     const id = shortId.generate().slice(0, 3)
-    return path.join(config.tmp, 'packages', sanitize(`build-${packageName}`))
+    return path.join(
+      config.tmp,
+      'packages',
+      sanitize(`build-${packageName}-${id}`)
+    )
   },
 
   async preparePath(packageName: string) {

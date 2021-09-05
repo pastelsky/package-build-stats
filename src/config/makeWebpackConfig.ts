@@ -60,10 +60,6 @@ export default function makeWebpackConfig({
     builtInNode[packageName] = false
   }
 
-  console.log('minifier is', minifier)
-
-  // @ts-ignore
-  // @ts-ignore
   // @ts-ignore
   return {
     entry: entry,
@@ -99,7 +95,7 @@ export default function makeWebpackConfig({
               }),
             ]
           : [
-              new ESBUildPlugin({
+              new ESBuildMinifyPlugin({
                 target: 'esnext',
               }),
             ]),
@@ -107,17 +103,7 @@ export default function makeWebpackConfig({
       ],
     },
     plugins: [
-      // new DuplicatePackageCheckerPlugin({
-      //   verbose: true,
-      //   showHelp: true,
-      //   // emitError: true,
-      //   strict: true,
-      // }),
       new webpack.IgnorePlugin({ resourceRegExp: /^electron$/ }),
-      // new BundleAnalyzerPlugin({
-      //   analyzerMode: 'static',
-      //   generateStatsFile: true,
-      // }),
       new VueLoaderPlugin(),
       new MiniCssExtractPlugin({
         // Options similar to the same options in webpackOptions.output
@@ -160,26 +146,6 @@ export default function makeWebpackConfig({
           test: /\.mjs$/,
           use: [],
         },
-        {
-          test: /\.js$/,
-          loader: [
-            // support CLI tools that start with a #!/usr/bin/node
-            require.resolve('shebang-loader'),
-            // ESBuild Minifier doesn't auto-remove license comments from code
-            // So, we break ESBuild's heuristic for license comments match. See github.com/privatenumber/esbuild-loader/issues/87
-            {
-              loader: require.resolve('string-replace-loader'),
-              options: {
-                multiple: [
-                  { search: '@license', replace: '@silence' },
-                  { search: /\/\/!/g, replace: '//' },
-                  { search: /\/\*!/g, replace: '/*' },
-                ],
-              },
-            },
-          ],
-        },
-
         {
           test: /\.vue$/,
           loader: require.resolve('vue-loader'),
@@ -254,7 +220,7 @@ export default function makeWebpackConfig({
         },
       ],
     },
-    node: {},
+    node: builtInNode,
     output: {
       filename: '[name].bundle.js',
       pathinfo: false,
