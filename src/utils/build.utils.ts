@@ -6,7 +6,6 @@ import memfs from 'memfs'
 import isValidNPMName from 'is-valid-npm-name'
 import { gzipSync } from 'zlib'
 import fs from 'fs'
-import * as inspectpack from 'inspectpack'
 import getDependencySizes from '../getDependencySizeTree'
 import getParseTime from '../getParseTime'
 import makeWebpackConfig from '../config/makeWebpackConfig'
@@ -120,7 +119,7 @@ const BuildUtils = {
 
     return new Promise<CompilePackageReturn>(resolve => {
       compiler.run((err, stats) => {
-        const error = (err as unknown) as WebpackError // Webpack types incorrect
+        const error = err as unknown as WebpackError // Webpack types incorrect
         // stats object can be empty if there are build errors
         resolve({ stats, error, memoryFileSystem })
 
@@ -181,45 +180,6 @@ const BuildUtils = {
     return uniqueMissingModules
   },
 
-  async _getDuplicates(stats, installPath: string) {
-    const instance = await inspectpack.actions('duplicates', { stats })
-    const dupeData = await instance.getData()
-    const getMainAsset = assets => {
-      const mainAsset = Object.entries(assets).find(([assetName, assetValue]) =>
-        assetName.startsWith('main.bundle')
-      )
-
-      if (!mainAsset) {
-        throw new UnexpectedBuildError(
-          'Expected to find the main bundle in stats object, could not in ' +
-            Object.keys(assets)
-        )
-      }
-
-      return mainAsset[1]
-    }
-
-    const mainAsset = getMainAsset(dupeData.assets)
-    console.log(JSON.stringify(mainAsset, null, 2))
-    return {
-      totalExtraCopies: dupeData.meta.extraFiles.num,
-      totalExtraBytes: dupeData.meta.extraSources.bytes,
-      duplicateModules: Object.entries(mainAsset.files).map(([file, value]) => {
-        return {
-          name: parsePackageNameFromPath(file),
-          extraBytes: value.meta.extraSources.bytes,
-          count: value.meta.extraFiles.num,
-          fileCopies: value.sources.flatMap(source =>
-            source.modules.map(module => ({
-              filename: cleanTmpPath(module.fileName, installPath),
-              packageVersion: getPackageVersionFromPath(module.fileName),
-            }))
-          ),
-        }
-      }),
-    }
-  },
-
   async buildPackage({
     name,
     installPath,
@@ -270,7 +230,6 @@ const BuildUtils = {
         'Expected webpack json stats to be non-null, but was null'
       )
     }
-    const a = {
     const jsonStatsStartTime = performance.now()
     let jsonStats = stats.toJson({
       assets: true,
@@ -283,7 +242,7 @@ const BuildUtils = {
       errorDetails: false,
       entrypoints: false,
       reasons: false,
-      // maxModules: 500,
+      maxModules: 500,
       performance: false,
       source: true,
       depth: true,
@@ -300,7 +259,6 @@ const BuildUtils = {
     } else {
       Telemetry.parseWebpackStats(name, true, jsonStatsStartTime)
     }
-    let jsonStats = stats.toJson(a)
     require('fs').writeFileSync('./stats-g.json', JSON.stringify(jsonStats))
 
     if (error && !stats) {
@@ -395,13 +353,6 @@ const BuildUtils = {
             options.minifier
           ),
         }),
-        // duplicateDependencies: console.log(
-        //   JSON.stringify(
-        //     await BuildUtils._getDuplicates(jsonStats, installPath),
-        //     null,
-        //     2
-        //   )
-        // ),
       }
     }
   },

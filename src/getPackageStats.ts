@@ -97,8 +97,6 @@ export default async function getPackageStats(
       }),
     ])
 
-    console.log('pacakgeJSONDetails is', pacakgeJSONDetails)
-
     const isStylePackageOnly =
       pacakgeJSONDetails.mainFields.length === 1 &&
       pacakgeJSONDetails.mainFields[0] === 'style'
