@@ -60,6 +60,8 @@ export default function makeWebpackConfig({
     builtInNode[packageName] = false
   }
 
+  console.log('minifier is', minifier)
+
   // @ts-ignore
   // @ts-ignore
   // @ts-ignore
@@ -67,8 +69,9 @@ export default function makeWebpackConfig({
     entry: entry,
     mode: 'production',
     // bail: true,
+    devtool: false,
     optimization: {
-      namedChunks: true,
+      chunkIds: 'named',
       runtimeChunk: { name: 'runtime' },
       minimize: true,
       splitChunks: {
@@ -96,7 +99,7 @@ export default function makeWebpackConfig({
               }),
             ]
           : [
-              new ESBuildMinifyPlugin({
+              new ESBUildPlugin({
                 target: 'esnext',
               }),
             ]),
@@ -104,7 +107,17 @@ export default function makeWebpackConfig({
       ],
     },
     plugins: [
-      new webpack.IgnorePlugin(/^electron$/),
+      // new DuplicatePackageCheckerPlugin({
+      //   verbose: true,
+      //   showHelp: true,
+      //   // emitError: true,
+      //   strict: true,
+      // }),
+      new webpack.IgnorePlugin({ resourceRegExp: /^electron$/ }),
+      // new BundleAnalyzerPlugin({
+      //   analyzerMode: 'static',
+      //   generateStatsFile: true,
+      // }),
       new VueLoaderPlugin(),
       new MiniCssExtractPlugin({
         // Options similar to the same options in webpackOptions.output
@@ -127,10 +140,15 @@ export default function makeWebpackConfig({
         '.css',
         '.sass',
         '.scss',
+        '.svelte',
       ],
+      alias: {
+        svelte: path.resolve('node_modules', 'svelte'),
+      },
       mainFields: ['browser', 'module', 'main', 'style'],
     },
     module: {
+      unsafeCache: true,
       rules: [
         {
           test: /\.css$/,
@@ -163,6 +181,10 @@ export default function makeWebpackConfig({
         },
 
         {
+          test: /\.vue$/,
+          loader: require.resolve('vue-loader'),
+        },
+        {
           test: /\.(html|svelte)$/,
           use: {
             loader: require.resolve('svelte-loader'),
@@ -172,12 +194,16 @@ export default function makeWebpackConfig({
           },
         },
         {
-          test: /\.vue$/,
-          loader: require.resolve('vue-loader'),
+          // required to prevent errors from Svelte on Webpack 5+, omit on Webpack 4
+          test: /node_modules\/svelte\/.*\.mjs$/,
+          resolve: {
+            fullySpecified: false,
+          },
         },
+
         {
           test: /\.(scss|sass)$/,
-          loader: [
+          use: [
             MiniCssExtractPlugin.loader,
             require.resolve('css-loader'),
             {
@@ -191,7 +217,7 @@ export default function makeWebpackConfig({
         },
         {
           test: /\.less$/,
-          loader: [
+          use: [
             MiniCssExtractPlugin.loader,
             require.resolve('css-loader'),
             {
@@ -228,14 +254,14 @@ export default function makeWebpackConfig({
         },
       ],
     },
-    node: builtInNode,
+    node: {},
     output: {
-      filename: 'bundle.js',
+      filename: '[name].bundle.js',
       pathinfo: false,
     },
-    externals: (context, request, callback) =>
-      isExternalRequest(request)
-        ? callback(null, 'commonjs ' + request)
+    externals: ({ context, request }, callback) =>
+      request && isExternalRequest(request)
+        ? callback(undefined, 'commonjs ' + request)
         : callback(),
   }
 }

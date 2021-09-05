@@ -31,6 +31,12 @@ function getPackageJSONDetails(packageName: string, installPath: string) {
           'dependencies' in parsedJSON
             ? Object.keys(parsedJSON.dependencies).length
             : 0,
+        mainFields: [
+          parsedJSON['module'] && 'module',
+          parsedJSON['jsnext:main'] && 'jsnext:main',
+          parsedJSON['main'] && 'main',
+          parsedJSON['style'] && 'style',
+        ].filter(Boolean),
         hasJSNext: parsedJSON['jsnext:main'] || false,
         hasJSModule: parsedJSON['module'] || false,
         isModuleType: parsedJSON['type'] === 'module',
@@ -91,10 +97,23 @@ export default async function getPackageStats(
       }),
     ])
 
+    console.log('pacakgeJSONDetails is', pacakgeJSONDetails)
+
+    const isStylePackageOnly =
+      pacakgeJSONDetails.mainFields.length === 1 &&
+      pacakgeJSONDetails.mainFields[0] === 'style'
+
+    if (isStylePackageOnly) {
+      builtDetails.assets = builtDetails.assets.filter(
+        asset => asset.type !== 'js'
+      )
+    }
+
     const hasCSSAsset = builtDetails.assets.some(asset => asset.type === 'css')
     const mainAsset = builtDetails.assets.find(
       asset =>
-        asset.name === 'main' && asset.type === (hasCSSAsset ? 'css' : 'js')
+        asset.name.startsWith('main') &&
+        asset.type === (hasCSSAsset ? 'css' : 'js')
     )
 
     if (!mainAsset) {
@@ -112,6 +131,7 @@ export default async function getPackageStats(
     return {
       ...pacakgeJSONDetails,
       ...builtDetails,
+      buildVersion: require('../package.json').version,
       size: mainAsset.size,
       gzip: mainAsset.gzip,
       parse: mainAsset.parse,
@@ -126,7 +146,7 @@ export default async function getPackageStats(
     throw e
   } finally {
     if (!options.debug) {
-      await InstallationUtils.cleanupPath(installPath)
+      // await InstallationUtils.cleanupPath(installPath)
     }
   }
 }

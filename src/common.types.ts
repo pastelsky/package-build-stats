@@ -50,11 +50,3 @@ export type Externals = {
   externalPackages: Array<string>
   externalBuiltIns: Array<string>
 }
-
-// This isn't exposed by webpack
-// but is used in their public interfaces
-export type WebpackError = {
-  name: 'ModuleNotFoundError'
-  details?: string
-  error: Error
-}
