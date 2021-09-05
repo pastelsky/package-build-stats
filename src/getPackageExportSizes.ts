@@ -1,6 +1,10 @@
 import Telemetry from './utils/telemetry.utils'
 import { performance } from 'perf_hooks'
+import pLimit from 'p-limit'
+import _ from 'lodash'
 
+const CONCURRENCY = 60
+const limit = pLimit(CONCURRENCY)
 const debug = require('debug')('bp:worker')
 
 import { getExternals, parsePackageString } from './utils/common.utils'
@@ -8,6 +12,10 @@ import { getAllExports } from './utils/exports.utils'
 import InstallationUtils from './utils/installation.utils'
 import BuildUtils from './utils/build.utils'
 import { GetPackageStatsOptions, InstallPackageOptions } from './common.types'
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
 
 async function installPackage(
   packageString: string,
@@ -59,7 +67,6 @@ export async function getPackageExportSizes(
   const startTime = performance.now()
   const { name: packageName, normalPath } = parsePackageString(packageString)
   const installPath = await InstallationUtils.preparePath(packageName)
-
   try {
     await installPackage(packageString, installPath, options)
 
@@ -74,22 +81,36 @@ export async function getPackageExportSizes(
 
     const externals = getExternals(packageName, installPath)
 
-    const builtDetails = await BuildUtils.buildPackageIgnoringMissingDeps({
-      name: packageName,
-      installPath,
-      externals,
-      options: {
-        customImports: exports,
-        splitCustomImports: true,
-        includeDependencySizes: false,
-        minifier: options.minifier || 'terser',
-      },
-    })
+    const exportsChunks = _.chunk(exports, 60)
+
+    const promises = exportsChunks.map(exportChunk =>
+      limit(() =>
+        BuildUtils.buildPackageIgnoringMissingDeps({
+          name: packageName,
+          installPath,
+          externals,
+          options: {
+            customImports: exportChunk,
+            splitCustomImports: true,
+            includeDependencySizes: false,
+            minifier: options.minifier || 'terser',
+            debug: options.debug,
+          },
+        })
+      )
+    )
+
+    const results = await Promise.all(promises)
+    const allAssets = results.flatMap(result => result.assets)
+
+    console.log('result is', results[0])
 
     Telemetry.packageExportsSizes(packageString, startTime, true, options)
     return {
-      ...builtDetails,
-      assets: builtDetails.assets.map(asset => ({
+      buildVersion: require('../package.json').version,
+      // ...builtDetails1,
+      // ...builtDetails2,
+      assets: allAssets.map(asset => ({
         ...asset,
         path: exportMap[asset.name],
       })),

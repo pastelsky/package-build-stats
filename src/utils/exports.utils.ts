@@ -223,6 +223,7 @@ const resolver = enhancedResolve.create({
   modules: webpackConfig?.resolve?.modules,
   // @ts-ignore Error due to unsynced types for enhanced resolve and webpack
   mainFields: webpackConfig?.resolve?.mainFields,
+  conditionNames: ['module', 'import', 'style', 'default'],
 })
 
 const resolve = async (context: string, path: string): Promise<string> =>
@@ -250,7 +251,9 @@ export async function getAllExports(
 ) {
   const startTime = performance.now()
   const getAllExportsRecursive = async (ctx: string, lookPath: string) => {
+    console.log('resolving ...', ctx, lookPath)
     const resolvedPath = await resolve(ctx, lookPath)
+    console.log('resolved')
 
     const resolvedExports: ResolvedExports = {}
     const code = await fs.readFile(resolvedPath, 'utf8')

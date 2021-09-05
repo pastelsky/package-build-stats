@@ -20,11 +20,7 @@ const wrapPackCommand = (packagePath: string) =>
 const InstallationUtils = {
   getInstallPath(packageName: string) {
     const id = shortId.generate().slice(0, 3)
-    return path.join(
-      config.tmp,
-      'packages',
-      sanitize(`build-${packageName}-${id}`)
-    )
+    return path.join(config.tmp, 'packages', sanitize(`build-${packageName}`))
   },
 
   async preparePath(packageName: string) {
@@ -111,7 +107,15 @@ const InstallationUtils = {
         isLocal ? wrapPackCommand(packageString) : packageString
       } ${additionalPackages.join(' ')} --${flags.join(' --')}`
     } else if (client === 'pnpm') {
-      flags = ['no-optional', 'loglevel error', 'ignore-scripts', 'save-exact']
+      console.log('CLIENT IS PNPM')
+      flags = [
+        'no-optional',
+        'loglevel error',
+        'ignore-scripts',
+        'save-exact',
+        'use-store-server',
+        'ignore-optional',
+      ]
 
       command = `pnpm add ${packageString} ${additionalPackages.join(
         ' '

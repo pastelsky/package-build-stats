@@ -1,4 +1,4 @@
-import webpack from 'webpack'
+import { StatsCompilation, Stats, Module, StatsModule } from 'webpack'
 import path from 'path'
 import Terser from 'terser'
 import * as esbuild from 'esbuild'
@@ -122,9 +122,11 @@ type StatsTree = {
   children: StatsChild[]
 }
 
+type StatsModule = NonNullable<Stats['compilation']['modules']>
+
 async function bundleSizeTree(
   packageName: string,
-  stats: webpack.Stats.ToJsonOutput,
+  stats: StatsCompilation,
   minifier: 'terser' | 'esbuild'
 ) {
   let startTime = performance.now()
@@ -138,10 +140,14 @@ async function bundleSizeTree(
 
   // extract source path for each module
   let modules: MakeModule[] = []
-  const makeModule = (mod: webpack.Stats.FnModules): MakeModule => {
+  const makeModule = (mod: Module): MakeModule => {
     // Uglifier cannot minify a json file, hence we need
     // to make it valid javascript syntax
     const isJSON = mod.identifier.endsWith('.json')
+    // const rawSource = mod
+    //   .source(stats.dependencyTemplates, stats.runtimeTemplate)
+    //   .source()
+    //   .toString()
     const source = isJSON ? `$a$=${mod.source}` : mod.source
 
     return {
@@ -151,16 +157,11 @@ async function bundleSizeTree(
     }
   }
 
-  stats.modules
-    .filter(mod => !mod.name.startsWith('external'))
+  ;[...stats.modules]
+    // TODO W5: check if name property works
+    .filter(mod => !mod.name?.startsWith('external'))
     .forEach(mod => {
-      if (mod.modules) {
-        mod.modules.forEach(subMod => {
-          modules.push(makeModule(subMod))
-        })
-      } else {
-        modules.push(makeModule(mod))
-      }
+      modules.push(makeModule(mod))
     })
 
   modules.sort((a, b) => {

@@ -1,11 +1,12 @@
 import path from 'path'
 
 const log = require('debug')('bp:worker')
-import webpack, { Entry } from 'webpack'
-import MemoryFS from 'memory-fs'
+import webpack, { Entry, WebpackError, Stats, StatsCompilation } from 'webpack'
+import memfs from 'memfs'
 import isValidNPMName from 'is-valid-npm-name'
 import { gzipSync } from 'zlib'
 import fs from 'fs'
+import * as inspectpack from 'inspectpack'
 import getDependencySizes from '../getDependencySizeTree'
 import getParseTime from '../getParseTime'
 import makeWebpackConfig from '../config/makeWebpackConfig'
@@ -20,11 +21,15 @@ import {
 } from '../errors/CustomError'
 import {
   Externals,
-  WebpackError,
   BuildPackageOptions,
   CreateEntryPointOptions,
 } from '../common.types'
 import Telemetry from './telemetry.utils'
+import {
+  cleanTmpPath,
+  getPackageVersionFromPath,
+  parsePackageNameFromPath,
+} from './common.utils'
 
 type CompilePackageArgs = {
   name: string
@@ -35,9 +40,9 @@ type CompilePackageArgs = {
 }
 
 type CompilePackageReturn = {
-  stats: webpack.Stats
+  stats: Stats | undefined
   error: WebpackError
-  memoryFileSystem: MemoryFS
+  memoryFileSystem: memfs.IFs
 }
 
 type BuildPackageArgs = {
@@ -47,7 +52,7 @@ type BuildPackageArgs = {
   options: BuildPackageOptions
 }
 
-type WebpackStatsAsset = NonNullable<webpack.Stats.ToJsonOutput['assets']>[0]
+type WebpackStatsAsset = NonNullable<StatsCompilation['assets']>[0]
 
 const BuildUtils = {
   createEntryPoint(
@@ -109,8 +114,9 @@ const BuildUtils = {
         minifier,
       })
     )
-    const memoryFileSystem = new MemoryFS()
-    compiler.outputFileSystem = memoryFileSystem
+
+    compiler.outputFileSystem = memfs.fs as any
+    compiler.intermediateFileSystem = memfs.fs as any
 
     return new Promise<CompilePackageReturn>(resolve => {
       compiler.run((err, stats) => {
@@ -141,7 +147,8 @@ const BuildUtils = {
     const missingModuleRegex = /Can't resolve '(.+)' in/
 
     const missingModules = missingModuleErrors.map(err => {
-      const matches = err.error.toString().match(missingModuleRegex)
+      // TODO: W5 simplify this
+      const matches = err.toString().match(missingModuleRegex)
 
       if (!matches) {
         throw new UnexpectedBuildError(
@@ -174,6 +181,45 @@ const BuildUtils = {
     return uniqueMissingModules
   },
 
+  async _getDuplicates(stats, installPath: string) {
+    const instance = await inspectpack.actions('duplicates', { stats })
+    const dupeData = await instance.getData()
+    const getMainAsset = assets => {
+      const mainAsset = Object.entries(assets).find(([assetName, assetValue]) =>
+        assetName.startsWith('main.bundle')
+      )
+
+      if (!mainAsset) {
+        throw new UnexpectedBuildError(
+          'Expected to find the main bundle in stats object, could not in ' +
+            Object.keys(assets)
+        )
+      }
+
+      return mainAsset[1]
+    }
+
+    const mainAsset = getMainAsset(dupeData.assets)
+    console.log(JSON.stringify(mainAsset, null, 2))
+    return {
+      totalExtraCopies: dupeData.meta.extraFiles.num,
+      totalExtraBytes: dupeData.meta.extraSources.bytes,
+      duplicateModules: Object.entries(mainAsset.files).map(([file, value]) => {
+        return {
+          name: parsePackageNameFromPath(file),
+          extraBytes: value.meta.extraSources.bytes,
+          count: value.meta.extraFiles.num,
+          fileCopies: value.sources.flatMap(source =>
+            source.modules.map(module => ({
+              filename: cleanTmpPath(module.fileName, installPath),
+              packageVersion: getPackageVersionFromPath(module.fileName),
+            }))
+          ),
+        }
+      }),
+    }
+  },
+
   async buildPackage({
     name,
     installPath,
@@ -187,11 +233,15 @@ const BuildUtils = {
         return { assets: [] }
       }
       options.customImports.forEach(importt => {
-        entry[importt] = BuildUtils.createEntryPoint(name, installPath, {
-          customImports: [importt],
-          entryFilename: importt,
-          esm: true,
-        })
+        ;(entry as any)[importt] = BuildUtils.createEntryPoint(
+          name,
+          installPath,
+          {
+            customImports: [importt],
+            entryFilename: importt,
+            esm: true,
+          }
+        )
       })
     } else {
       entry['main'] = BuildUtils.createEntryPoint(name, installPath, {
@@ -211,6 +261,16 @@ const BuildUtils = {
 
     log('build end %s', name)
 
+    console.log('compiler error is', error)
+
+    if (error) {
+      throw new BuildError(error)
+    } else if (!stats) {
+      throw new UnexpectedBuildError(
+        'Expected webpack json stats to be non-null, but was null'
+      )
+    }
+    const a = {
     const jsonStatsStartTime = performance.now()
     let jsonStats = stats.toJson({
       assets: true,
@@ -223,7 +283,7 @@ const BuildUtils = {
       errorDetails: false,
       entrypoints: false,
       reasons: false,
-      maxModules: 500,
+      // maxModules: 500,
       performance: false,
       source: true,
       depth: true,
@@ -240,6 +300,8 @@ const BuildUtils = {
     } else {
       Telemetry.parseWebpackStats(name, true, jsonStatsStartTime)
     }
+    let jsonStats = stats.toJson(a)
+    require('fs').writeFileSync('./stats-g.json', JSON.stringify(jsonStats))
 
     if (error && !stats) {
       throw new BuildError(error)
@@ -260,9 +322,10 @@ const BuildUtils = {
           )
         }
       } else if (jsonStats.errors && jsonStats.errors.length > 0) {
+        console.log(jsonStats.errors)
         if (
           jsonStats.errors.some(error =>
-            error.includes("Unexpected character '#'")
+            error.message.includes("Unexpected character '#'")
           )
         ) {
           throw new CLIBuildError(jsonStats.errors)
@@ -277,7 +340,16 @@ const BuildUtils = {
     } else {
       const getAssetStats = (asset: WebpackStatsAsset) => {
         const bundle = path.join(process.cwd(), 'dist', asset.name)
-        const bundleContents = memoryFileSystem.readFileSync(bundle)
+        const bundleContents = memoryFileSystem.readFileSync(bundle, 'utf8')
+
+        if (typeof bundleContents !== 'string') {
+          throw new UnexpectedBuildError(
+            'Expected contents of asset to be a string, found ' +
+              typeof bundleContents +
+              ' : ' +
+              asset.name
+          )
+        }
         let parseTimes = null
         if (options.calcParse) {
           parseTimes = getParseTime(bundleContents)
@@ -307,7 +379,7 @@ const BuildUtils = {
 
       const assetsGzipStartTime = performance.now()
       const assetStats = jsonStats?.assets
-        ?.filter(asset => !asset.chunkNames.includes('runtime'))
+        ?.filter(asset => !asset.chunkNames?.includes('runtime'))
         .filter(asset => !asset.name.endsWith('LICENSE.txt'))
         .map(getAssetStats)
       Telemetry.assetsGZIPParseTime(name, assetsGzipStartTime)
@@ -323,6 +395,13 @@ const BuildUtils = {
             options.minifier
           ),
         }),
+        // duplicateDependencies: console.log(
+        //   JSON.stringify(
+        //     await BuildUtils._getDuplicates(jsonStats, installPath),
+        //     null,
+        //     2
+        //   )
+        // ),
       }
     }
   },
