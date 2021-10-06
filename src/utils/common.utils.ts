@@ -31,7 +31,7 @@ export function exec(command: string, options: any, timeout?: number) {
         reject(
           `Execution of ${command.substring(
             0,
-            20
+            40
           )}... cancelled as it exceeded a timeout of ${timeout} ms`
         )
       }, timeout)
