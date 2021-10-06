@@ -28,7 +28,7 @@ export function exec(command: string, options: any, timeout?: number) {
     if (timeout) {
       setTimeout(() => {
         process.kill(child.pid)
-        reject(`Execution cancelled as it exceeded a timeout of ${timeout} ms`)
+        reject(`Execution of ${command.substring(0, 20)}... cancelled as it exceeded a timeout of ${timeout} ms`)
       }, timeout)
     }
   })
