@@ -1,6 +1,6 @@
 {
   "name": "package-build-stats",
-  "version": "7.3.2",
+  "version": "7.3.3",
   "author": "Shubham Kanodia <shubham.kanodia10@gmail.com>",
   "repository": "https://github.com/pastelsky/package-build-stats",
   "publishConfig": {
