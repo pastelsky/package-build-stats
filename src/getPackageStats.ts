@@ -66,17 +66,16 @@ export default async function getPackageStats(
   if (options.debug) {
     console.log('Install path:', installPath)
   }
-
-  await InstallationUtils.installPackage(packageString, installPath, {
-    isLocal,
-    client: options.client,
-    limitConcurrency: options.limitConcurrency,
-    networkConcurrency: options.networkConcurrency,
-    installTimeout: options.installTimeout,
-  })
-
-  const externals = getExternals(packageName, installPath)
   try {
+    await InstallationUtils.installPackage(packageString, installPath, {
+      isLocal,
+      client: options.client,
+      limitConcurrency: options.limitConcurrency,
+      networkConcurrency: options.networkConcurrency,
+      installTimeout: options.installTimeout,
+    })
+
+    const externals = getExternals(packageName, installPath)
     const [pacakgeJSONDetails, builtDetails] = await Promise.all([
       getPackageJSONDetails(packageName, installPath),
       BuildUtils.buildPackageIgnoringMissingDeps({
