@@ -63,6 +63,7 @@ const InstallationUtils = {
       networkConcurrency,
       additionalPackages = [],
       isLocal,
+      installTimeout = 30000,
     } = installOptions
 
     if (client === 'yarn') {
@@ -123,10 +124,15 @@ const InstallationUtils = {
     debug('install start %s', packageString)
 
     try {
-      await exec(command, {
-        cwd: installPath,
-        maxBuffer: 1024 * 500,
-      })
+      await exec(
+        command,
+        {
+          cwd: installPath,
+          maxBuffer: 1024 * 500,
+        },
+        installTimeout
+      )
+
       debug('install finish %s', packageString)
       Telemetry.installPackage(
         packageString,
@@ -142,7 +148,7 @@ const InstallationUtils = {
         installStartTime,
         installOptions
       )
-      if (err.includes('code E404')) {
+      if (typeof err === 'string' && err.includes('code E404')) {
         throw new PackageNotFoundError(err)
       } else {
         throw new InstallError(err)
@@ -153,7 +159,7 @@ const InstallationUtils = {
   async cleanupPath(installPath: string) {
     const noop = () => {}
     try {
-    await rimraf(installPath, noop)
+      await rimraf(installPath, noop)
     } catch (err) {
       console.error('cleaning up path ', installPath, ' failed due to ', err)
     }

@@ -72,6 +72,7 @@ export default async function getPackageStats(
     client: options.client,
     limitConcurrency: options.limitConcurrency,
     networkConcurrency: options.networkConcurrency,
+    installTimeout: options.installTimeout,
   })
 
   const externals = getExternals(packageName, installPath)

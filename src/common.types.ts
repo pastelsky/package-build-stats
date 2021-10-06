@@ -12,6 +12,7 @@ type AllOptions = {
   networkConcurrency?: number
   additionalPackages?: Array<string>
   isLocal?: boolean
+  installTimeout?: number
 }
 
 export type BuildPackageOptions = Pick<
@@ -33,6 +34,7 @@ export type InstallPackageOptions = Pick<
   | 'networkConcurrency'
   | 'additionalPackages'
   | 'isLocal'
+  | 'installTimeout'
 >
 
 export type GetPackageStatsOptions = Pick<
@@ -42,6 +44,7 @@ export type GetPackageStatsOptions = Pick<
   | 'networkConcurrency'
   | 'debug'
   | 'customImports'
+  | 'installTimeout'
 > & {
   minifier?: Minifier
 }

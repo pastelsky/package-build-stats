@@ -6,15 +6,31 @@ import os from 'os'
 
 const homeDirectory = os.homedir()
 
-export function exec(command: string, options: any) {
+export function exec(command: string, options: any, timeout?: number) {
+  let timerId: number
   return new Promise((resolve, reject) => {
-    childProcess.exec(command, options, (error, stdout, stderr) => {
-      if (error) {
-        reject(stderr)
-      } else {
-        resolve(stdout)
+    const child = childProcess.exec(
+      command,
+      options,
+      (error, stdout, stderr) => {
+        if (error) {
+          reject(stderr)
+        } else {
+          resolve(stdout)
+        }
+
+        if (timerId) {
+          clearTimeout(timerId)
+        }
       }
-    })
+    )
+
+    if (timeout) {
+      setTimeout(() => {
+        process.kill(child.pid)
+        reject(`Execution cancelled as it exceeded a timeout of ${timeout} ms`)
+      }, timeout)
+    }
   })
 }
 

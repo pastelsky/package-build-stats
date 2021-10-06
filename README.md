@@ -43,6 +43,7 @@ const results = await getBuiltPackageStats('moment', options)
 | networkConcurrency | `number`              | `false`  | When using `yarn` as client, limit simultaneous installs to this number.                                                                                        |
 | customImports      | `Array<string>`       | `null`   | By default, the default export is used for calculating sizes. Setting this option allows calculation of package stats based on more granular top-level exports. |
 | minifier           | `terser` or `esbuild` | `terser` | ESbuild is faster, albeit with marginally larger file sizes                                                                                                     |
+| installTimeout     | number (ms)           | 30000    | Timeout for package install                                                                                               |
 
 ## Listening to events
 

@@ -21,6 +21,7 @@ async function installPackage(
     client: options.client,
     limitConcurrency: options.limitConcurrency,
     networkConcurrency: options.networkConcurrency,
+    installTimeout: options.installTimeout,
   })
 }
 
