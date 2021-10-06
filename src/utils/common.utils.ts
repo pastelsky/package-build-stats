@@ -7,7 +7,7 @@ import os from 'os'
 const homeDirectory = os.homedir()
 
 export function exec(command: string, options: any, timeout?: number) {
-  let timerId: number
+  let timerId: NodeJS.Timeout
   return new Promise((resolve, reject) => {
     const child = childProcess.exec(
       command,
@@ -26,9 +26,14 @@ export function exec(command: string, options: any, timeout?: number) {
     )
 
     if (timeout) {
-      setTimeout(() => {
+      timerId = setTimeout(() => {
         process.kill(child.pid)
-        reject(`Execution of ${command.substring(0, 20)}... cancelled as it exceeded a timeout of ${timeout} ms`)
+        reject(
+          `Execution of ${command.substring(
+            0,
+            20
+          )}... cancelled as it exceeded a timeout of ${timeout} ms`
+        )
       }, timeout)
     }
   })
