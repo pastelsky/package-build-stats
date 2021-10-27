@@ -13,6 +13,14 @@ class CustomError extends Error {
     this.extra = extra
     Object.setPrototypeOf(this, CustomError.prototype)
   }
+
+  toJSON() {
+    return {
+      name: this.name,
+      originalError: this.originalError,
+      extra: this.extra,
+    }
+  }
 }
 
 export class BuildError extends CustomError {
