@@ -61,14 +61,13 @@ export default function makeWebpackConfig({
   }
 
   // @ts-ignore
-  // @ts-ignore
-  // @ts-ignore
   return {
     entry: entry,
     mode: 'production',
     // bail: true,
+    devtool: false,
     optimization: {
-      namedChunks: true,
+      chunkIds: 'named',
       runtimeChunk: { name: 'runtime' },
       minimize: true,
       splitChunks: {
@@ -104,7 +103,7 @@ export default function makeWebpackConfig({
       ],
     },
     plugins: [
-      new webpack.IgnorePlugin(/^electron$/),
+      new webpack.IgnorePlugin({ resourceRegExp: /^electron$/ }),
       new VueLoaderPlugin(),
       new MiniCssExtractPlugin({
         // Options similar to the same options in webpackOptions.output
@@ -127,10 +126,15 @@ export default function makeWebpackConfig({
         '.css',
         '.sass',
         '.scss',
+        '.svelte',
       ],
+      alias: {
+        svelte: path.resolve('node_modules', 'svelte'),
+      },
       mainFields: ['browser', 'module', 'main', 'style'],
     },
     module: {
+      unsafeCache: true,
       rules: [
         {
           test: /\.css$/,
@@ -143,25 +147,9 @@ export default function makeWebpackConfig({
           use: [],
         },
         {
-          test: /\.js$/,
-          loader: [
-            // support CLI tools that start with a #!/usr/bin/node
-            require.resolve('shebang-loader'),
-            // ESBuild Minifier doesn't auto-remove license comments from code
-            // So, we break ESBuild's heuristic for license comments match. See github.com/privatenumber/esbuild-loader/issues/87
-            {
-              loader: require.resolve('string-replace-loader'),
-              options: {
-                multiple: [
-                  { search: '@license', replace: '@silence' },
-                  { search: /\/\/!/g, replace: '//' },
-                  { search: /\/\*!/g, replace: '/*' },
-                ],
-              },
-            },
-          ],
+          test: /\.vue$/,
+          loader: require.resolve('vue-loader'),
         },
-
         {
           test: /\.(html|svelte)$/,
           use: {
@@ -172,12 +160,16 @@ export default function makeWebpackConfig({
           },
         },
         {
-          test: /\.vue$/,
-          loader: require.resolve('vue-loader'),
+          // required to prevent errors from Svelte on Webpack 5+, omit on Webpack 4
+          test: /node_modules\/svelte\/.*\.mjs$/,
+          resolve: {
+            fullySpecified: false,
+          },
         },
+
         {
           test: /\.(scss|sass)$/,
-          loader: [
+          use: [
             MiniCssExtractPlugin.loader,
             require.resolve('css-loader'),
             {
@@ -191,7 +183,7 @@ export default function makeWebpackConfig({
         },
         {
           test: /\.less$/,
-          loader: [
+          use: [
             MiniCssExtractPlugin.loader,
             require.resolve('css-loader'),
             {
@@ -230,12 +222,12 @@ export default function makeWebpackConfig({
     },
     node: builtInNode,
     output: {
-      filename: 'bundle.js',
+      filename: '[name].bundle.js',
       pathinfo: false,
     },
-    externals: (context, request, callback) =>
-      isExternalRequest(request)
-        ? callback(null, 'commonjs ' + request)
+    externals: ({ context, request }, callback) =>
+      request && isExternalRequest(request)
+        ? callback(undefined, 'commonjs ' + request)
         : callback(),
   }
 }

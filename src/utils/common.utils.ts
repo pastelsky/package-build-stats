@@ -2,7 +2,11 @@ import childProcess from 'child_process'
 import path from 'path'
 import builtInModules from 'builtin-modules'
 import fs from 'fs'
-import os from 'os'
+import os, { tmpdir } from 'os'
+import { dirname } from 'path'
+import config from '../config/config'
+import memoize from 'memoizee'
+import { findNearestPackageJsonSync } from 'find-nearest-package-json'
 
 const homeDirectory = os.homedir()
 
@@ -145,4 +149,75 @@ export function parsePackageString(packageString: string): ParsePackageResult {
   } else {
     return parseUnscopedPackageString(normalPackageString)
   }
+}
+
+// Works only when the `path` begins with the package name
+export const parsePackageNameFromPath = (path: string) => {
+  const fragments = path.split('/')
+  if (path.startsWith('@')) {
+    return [fragments[0], fragments[1]].join('/')
+  } else {
+    return fragments[0]
+  }
+}
+
+/**
+ *
+ */
+export function getPackageFromWebpackPath(filePath: string) {
+  let filePathReal = filePath.includes('!')
+    ? filePath.split('!')[filePath.split('!').length - 1]
+    : filePath
+
+  let lastNodeModulesIndex =
+    filePathReal.lastIndexOf('node_modules') + 'node_modules'.length + 1
+  return {
+    name: parsePackageNameFromPath(
+      filePathReal.substring(lastNodeModulesIndex)
+    ),
+    cleanPath: filePathReal,
+  }
+}
+
+export const getPackageJSONFromPath = memoize(
+  (filePath: string): string | null => {
+    const { cleanPath, name } = getPackageFromWebpackPath(filePath)
+    const packageRoot = cleanPath.substring(
+      0,
+      cleanPath.lastIndexOf(name) + name.length
+    )
+
+    try {
+      const packageJSON = require(path.join(packageRoot, 'package.json'))
+      return packageJSON
+    } catch (err) {
+      return null
+    }
+  },
+  { max: 1000 }
+)
+
+/**
+ * eg.
+ * loader!/private/tmp/tmp-build/packages/build-gulp-ORQ/node_modules/.pnpm/is-data@0.1.4/node_modules/is-data/index.js =>  is-data/index.js
+ */
+export function cleanWebpackPath(filePath: string, installPath: string) {
+  // Webpack paths are of the form `loader!path`
+  let filePathReal = filePath.includes('!')
+    ? filePath.split('!')[filePath.split('!').length - 1]
+    : filePath
+  let fragments = filePathReal
+    .substring(filePathReal.indexOf(installPath) + installPath.length + 1)
+    .split(path.sep)
+
+  // let currentFragment = fragments[0]
+  // while (['node_modules', '.pnpm'].includes(currentFragment)) {
+  //   currentFragment = fragments.shift() || ''
+  // }
+
+  return filePath //fragments.join(path.sep)
+}
+
+export function isReactNativePackage(packageName: string) {
+  return packageName.startsWith('react-native')
 }

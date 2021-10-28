@@ -8,7 +8,7 @@ const emitter = mitt()
 export { emitter }
 
 emitter.on('*', (type, data) => {
-  debug('Telementry Event: %s  %o', type, data)
+  debug('Telemetry Event: %s  %o', type, data)
 })
 
 function errorToObject(error: any) {

@@ -223,6 +223,7 @@ const resolver = enhancedResolve.create({
   modules: webpackConfig?.resolve?.modules,
   // @ts-ignore Error due to unsynced types for enhanced resolve and webpack
   mainFields: webpackConfig?.resolve?.mainFields,
+  conditionNames: ['module', 'import', 'style', 'default'],
 })
 
 const resolve = async (context: string, path: string): Promise<string> =>

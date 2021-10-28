@@ -1,6 +1,10 @@
 import Telemetry from './utils/telemetry.utils'
 import { performance } from 'perf_hooks'
+import pLimit from 'p-limit'
+import _ from 'lodash'
 
+const CONCURRENCY = 60
+const limit = pLimit(CONCURRENCY)
 const debug = require('debug')('bp:worker')
 
 import { getExternals, parsePackageString } from './utils/common.utils'
@@ -59,7 +63,6 @@ export async function getPackageExportSizes(
   const startTime = performance.now()
   const { name: packageName, normalPath } = parsePackageString(packageString)
   const installPath = await InstallationUtils.preparePath(packageName)
-
   try {
     await installPackage(packageString, installPath, options)
 
@@ -74,22 +77,32 @@ export async function getPackageExportSizes(
 
     const externals = getExternals(packageName, installPath)
 
-    const builtDetails = await BuildUtils.buildPackageIgnoringMissingDeps({
-      name: packageName,
-      installPath,
-      externals,
-      options: {
-        customImports: exports,
-        splitCustomImports: true,
-        includeDependencySizes: false,
-        minifier: options.minifier || 'terser',
-      },
-    })
+    const exportsChunks = _.chunk(exports, 60)
+
+    const promises = exportsChunks.map(exportChunk =>
+      limit(() =>
+        BuildUtils.buildPackageIgnoringMissingDeps({
+          name: packageName,
+          installPath,
+          externals,
+          options: {
+            customImports: exportChunk,
+            splitCustomImports: true,
+            includeDependencySizes: false,
+            minifier: options.minifier || 'terser',
+            debug: options.debug,
+          },
+        })
+      )
+    )
+
+    const results = await Promise.all(promises)
+    const allAssets = results.flatMap(result => result.assets)
 
     Telemetry.packageExportsSizes(packageString, startTime, true, options)
     return {
-      ...builtDetails,
-      assets: builtDetails.assets.map(asset => ({
+      buildVersion: require('../package.json').version,
+      assets: allAssets.map(asset => ({
         ...asset,
         path: exportMap[asset.name],
       })),

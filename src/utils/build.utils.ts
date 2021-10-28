@@ -1,8 +1,8 @@
 import path from 'path'
 
 const log = require('debug')('bp:worker')
-import webpack, { Entry } from 'webpack'
-import MemoryFS from 'memory-fs'
+import webpack, { Entry, WebpackError, Stats, StatsCompilation } from 'webpack'
+import memfs from 'memfs'
 import isValidNPMName from 'is-valid-npm-name'
 import { gzipSync } from 'zlib'
 import fs from 'fs'
@@ -20,11 +20,15 @@ import {
 } from '../errors/CustomError'
 import {
   Externals,
-  WebpackError,
   BuildPackageOptions,
   CreateEntryPointOptions,
 } from '../common.types'
 import Telemetry from './telemetry.utils'
+import {
+  cleanTmpPath,
+  getPackageVersionFromPath,
+  parsePackageNameFromPath,
+} from './common.utils'
 
 type CompilePackageArgs = {
   name: string
@@ -35,9 +39,9 @@ type CompilePackageArgs = {
 }
 
 type CompilePackageReturn = {
-  stats: webpack.Stats
+  stats: Stats | undefined
   error: WebpackError
-  memoryFileSystem: MemoryFS
+  memoryFileSystem: memfs.IFs
 }
 
 type BuildPackageArgs = {
@@ -47,7 +51,7 @@ type BuildPackageArgs = {
   options: BuildPackageOptions
 }
 
-type WebpackStatsAsset = NonNullable<webpack.Stats.ToJsonOutput['assets']>[0]
+type WebpackStatsAsset = NonNullable<StatsCompilation['assets']>[0]
 
 const BuildUtils = {
   createEntryPoint(
@@ -109,12 +113,13 @@ const BuildUtils = {
         minifier,
       })
     )
-    const memoryFileSystem = new MemoryFS()
-    compiler.outputFileSystem = memoryFileSystem
+
+    compiler.outputFileSystem = memfs.fs as any
+    compiler.intermediateFileSystem = memfs.fs as any
 
     return new Promise<CompilePackageReturn>(resolve => {
       compiler.run((err, stats) => {
-        const error = (err as unknown) as WebpackError // Webpack types incorrect
+        const error = err as unknown as WebpackError // Webpack types incorrect
         // stats object can be empty if there are build errors
         resolve({ stats, error, memoryFileSystem })
 
@@ -141,7 +146,8 @@ const BuildUtils = {
     const missingModuleRegex = /Can't resolve '(.+)' in/
 
     const missingModules = missingModuleErrors.map(err => {
-      const matches = err.error.toString().match(missingModuleRegex)
+      // TODO: W5 simplify this
+      const matches = err.toString().match(missingModuleRegex)
 
       if (!matches) {
         throw new UnexpectedBuildError(
@@ -187,11 +193,15 @@ const BuildUtils = {
         return { assets: [] }
       }
       options.customImports.forEach(importt => {
-        entry[importt] = BuildUtils.createEntryPoint(name, installPath, {
-          customImports: [importt],
-          entryFilename: importt,
-          esm: true,
-        })
+        ;(entry as any)[importt] = BuildUtils.createEntryPoint(
+          name,
+          installPath,
+          {
+            customImports: [importt],
+            entryFilename: importt,
+            esm: true,
+          }
+        )
       })
     } else {
       entry['main'] = BuildUtils.createEntryPoint(name, installPath, {
@@ -211,6 +221,15 @@ const BuildUtils = {
 
     log('build end %s', name)
 
+    console.log('compiler error is', error)
+
+    if (error) {
+      throw new BuildError(error)
+    } else if (!stats) {
+      throw new UnexpectedBuildError(
+        'Expected webpack json stats to be non-null, but was null'
+      )
+    }
     const jsonStatsStartTime = performance.now()
     let jsonStats = stats.toJson({
       assets: true,
@@ -240,6 +259,7 @@ const BuildUtils = {
     } else {
       Telemetry.parseWebpackStats(name, true, jsonStatsStartTime)
     }
+    require('fs').writeFileSync('./stats-g.json', JSON.stringify(jsonStats))
 
     if (error && !stats) {
       throw new BuildError(error)
@@ -260,9 +280,10 @@ const BuildUtils = {
           )
         }
       } else if (jsonStats.errors && jsonStats.errors.length > 0) {
+        console.log(jsonStats.errors)
         if (
           jsonStats.errors.some(error =>
-            error.includes("Unexpected character '#'")
+            error.message.includes("Unexpected character '#'")
           )
         ) {
           throw new CLIBuildError(jsonStats.errors)
@@ -277,7 +298,16 @@ const BuildUtils = {
     } else {
       const getAssetStats = (asset: WebpackStatsAsset) => {
         const bundle = path.join(process.cwd(), 'dist', asset.name)
-        const bundleContents = memoryFileSystem.readFileSync(bundle)
+        const bundleContents = memoryFileSystem.readFileSync(bundle, 'utf8')
+
+        if (typeof bundleContents !== 'string') {
+          throw new UnexpectedBuildError(
+            'Expected contents of asset to be a string, found ' +
+              typeof bundleContents +
+              ' : ' +
+              asset.name
+          )
+        }
         let parseTimes = null
         if (options.calcParse) {
           parseTimes = getParseTime(bundleContents)
@@ -307,7 +337,7 @@ const BuildUtils = {
 
       const assetsGzipStartTime = performance.now()
       const assetStats = jsonStats?.assets
-        ?.filter(asset => !asset.chunkNames.includes('runtime'))
+        ?.filter(asset => !asset.chunkNames?.includes('runtime'))
         .filter(asset => !asset.name.endsWith('LICENSE.txt'))
         .map(getAssetStats)
       Telemetry.assetsGZIPParseTime(name, assetsGzipStartTime)
