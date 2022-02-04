@@ -87,14 +87,6 @@ const UILibraries = [
     name: 'animate.css@3.5.2',
     size: 52.79 * 1024,
   },
-  {
-    name: 'bulma@0.5.1',
-    size: 125 * 1024,
-  },
-  {
-    name: 'tachyons@4.8.1',
-    size: 80.69 * 1024,
-  },
 ]
 
 const libsWithPeerDeps = [
