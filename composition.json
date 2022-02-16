@@ -1,0 +1,798 @@
+[
+  {
+    "size": 72718,
+    "name": "react-select",
+    "versionRanges": [
+      "^4.3.1"
+    ],
+    "resolvedVersion": "4.3.1",
+    "requiredBy": [
+      "@atlaskit/select"
+    ]
+  },
+  {
+    "size": 42104,
+    "name": "(buffer-polyfill)",
+    "versionRanges": [],
+    "resolvedVersion": "0.0.0",
+    "requiredBy": []
+  },
+  {
+    "size": 27629,
+    "name": "@atlaskit/button",
+    "versionRanges": [
+      "^16.1.0",
+      "^16.0.0"
+    ],
+    "resolvedVersion": "16.1.6",
+    "requiredBy": [
+      "@atlaskit/feedback-collector",
+      "@atlaskit/flag"
+    ]
+  },
+  {
+    "size": 20921,
+    "name": "@atlaskit/modal-dialog",
+    "versionRanges": [
+      "^12.2.0"
+    ],
+    "resolvedVersion": "12.2.2",
+    "requiredBy": [
+      "@atlaskit/feedback-collector"
+    ]
+  },
+  {
+    "size": 20342,
+    "name": "@atlaskit/theme",
+    "versionRanges": [
+      "^12.1.0"
+    ],
+    "resolvedVersion": "12.1.2",
+    "requiredBy": [
+      "@atlaskit/button",
+      "@atlaskit/checkbox",
+      "@atlaskit/form",
+      "@atlaskit/modal-dialog",
+      "@atlaskit/select",
+      "@atlaskit/textarea",
+      "@atlaskit/feedback-collector",
+      "@atlaskit/icon",
+      "@atlaskit/blanket",
+      "@atlaskit/focus-ring",
+      "@atlaskit/spinner",
+      "@atlaskit/flag"
+    ]
+  },
+  {
+    "size": 19324,
+    "name": "@atlaskit/flag",
+    "versionRanges": [
+      "^14.5.0"
+    ],
+    "resolvedVersion": "14.5.2",
+    "requiredBy": [
+      "@atlaskit/feedback-collector"
+    ]
+  },
+  {
+    "size": 19186,
+    "name": "@babel/runtime",
+    "versionRanges": [
+      "^7.0.0",
+      "^7.5.5",
+      "^7.10.0",
+      "^7.12.13",
+      "^7.13.10",
+      "^7.12.0"
+    ],
+    "resolvedVersion": "7.17.0",
+    "requiredBy": [
+      "@atlaskit/feedback-collector",
+      "@atlaskit/button",
+      "@atlaskit/checkbox",
+      "@atlaskit/form",
+      "@atlaskit/modal-dialog",
+      "@atlaskit/select",
+      "@atlaskit/textarea",
+      "@atlaskit/theme",
+      "@emotion/core",
+      "@atlaskit/analytics-next",
+      "@atlaskit/ds-lib",
+      "@atlaskit/icon",
+      "final-form",
+      "react-focus-lock",
+      "@atlaskit/blanket",
+      "@atlaskit/motion",
+      "@atlaskit/portal",
+      "react-clientside-effect",
+      "@emotion/react",
+      "react-select",
+      "@atlaskit/spinner",
+      "@atlaskit/flag"
+    ]
+  },
+  {
+    "size": 17761,
+    "name": "@atlaskit/analytics-next",
+    "versionRanges": [
+      "^8.2.0",
+      "^8.0.0"
+    ],
+    "resolvedVersion": "8.3.0",
+    "requiredBy": [
+      "@atlaskit/button",
+      "@atlaskit/checkbox",
+      "@atlaskit/modal-dialog",
+      "@atlaskit/select",
+      "@atlaskit/textarea",
+      "@atlaskit/blanket",
+      "@atlaskit/flag"
+    ]
+  },
+  {
+    "size": 17368,
+    "name": "final-form",
+    "versionRanges": [
+      "^4.20.1",
+      ">=1.3.0"
+    ],
+    "resolvedVersion": "4.20.6",
+    "requiredBy": [
+      "@atlaskit/form",
+      "final-form-focus"
+    ]
+  },
+  {
+    "size": 17120,
+    "name": "lodash",
+    "versionRanges": [
+      "^4.17.21"
+    ],
+    "resolvedVersion": "4.17.21",
+    "requiredBy": [
+      "@atlaskit/feedback-collector",
+      "@atlaskit/form"
+    ]
+  },
+  {
+    "size": 16853,
+    "name": "@atlaskit/feedback-collector",
+    "versionRanges": [
+      "8.0.2"
+    ],
+    "resolvedVersion": "8.0.2",
+    "requiredBy": [
+      "@atlaskit/feedback-collector"
+    ]
+  },
+  {
+    "size": 15855,
+    "name": "@atlaskit/motion",
+    "versionRanges": [
+      "^1.0.0"
+    ],
+    "resolvedVersion": "1.0.3",
+    "requiredBy": [
+      "@atlaskit/modal-dialog",
+      "@atlaskit/flag"
+    ]
+  },
+  {
+    "size": 14912,
+    "name": "focus-lock",
+    "versionRanges": [
+      "^0.10.1"
+    ],
+    "resolvedVersion": "0.10.1",
+    "requiredBy": [
+      "react-focus-lock"
+    ]
+  },
+  {
+    "size": 14366,
+    "name": "@atlaskit/checkbox",
+    "versionRanges": [
+      "^12.3.0"
+    ],
+    "resolvedVersion": "12.3.7",
+    "requiredBy": [
+      "@atlaskit/feedback-collector"
+    ]
+  },
+  {
+    "size": 14009,
+    "name": "@atlaskit/select",
+    "versionRanges": [
+      "^15.2.0"
+    ],
+    "resolvedVersion": "15.2.7",
+    "requiredBy": [
+      "@atlaskit/feedback-collector"
+    ]
+  },
+  {
+    "size": 13597,
+    "name": "tslib",
+    "versionRanges": [
+      "^1.10.0"
+    ],
+    "resolvedVersion": "1.14.1",
+    "requiredBy": [
+      "react-uid"
+    ]
+  },
+  {
+    "size": 11753,
+    "name": "@atlaskit/textarea",
+    "versionRanges": [
+      "^4.2.0"
+    ],
+    "resolvedVersion": "4.2.6",
+    "requiredBy": [
+      "@atlaskit/feedback-collector"
+    ]
+  },
+  {
+    "size": 11703,
+    "name": "react-focus-lock",
+    "versionRanges": [
+      "^2.5.2"
+    ],
+    "resolvedVersion": "2.7.1",
+    "requiredBy": [
+      "@atlaskit/modal-dialog"
+    ]
+  },
+  {
+    "size": 11128,
+    "name": "@atlaskit/icon",
+    "versionRanges": [
+      "^21.10.0"
+    ],
+    "resolvedVersion": "21.10.2",
+    "requiredBy": [
+      "@atlaskit/checkbox",
+      "@atlaskit/modal-dialog",
+      "@atlaskit/select",
+      "@atlaskit/feedback-collector",
+      "@atlaskit/flag"
+    ]
+  },
+  {
+    "size": 10518,
+    "name": "react-scrolllock",
+    "versionRanges": [
+      "^5.0.1"
+    ],
+    "resolvedVersion": "5.0.1",
+    "requiredBy": [
+      "@atlaskit/modal-dialog"
+    ]
+  },
+  {
+    "size": 10498,
+    "name": "stylis",
+    "versionRanges": [
+      "4.0.13"
+    ],
+    "resolvedVersion": "4.0.13",
+    "requiredBy": [
+      "@emotion/cache"
+    ]
+  },
+  {
+    "size": 8324,
+    "name": "@emotion/stylis",
+    "versionRanges": [
+      "0.8.5"
+    ],
+    "resolvedVersion": "0.8.5",
+    "requiredBy": [
+      "@emotion/cache"
+    ]
+  },
+  {
+    "size": 8251,
+    "name": "@atlaskit/form",
+    "versionRanges": [
+      "^8.4.0"
+    ],
+    "resolvedVersion": "8.4.8",
+    "requiredBy": [
+      "@atlaskit/feedback-collector"
+    ]
+  },
+  {
+    "size": 6541,
+    "name": "regenerator-runtime",
+    "versionRanges": [
+      "^0.13.4"
+    ],
+    "resolvedVersion": "0.13.9",
+    "requiredBy": [
+      "@babel/runtime"
+    ]
+  },
+  {
+    "size": 6001,
+    "name": "@emotion/react",
+    "versionRanges": [
+      "^11.1.1"
+    ],
+    "resolvedVersion": "11.7.1",
+    "requiredBy": [
+      "react-select"
+    ]
+  },
+  {
+    "size": 5412,
+    "name": "react-input-autosize",
+    "versionRanges": [
+      "^3.0.0"
+    ],
+    "resolvedVersion": "3.0.0",
+    "requiredBy": [
+      "react-select"
+    ]
+  },
+  {
+    "size": 5202,
+    "name": "@emotion/core",
+    "versionRanges": [
+      "^10.0.9"
+    ],
+    "resolvedVersion": "10.3.1",
+    "requiredBy": [
+      "@atlaskit/button",
+      "@atlaskit/checkbox",
+      "@atlaskit/form",
+      "@atlaskit/modal-dialog",
+      "@atlaskit/select",
+      "@atlaskit/textarea",
+      "@atlaskit/icon",
+      "@atlaskit/blanket",
+      "@atlaskit/motion",
+      "@atlaskit/focus-ring",
+      "@atlaskit/spinner",
+      "@atlaskit/flag",
+      "@atlaskit/visually-hidden"
+    ]
+  },
+  {
+    "size": 4712,
+    "name": "@emotion/cache",
+    "versionRanges": [
+      "^11.4.0"
+    ],
+    "resolvedVersion": "11.7.1",
+    "requiredBy": [
+      "react-select"
+    ]
+  },
+  {
+    "size": 4440,
+    "name": "@atlaskit/portal",
+    "versionRanges": [
+      "^4.1.0",
+      "^4.0.0"
+    ],
+    "resolvedVersion": "4.2.5",
+    "requiredBy": [
+      "@atlaskit/modal-dialog",
+      "@atlaskit/flag"
+    ]
+  },
+  {
+    "size": 4194,
+    "name": "(unknown)",
+    "versionRanges": [],
+    "resolvedVersion": "0.0.0",
+    "requiredBy": []
+  },
+  {
+    "size": 3827,
+    "name": "@atlaskit/ds-lib",
+    "versionRanges": [
+      "^1.3.0"
+    ],
+    "resolvedVersion": "1.3.0",
+    "requiredBy": [
+      "@atlaskit/button",
+      "@atlaskit/checkbox",
+      "@atlaskit/modal-dialog",
+      "@atlaskit/blanket",
+      "@atlaskit/flag"
+    ]
+  },
+  {
+    "size": 3635,
+    "name": "react-uid",
+    "versionRanges": [
+      "^2.2.0"
+    ],
+    "resolvedVersion": "2.3.1",
+    "requiredBy": [
+      "@atlaskit/form",
+      "@atlaskit/modal-dialog"
+    ]
+  },
+  {
+    "size": 3334,
+    "name": "@atlaskit/spinner",
+    "versionRanges": [
+      "^15.0.0",
+      "^15.1.0"
+    ],
+    "resolvedVersion": "15.1.6",
+    "requiredBy": [
+      "@atlaskit/select",
+      "@atlaskit/button"
+    ]
+  },
+  {
+    "size": 3033,
+    "name": "@emotion/sheet",
+    "versionRanges": [
+      "^1.1.0"
+    ],
+    "resolvedVersion": "1.1.0",
+    "requiredBy": [
+      "@emotion/cache"
+    ]
+  },
+  {
+    "size": 2832,
+    "name": "base64-js",
+    "versionRanges": [
+      "^1.3.1"
+    ],
+    "resolvedVersion": "1.5.1",
+    "requiredBy": [
+      "buffer"
+    ]
+  },
+  {
+    "size": 2755,
+    "name": "@atlaskit/blanket",
+    "versionRanges": [
+      "^12.2.0"
+    ],
+    "resolvedVersion": "12.2.7",
+    "requiredBy": [
+      "@atlaskit/modal-dialog"
+    ]
+  },
+  {
+    "size": 2418,
+    "name": "react-is",
+    "versionRanges": [
+      "^16.7.0"
+    ],
+    "resolvedVersion": "16.13.1",
+    "requiredBy": [
+      "hoist-non-react-statics"
+    ]
+  },
+  {
+    "size": 2291,
+    "name": "@emotion/serialize",
+    "versionRanges": [
+      "^0.11.15"
+    ],
+    "resolvedVersion": "0.11.16",
+    "requiredBy": [
+      "@emotion/core",
+      "@emotion/css"
+    ]
+  },
+  {
+    "size": 2251,
+    "name": "@emotion/serialize",
+    "versionRanges": [
+      "^1.0.2"
+    ],
+    "resolvedVersion": "1.0.2",
+    "requiredBy": [
+      "@emotion/react"
+    ]
+  },
+  {
+    "size": 1979,
+    "name": "react-fast-compare",
+    "versionRanges": [
+      "^3.2.0"
+    ],
+    "resolvedVersion": "3.2.0",
+    "requiredBy": [
+      "@atlaskit/select"
+    ]
+  },
+  {
+    "size": 1895,
+    "name": "ieee754",
+    "versionRanges": [
+      "^1.1.13"
+    ],
+    "resolvedVersion": "1.2.1",
+    "requiredBy": [
+      "buffer"
+    ]
+  },
+  {
+    "size": 1678,
+    "name": "use-callback-ref",
+    "versionRanges": [
+      "^1.2.5"
+    ],
+    "resolvedVersion": "1.2.5",
+    "requiredBy": [
+      "react-focus-lock"
+    ]
+  },
+  {
+    "size": 1595,
+    "name": "use-sidecar",
+    "versionRanges": [
+      "^1.0.5"
+    ],
+    "resolvedVersion": "1.0.5",
+    "requiredBy": [
+      "react-focus-lock"
+    ]
+  },
+  {
+    "size": 1491,
+    "name": "@emotion/css",
+    "versionRanges": [
+      "^10.0.27"
+    ],
+    "resolvedVersion": "10.0.27",
+    "requiredBy": [
+      "@emotion/core"
+    ]
+  },
+  {
+    "size": 1444,
+    "name": "@atlaskit/focus-ring",
+    "versionRanges": [
+      "^0.2.4",
+      "^0.2.2"
+    ],
+    "resolvedVersion": "0.2.7",
+    "requiredBy": [
+      "@atlaskit/modal-dialog",
+      "@atlaskit/flag"
+    ]
+  },
+  {
+    "size": 1437,
+    "name": "@emotion/cache",
+    "versionRanges": [
+      "^10.0.27"
+    ],
+    "resolvedVersion": "10.0.29",
+    "requiredBy": [
+      "@emotion/core"
+    ]
+  },
+  {
+    "size": 1275,
+    "name": "@emotion/sheet",
+    "versionRanges": [
+      "0.9.4"
+    ],
+    "resolvedVersion": "0.9.4",
+    "requiredBy": [
+      "@emotion/core",
+      "@emotion/cache"
+    ]
+  },
+  {
+    "size": 1072,
+    "name": "react-clientside-effect",
+    "versionRanges": [
+      "^1.2.5"
+    ],
+    "resolvedVersion": "1.2.5",
+    "requiredBy": [
+      "react-focus-lock"
+    ]
+  },
+  {
+    "size": 1049,
+    "name": "final-form-focus",
+    "versionRanges": [
+      "^1.1.2"
+    ],
+    "resolvedVersion": "1.1.2",
+    "requiredBy": [
+      "@atlaskit/form"
+    ]
+  },
+  {
+    "size": 1020,
+    "name": "prop-types",
+    "versionRanges": [
+      "^15.5.10",
+      "^15.6.2",
+      "^15.5.8"
+    ],
+    "resolvedVersion": "15.8.1",
+    "requiredBy": [
+      "@atlaskit/analytics-next",
+      "react-focus-lock",
+      "react-input-autosize"
+    ]
+  },
+  {
+    "size": 1009,
+    "name": "hoist-non-react-statics",
+    "versionRanges": [
+      "^3.3.1"
+    ],
+    "resolvedVersion": "3.3.2",
+    "requiredBy": [
+      "@emotion/react"
+    ]
+  },
+  {
+    "size": 922,
+    "name": "@atlaskit/visually-hidden",
+    "versionRanges": [
+      "^0.1.1"
+    ],
+    "resolvedVersion": "0.1.2",
+    "requiredBy": [
+      "@atlaskit/flag"
+    ]
+  },
+  {
+    "size": 827,
+    "name": "use-memo-one",
+    "versionRanges": [
+      "^1.1.1"
+    ],
+    "resolvedVersion": "1.1.2",
+    "requiredBy": [
+      "@atlaskit/analytics-next"
+    ]
+  },
+  {
+    "size": 818,
+    "name": "@emotion/unitless",
+    "versionRanges": [
+      "0.7.5",
+      "^0.7.5"
+    ],
+    "resolvedVersion": "0.7.5",
+    "requiredBy": [
+      "@emotion/serialize"
+    ]
+  },
+  {
+    "size": 710,
+    "name": "@emotion/hash",
+    "versionRanges": [
+      "0.8.0",
+      "^0.8.0"
+    ],
+    "resolvedVersion": "0.8.0",
+    "requiredBy": [
+      "@emotion/serialize"
+    ]
+  },
+  {
+    "size": 610,
+    "name": "memoize-one",
+    "versionRanges": [
+      "^5.0.0"
+    ],
+    "resolvedVersion": "5.2.1",
+    "requiredBy": [
+      "react-select"
+    ]
+  },
+  {
+    "size": 597,
+    "name": "@emotion/utils",
+    "versionRanges": [
+      "^1.0.0"
+    ],
+    "resolvedVersion": "1.0.0",
+    "requiredBy": [
+      "@emotion/react"
+    ]
+  },
+  {
+    "size": 586,
+    "name": "@emotion/utils",
+    "versionRanges": [
+      "0.11.3"
+    ],
+    "resolvedVersion": "0.11.3",
+    "requiredBy": [
+      "@emotion/core"
+    ]
+  },
+  {
+    "size": 579,
+    "name": "memoize-one",
+    "versionRanges": [
+      "^6.0.0"
+    ],
+    "resolvedVersion": "6.0.0",
+    "requiredBy": [
+      "@atlaskit/select"
+    ]
+  },
+  {
+    "size": 555,
+    "name": "@atlaskit/analytics-next-stable-react-context",
+    "versionRanges": [
+      "1.0.1"
+    ],
+    "resolvedVersion": "1.0.1",
+    "requiredBy": [
+      "@atlaskit/analytics-next"
+    ]
+  },
+  {
+    "size": 466,
+    "name": "exenv",
+    "versionRanges": [
+      "^1.2.2"
+    ],
+    "resolvedVersion": "1.2.2",
+    "requiredBy": [
+      "react-scrolllock"
+    ]
+  },
+  {
+    "size": 413,
+    "name": "raf-schd",
+    "versionRanges": [
+      "^4.0.3"
+    ],
+    "resolvedVersion": "4.0.3",
+    "requiredBy": [
+      "@atlaskit/modal-dialog"
+    ]
+  },
+  {
+    "size": 309,
+    "name": "@emotion/weak-memoize",
+    "versionRanges": [
+      "0.2.5",
+      "^0.2.5"
+    ],
+    "resolvedVersion": "0.2.5",
+    "requiredBy": [
+      "@emotion/cache",
+      "@emotion/react"
+    ]
+  },
+  {
+    "size": 284,
+    "name": "tiny-invariant",
+    "versionRanges": [
+      "^1.2.0"
+    ],
+    "resolvedVersion": "1.2.0",
+    "requiredBy": [
+      "@atlaskit/form"
+    ]
+  },
+  {
+    "size": 229,
+    "name": "@emotion/memoize",
+    "versionRanges": [
+      "0.7.4",
+      "^0.7.4"
+    ],
+    "resolvedVersion": "0.7.4",
+    "requiredBy": [
+      "@emotion/serialize",
+      "@emotion/cache"
+    ]
+  }
+]

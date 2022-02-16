@@ -1,0 +1,2690 @@
+[
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/buffer/index.js",
+    "size": 42104,
+    "originalSize": 51710,
+    "time": 35
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-select/dist/Select-dbb12e54.esm.js",
+    "size": 37557,
+    "originalSize": 98718,
+    "time": 97
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-select/dist/index-4bd03571.esm.js",
+    "size": 22146,
+    "originalSize": 51903,
+    "time": 96
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/final-form/dist/final-form.es.js",
+    "size": 17368,
+    "originalSize": 52167,
+    "time": 123
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/theme/dist/esm/colors.js",
+    "size": 10154,
+    "originalSize": 16937,
+    "time": 30
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/button/dist/esm/shared/colors.js",
+    "size": 10132,
+    "originalSize": 17110,
+    "time": 16
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/feedback-collector/dist/esm/components/FeedbackCollector.js",
+    "size": 8439,
+    "originalSize": 21144,
+    "time": 9
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@emotion/stylis/dist/stylis.browser.esm.js",
+    "size": 8324,
+    "originalSize": 20410,
+    "time": 12
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/checkbox/dist/esm/internal/styles.js",
+    "size": 7816,
+    "originalSize": 9670,
+    "time": 98
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-uid/node_modules/tslib/tslib.es6.js",
+    "size": 6819,
+    "originalSize": 13860,
+    "time": 108
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/use-sidecar/node_modules/tslib/tslib.es6.js",
+    "size": 6778,
+    "originalSize": 13860,
+    "time": 9
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/feedback-collector/dist/esm/components/FeedbackForm.js",
+    "size": 6654,
+    "originalSize": 13672,
+    "time": 81
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/regenerator-runtime/runtime.js",
+    "size": 6541,
+    "originalSize": 27019,
+    "time": 18
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/select/dist/esm/styles.js",
+    "size": 6341,
+    "originalSize": 13230,
+    "time": 188
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/index.js",
+    "size": 5993,
+    "originalSize": 15787,
+    "time": 15
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_decorate.js",
+    "size": 5825,
+    "originalSize": 12509,
+    "time": 32
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-input-autosize/lib/AutosizeInput.js",
+    "size": 5412,
+    "originalSize": 11634,
+    "time": 34
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/form/dist/esm/field.js",
+    "size": 5248,
+    "originalSize": 11913,
+    "time": 6
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-select/async/dist/react-select.esm.js",
+    "size": 4450,
+    "originalSize": 10016,
+    "time": 23
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/theme/dist/esm/typography.js",
+    "size": 4446,
+    "originalSize": 6944,
+    "time": 50
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/flag/dist/esm/theme.js",
+    "size": 4168,
+    "originalSize": 6686,
+    "time": 27
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/button/dist/esm/shared/css.js",
+    "size": 4102,
+    "originalSize": 10735,
+    "time": 143
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/select/dist/esm/createSelect.js",
+    "size": 4064,
+    "originalSize": 7773,
+    "time": 40
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/flag/dist/esm/flag.js",
+    "size": 4061,
+    "originalSize": 8028,
+    "time": 25
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/button/dist/esm/custom-theme-button/custom-theme-button.js",
+    "size": 4026,
+    "originalSize": 9423,
+    "time": 35
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/flag/dist/esm/flag-group.js",
+    "size": 3908,
+    "originalSize": 5166,
+    "time": 26
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/typeof.js",
+    "size": 3804,
+    "originalSize": 701,
+    "time": 22
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-select/creatable/dist/react-select.esm.js",
+    "size": 3798,
+    "originalSize": 8309,
+    "time": 21
+  },
+  {
+    "filePath": "",
+    "size": 3648,
+    "originalSize": 3648,
+    "time": 0
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@emotion/core/dist/core.browser.esm.js",
+    "size": 3561,
+    "originalSize": 7883,
+    "time": 141
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/textarea/dist/esm/text-area.js",
+    "size": 3506,
+    "originalSize": 7266,
+    "time": 18
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/textarea/dist/esm/styles.js",
+    "size": 3394,
+    "originalSize": 7327,
+    "time": 92
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/checkbox/dist/esm/checkbox.js",
+    "size": 3346,
+    "originalSize": 6879,
+    "time": 7
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/stylis/src/Enum.js",
+    "size": 3320,
+    "originalSize": 3320,
+    "time": 0
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@emotion/react/dist/emotion-react.browser.esm.js",
+    "size": 3232,
+    "originalSize": 10163,
+    "time": 37
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/modal-dialog/dist/esm/internal/components/modal-dialog.js",
+    "size": 3189,
+    "originalSize": 5717,
+    "time": 22
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/button/dist/esm/shared/button-base.js",
+    "size": 3033,
+    "originalSize": 6887,
+    "time": 142
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/spinner/dist/esm/spinner.js",
+    "size": 2960,
+    "originalSize": 4974,
+    "time": 64
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/modal-dialog/dist/esm/modal-wrapper.js",
+    "size": 2927,
+    "originalSize": 5597,
+    "time": 24
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/base64-js/index.js",
+    "size": 2832,
+    "originalSize": 3939,
+    "time": 6
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-focus-lock/dist/es2015/Trap.js",
+    "size": 2744,
+    "originalSize": 8091,
+    "time": 16
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/analytics-next/dist/esm/components/AnalyticsContext/LegacyAnalyticsContext.js",
+    "size": 2742,
+    "originalSize": 5289,
+    "time": 65
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-focus-lock/dist/es2015/Lock.js",
+    "size": 2733,
+    "originalSize": 6368,
+    "time": 16
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-select/dist/stateManager-845a3300.esm.js",
+    "size": 2686,
+    "originalSize": 5949,
+    "time": 96
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/theme/dist/esm/constants.js",
+    "size": 2637,
+    "originalSize": 4301,
+    "time": 51
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/analytics-next/dist/esm/events/UIAnalyticsEvent.js",
+    "size": 2554,
+    "originalSize": 5223,
+    "time": 122
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@emotion/react/dist/emotion-element-699e6908.browser.esm.js",
+    "size": 2547,
+    "originalSize": 7704,
+    "time": 20
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/blanket/dist/esm/blanket.js",
+    "size": 2527,
+    "originalSize": 4500,
+    "time": 31
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/motion/dist/esm/entering/fade-in.js",
+    "size": 2388,
+    "originalSize": 4234,
+    "time": 32
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/textarea/dist/esm/theme.js",
+    "size": 2381,
+    "originalSize": 4000,
+    "time": 92
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/motion/dist/esm/entering/keyframes-motion.js",
+    "size": 2371,
+    "originalSize": 5500,
+    "time": 17
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-select/node_modules/@emotion/cache/dist/emotion-cache.browser.esm.js",
+    "size": 2357,
+    "originalSize": 10032,
+    "time": 61
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@emotion/react/node_modules/@emotion/cache/dist/emotion-cache.browser.esm.js",
+    "size": 2355,
+    "originalSize": 10032,
+    "time": 59
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/icon/dist/esm/components/icon.js",
+    "size": 2354,
+    "originalSize": 5388,
+    "time": 82
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/modal-dialog/dist/esm/internal/components/scroll-container.js",
+    "size": 2350,
+    "originalSize": 5182,
+    "time": 27
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-scrolllock/dist/TouchScrollable.js",
+    "size": 2345,
+    "originalSize": 4669,
+    "time": 30
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@emotion/serialize/dist/serialize.browser.esm.js",
+    "size": 2291,
+    "originalSize": 7337,
+    "time": 62
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-is/cjs/react-is.production.min.js",
+    "size": 2286,
+    "originalSize": 3589,
+    "time": 18
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/form/dist/esm/form.js",
+    "size": 2272,
+    "originalSize": 5157,
+    "time": 7
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@emotion/react/node_modules/@emotion/serialize/dist/emotion-serialize.browser.esm.js",
+    "size": 2251,
+    "originalSize": 7147,
+    "time": 57
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/textarea/dist/esm/component-tokens.js",
+    "size": 2207,
+    "originalSize": 3609,
+    "time": 96
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-scrolllock/dist/withLockSheet.js",
+    "size": 2158,
+    "originalSize": 4752,
+    "time": 15
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-select/dist/react-select.esm.js",
+    "size": 2081,
+    "originalSize": 3303,
+    "time": 113
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/stylis/src/Prefixer.js",
+    "size": 2062,
+    "originalSize": 2062,
+    "time": 0
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/button/dist/esm/custom-theme-button/theme.js",
+    "size": 2042,
+    "originalSize": 4630,
+    "time": 33
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/analytics-next/dist/esm/hooks/usePatchedProps.js",
+    "size": 2002,
+    "originalSize": 4080,
+    "time": 124
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-scrolllock/dist/ScrollLock.js",
+    "size": 1989,
+    "originalSize": 4337,
+    "time": 29
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-fast-compare/index.js",
+    "size": 1979,
+    "originalSize": 4303,
+    "time": 145
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/ieee754/index.js",
+    "size": 1895,
+    "originalSize": 2300,
+    "time": 6
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/motion/dist/esm/entering/exiting-persistence.js",
+    "size": 1880,
+    "originalSize": 7783,
+    "time": 34
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/analytics-next/dist/esm/events/AnalyticsEvent.js",
+    "size": 1856,
+    "originalSize": 3436,
+    "time": 11
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/flag/dist/esm/flag-actions.js",
+    "size": 1838,
+    "originalSize": 3472,
+    "time": 23
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-scrolllock/dist/utils.js",
+    "size": 1810,
+    "originalSize": 3554,
+    "time": 18
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-scrolllock/dist/withTouchListeners.js",
+    "size": 1774,
+    "originalSize": 3615,
+    "time": 15
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/modal-dialog/dist/esm/internal/components/positioner.js",
+    "size": 1726,
+    "originalSize": 2758,
+    "time": 9
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/motion/dist/esm/entering/slide-in.js",
+    "size": 1674,
+    "originalSize": 2950,
+    "time": 29
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/button/dist/esm/button.js",
+    "size": 1666,
+    "originalSize": 3611,
+    "time": 4
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@emotion/core/dist/emotion-element-04d85134.browser.esm.js",
+    "size": 1641,
+    "originalSize": 4352,
+    "time": 95
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/analytics-next/dist/esm/hocs/withAnalyticsContext.js",
+    "size": 1627,
+    "originalSize": 3063,
+    "time": 98
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/modal-dialog/dist/esm/modal-footer.js",
+    "size": 1583,
+    "originalSize": 978,
+    "time": 18
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/stylis/src/Parser.js",
+    "size": 1555,
+    "originalSize": 1555,
+    "time": 0
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/analytics-next/dist/esm/index.js",
+    "size": 1545,
+    "originalSize": 4106,
+    "time": 29
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-select/node_modules/@emotion/sheet/dist/emotion-sheet.browser.esm.js",
+    "size": 1518,
+    "originalSize": 3771,
+    "time": 12
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/analytics-next/dist/esm/hooks/usePlatformLeafEventHandler.js",
+    "size": 1516,
+    "originalSize": 3954,
+    "time": 95
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@emotion/react/node_modules/@emotion/sheet/dist/emotion-sheet.browser.esm.js",
+    "size": 1515,
+    "originalSize": 3771,
+    "time": 56
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@emotion/css/dist/css.browser.esm.js",
+    "size": 1491,
+    "originalSize": 377,
+    "time": 62
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/stylis/src/Tokenizer.js",
+    "size": 1467,
+    "originalSize": 1467,
+    "time": 0
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/motion/dist/esm/entering/staggered-entrance.js",
+    "size": 1443,
+    "originalSize": 5450,
+    "time": 72
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@emotion/cache/dist/cache.browser.esm.js",
+    "size": 1437,
+    "originalSize": 3491,
+    "time": 61
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/modal-dialog/dist/esm/modal-title.js",
+    "size": 1436,
+    "originalSize": 3311,
+    "time": 20
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/flag/dist/esm/internal/dismiss-button.js",
+    "size": 1373,
+    "originalSize": 2390,
+    "time": 148
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/focus-lock/dist/es2015/focusMerge.js",
+    "size": 1335,
+    "originalSize": 2659,
+    "time": 11
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/modal-dialog/dist/esm/internal/hooks/use-modal-stack.js",
+    "size": 1292,
+    "originalSize": 4265,
+    "time": 24
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/stylis/src/Middleware.js",
+    "size": 1284,
+    "originalSize": 1284,
+    "time": 0
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/flag/dist/esm/auto-dismiss-flag.js",
+    "size": 1284,
+    "originalSize": 3204,
+    "time": 3
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/motion/dist/esm/utils/timer-hooks.js",
+    "size": 1277,
+    "originalSize": 2790,
+    "time": 72
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@emotion/sheet/dist/sheet.browser.esm.js",
+    "size": 1275,
+    "originalSize": 4212,
+    "time": 68
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/checkbox/dist/esm/internal/required-indicator.js",
+    "size": 1250,
+    "originalSize": 748,
+    "time": 98
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/feedback-collector/dist/esm/components/FeedbackFlag.js",
+    "size": 1246,
+    "originalSize": 1191,
+    "time": 3
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/modal-dialog/dist/esm/internal/constants.js",
+    "size": 1219,
+    "originalSize": 1926,
+    "time": 25
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/focus-ring/dist/esm/focus-ring.js",
+    "size": 1218,
+    "originalSize": 2322,
+    "time": 34
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/use-sidecar/dist/es2015/medium.js",
+    "size": 1196,
+    "originalSize": 2981,
+    "time": 7
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/select/dist/esm/index.js",
+    "size": 1176,
+    "originalSize": 2852,
+    "time": 74
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_async_generator.js",
+    "size": 1160,
+    "originalSize": 2501,
+    "time": 39
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/select/dist/esm/components/indicators.js",
+    "size": 1146,
+    "originalSize": 1694,
+    "time": 40
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/focus-lock/dist/es2015/utils/is.js",
+    "size": 1133,
+    "originalSize": 1975,
+    "time": 7
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-clientside-effect/lib/index.es.js",
+    "size": 1072,
+    "originalSize": 2439,
+    "time": 12
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/analytics-next/dist/esm/components/AnalyticsContext/ModernAnalyticsContext.js",
+    "size": 1067,
+    "originalSize": 1739,
+    "time": 10
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/final-form-focus/dist/final-form-focus.es.js",
+    "size": 1049,
+    "originalSize": 3189,
+    "time": 11
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/modal-dialog/dist/esm/modal-body.js",
+    "size": 1030,
+    "originalSize": 2173,
+    "time": 21
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/truncate.js",
+    "size": 1015,
+    "originalSize": 3293,
+    "time": 97
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/hoist-non-react-statics/dist/hoist-non-react-statics.cjs.js",
+    "size": 1009,
+    "originalSize": 2887,
+    "time": 57
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/focus-lock/dist/es2015/constants.js",
+    "size": 1008,
+    "originalSize": 637,
+    "time": 9
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-focus-lock/dist/es2015/medium.js",
+    "size": 961,
+    "originalSize": 893,
+    "time": 74
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/icon/glyph/error.js",
+    "size": 940,
+    "originalSize": 991,
+    "time": 103
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/motion/dist/esm/index.js",
+    "size": 935,
+    "originalSize": 3305,
+    "time": 103
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-focus-lock/dist/es2015/MoveFocusInside.js",
+    "size": 931,
+    "originalSize": 1657,
+    "time": 16
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/focus-lock/dist/es2015/utils/parenting.js",
+    "size": 921,
+    "originalSize": 2038,
+    "time": 6
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/icon/glyph/select-clear.js",
+    "size": 911,
+    "originalSize": 1039,
+    "time": 66
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_wrap_native_super.js",
+    "size": 909,
+    "originalSize": 1761,
+    "time": 22
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/theme/dist/esm/components.js",
+    "size": 905,
+    "originalSize": 1570,
+    "time": 51
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/analytics-next/dist/esm/hocs/withAnalyticsEvents.js",
+    "size": 895,
+    "originalSize": 1546,
+    "time": 94
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-uid/dist/es2015/Control.js",
+    "size": 888,
+    "originalSize": 1408,
+    "time": 79
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/focus-lock/dist/es2015/index.js",
+    "size": 879,
+    "originalSize": 1518,
+    "time": 11
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/focus-lock/dist/es2015/utils/DOMutils.js",
+    "size": 873,
+    "originalSize": 1535,
+    "time": 8
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/focus-lock/dist/es2015/solver.js",
+    "size": 869,
+    "originalSize": 2162,
+    "time": 7
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/focus-lock/dist/es2015/utils/all-affected.js",
+    "size": 863,
+    "originalSize": 1442,
+    "time": 12
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/checkbox/dist/esm/internal/label.js",
+    "size": 848,
+    "originalSize": 1233,
+    "time": 98
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/focus-lock/dist/es2015/sibling.js",
+    "size": 836,
+    "originalSize": 1866,
+    "time": 11
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/theme/dist/esm/utils/create-theme.js",
+    "size": 828,
+    "originalSize": 3863,
+    "time": 92
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/use-memo-one/dist/use-memo-one.esm.js",
+    "size": 827,
+    "originalSize": 1597,
+    "time": 177
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/portal/dist/esm/internal/utils/portal-dom-utils.js",
+    "size": 821,
+    "originalSize": 2020,
+    "time": 73
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/icon/glyph/warning.js",
+    "size": 820,
+    "originalSize": 977,
+    "time": 104
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@emotion/unitless/dist/unitless.browser.esm.js",
+    "size": 818,
+    "originalSize": 1114,
+    "time": 53
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/icon/dist/esm/components/svg.js",
+    "size": 813,
+    "originalSize": 1619,
+    "time": 41
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-uid/dist/es2015/UIDComponent.js",
+    "size": 813,
+    "originalSize": 1729,
+    "time": 97
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_set.js",
+    "size": 812,
+    "originalSize": 1531,
+    "time": 25
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/focus-lock/dist/es2015/utils/tabUtils.js",
+    "size": 810,
+    "originalSize": 1332,
+    "time": 4
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/flag/dist/esm/internal/expander.js",
+    "size": 810,
+    "originalSize": 1420,
+    "time": 96
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/modal-dialog/dist/esm/internal/hooks/use-prevent-programmatic-scroll.js",
+    "size": 806,
+    "originalSize": 1689,
+    "time": 26
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/focus-lock/dist/es2015/focusables.js",
+    "size": 802,
+    "originalSize": 1272,
+    "time": 11
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/icon/glyph/cross.js",
+    "size": 784,
+    "originalSize": 876,
+    "time": 126
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/icon/dist/esm/constants.js",
+    "size": 779,
+    "originalSize": 884,
+    "time": 27
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/button/dist/esm/shared/loading-spinner.js",
+    "size": 770,
+    "originalSize": 1310,
+    "time": 8
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/icon/glyph/chevron-down.js",
+    "size": 764,
+    "originalSize": 931,
+    "time": 125
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-focus-lock/dist/es2015/util.js",
+    "size": 761,
+    "originalSize": 672,
+    "time": 73
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-focus-lock/dist/es2015/Combination.js",
+    "size": 744,
+    "originalSize": 1421,
+    "time": 32
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/focus-lock/dist/es2015/setFocus.js",
+    "size": 740,
+    "originalSize": 1244,
+    "time": 11
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/prop-types/factoryWithThrowingShims.js",
+    "size": 733,
+    "originalSize": 1711,
+    "time": 31
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/form/dist/esm/index.js",
+    "size": 731,
+    "originalSize": 2148,
+    "time": 74
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-focus-lock/dist/es2015/FocusGuard.js",
+    "size": 723,
+    "originalSize": 1151,
+    "time": 15
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/icon/dist/esm/components/styles.js",
+    "size": 717,
+    "originalSize": 1552,
+    "time": 98
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-focus-lock/dist/es2015/AutoFocusInside.js",
+    "size": 711,
+    "originalSize": 948,
+    "time": 17
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@emotion/hash/dist/hash.browser.esm.js",
+    "size": 710,
+    "originalSize": 1764,
+    "time": 13
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/modal-dialog/dist/esm/modal-header.js",
+    "size": 706,
+    "originalSize": 1023,
+    "time": 22
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/select/dist/esm/Select.js",
+    "size": 703,
+    "originalSize": 1240,
+    "time": 7
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/portal/dist/esm/portal.js",
+    "size": 698,
+    "originalSize": 1126,
+    "time": 35
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_jsx.js",
+    "size": 691,
+    "originalSize": 1226,
+    "time": 28
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/icon/glyph/chevron-up.js",
+    "size": 690,
+    "originalSize": 932,
+    "time": 125
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/visually-hidden/dist/esm/visually-hidden.js",
+    "size": 684,
+    "originalSize": 1103,
+    "time": 30
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_create_super.js",
+    "size": 675,
+    "originalSize": 1178,
+    "time": 42
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_construct.js",
+    "size": 664,
+    "originalSize": 1115,
+    "time": 32
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/focus-lock/dist/es2015/utils/tabOrder.js",
+    "size": 647,
+    "originalSize": 1041,
+    "time": 4
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/icon/glyph/check-circle.js",
+    "size": 647,
+    "originalSize": 905,
+    "time": 115
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/analytics-next/dist/esm/hooks/useAnalyticsEvents.js",
+    "size": 646,
+    "originalSize": 1004,
+    "time": 69
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_sliced_to_array_loose.js",
+    "size": 640,
+    "originalSize": 1012,
+    "time": 21
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/focus-lock/dist/es2015/focusInside.js",
+    "size": 633,
+    "originalSize": 991,
+    "time": 11
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/esm/defineProperty.js",
+    "size": 627,
+    "originalSize": 406,
+    "time": 31
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/focus-lock/dist/es2015/utils/correctFocus.js",
+    "size": 626,
+    "originalSize": 1053,
+    "time": 7
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/modal-dialog/dist/esm/index.js",
+    "size": 615,
+    "originalSize": 1556,
+    "time": 75
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_to_array.js",
+    "size": 612,
+    "originalSize": 932,
+    "time": 25
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_to_consumable_array.js",
+    "size": 611,
+    "originalSize": 974,
+    "time": 23
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/ds-lib/dist/esm/hooks/use-close-on-escape-press.js",
+    "size": 611,
+    "originalSize": 1110,
+    "time": 141
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-uid/dist/es2015/context.js",
+    "size": 610,
+    "originalSize": 1008,
+    "time": 124
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/motion/dist/esm/utils/use-unique-id.js",
+    "size": 610,
+    "originalSize": 706,
+    "time": 28
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-select/node_modules/memoize-one/dist/memoize-one.esm.js",
+    "size": 610,
+    "originalSize": 1274,
+    "time": 36
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/button/dist/esm/shared/block-events.js",
+    "size": 609,
+    "originalSize": 1023,
+    "time": 17
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_sliced_to_array.js",
+    "size": 607,
+    "originalSize": 950,
+    "time": 23
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/esm/toConsumableArray.js",
+    "size": 607,
+    "originalSize": 1005,
+    "time": 33
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@emotion/react/node_modules/@emotion/utils/dist/emotion-utils.browser.esm.js",
+    "size": 597,
+    "originalSize": 1716,
+    "time": 57
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_async_generator_delegate.js",
+    "size": 596,
+    "originalSize": 1141,
+    "time": 35
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_object_spread.js",
+    "size": 593,
+    "originalSize": 865,
+    "time": 31
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@emotion/utils/dist/utils.browser.esm.js",
+    "size": 586,
+    "originalSize": 1710,
+    "time": 68
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/memoize-one/dist/memoize-one.esm.js",
+    "size": 579,
+    "originalSize": 1387,
+    "time": 140
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/select/dist/esm/components/index.js",
+    "size": 579,
+    "originalSize": 1361,
+    "time": 49
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/esm/unsupportedIterableToArray.js",
+    "size": 578,
+    "originalSize": 787,
+    "time": 21
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/portal/dist/esm/internal/components/internal-portal.js",
+    "size": 570,
+    "originalSize": 1068,
+    "time": 14
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/theme/dist/esm/utils/themed.js",
+    "size": 567,
+    "originalSize": 1397,
+    "time": 5
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_unsupported_iterable_to_array.js",
+    "size": 565,
+    "originalSize": 778,
+    "time": 24
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-focus-lock/dist/es2015/FreeFocusInside.js",
+    "size": 561,
+    "originalSize": 897,
+    "time": 15
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/esm/objectWithoutProperties.js",
+    "size": 561,
+    "originalSize": 966,
+    "time": 32
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_async_to_generator.js",
+    "size": 554,
+    "originalSize": 992,
+    "time": 7
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_object_without_properties.js",
+    "size": 547,
+    "originalSize": 959,
+    "time": 31
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@parcel/transformer-js/src/esmodule-helpers.js",
+    "size": 546,
+    "originalSize": 751,
+    "time": 6
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/esm/inherits.js",
+    "size": 546,
+    "originalSize": 836,
+    "time": 35
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/ds-lib/dist/esm/hooks/use-state-ref.js",
+    "size": 542,
+    "originalSize": 650,
+    "time": 32
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/portal/dist/esm/internal/hooks/use-portal-event.js",
+    "size": 538,
+    "originalSize": 781,
+    "time": 15
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-focus-lock/dist/es2015/UI.js",
+    "size": 534,
+    "originalSize": 1388,
+    "time": 31
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-uid/dist/es2015/hooks.js",
+    "size": 532,
+    "originalSize": 1018,
+    "time": 96
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_baseSet.js",
+    "size": 527,
+    "originalSize": 1338,
+    "time": 8
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/ds-lib/dist/esm/hooks/use-document-event.js",
+    "size": 527,
+    "originalSize": 528,
+    "time": 120
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_to_primitive.js",
+    "size": 526,
+    "originalSize": 706,
+    "time": 30
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/motion/dist/esm/utils/accessibility.js",
+    "size": 525,
+    "originalSize": 806,
+    "time": 16
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/feedback-collector/dist/esm/index.js",
+    "size": 514,
+    "originalSize": 792,
+    "time": 2
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/get.js",
+    "size": 514,
+    "originalSize": 804,
+    "time": 33
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/esm/createClass.js",
+    "size": 512,
+    "originalSize": 831,
+    "time": 36
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_define_enumerable_properties.js",
+    "size": 508,
+    "originalSize": 864,
+    "time": 36
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_baseIsNative.js",
+    "size": 506,
+    "originalSize": 1383,
+    "time": 13
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_apply_decorated_descriptor.js",
+    "size": 503,
+    "originalSize": 1035,
+    "time": 33
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_get.js",
+    "size": 503,
+    "originalSize": 849,
+    "time": 34
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/portal/dist/esm/internal/utils/portal-custom-event.js",
+    "size": 495,
+    "originalSize": 1437,
+    "time": 74
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_ListCache.js",
+    "size": 494,
+    "originalSize": 857,
+    "time": 6
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/modal-dialog/dist/esm/internal/utils.js",
+    "size": 494,
+    "originalSize": 845,
+    "time": 8
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_extends.js",
+    "size": 492,
+    "originalSize": 582,
+    "time": 42
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/motion/dist/esm/entry-points/curves.js",
+    "size": 492,
+    "originalSize": 423,
+    "time": 17
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/extends.js",
+    "size": 489,
+    "originalSize": 565,
+    "time": 56
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_MapCache.js",
+    "size": 484,
+    "originalSize": 857,
+    "time": 15
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/stylis/src/Utility.js",
+    "size": 483,
+    "originalSize": 483,
+    "time": 0
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/use-callback-ref/dist/es2015/index.js",
+    "size": 482,
+    "originalSize": 1458,
+    "time": 12
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_unicodeSize.js",
+    "size": 480,
+    "originalSize": 1603,
+    "time": 90
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/toNumber.js",
+    "size": 480,
+    "originalSize": 1484,
+    "time": 74
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_iterable_to_array_limit.js",
+    "size": 478,
+    "originalSize": 820,
+    "time": 24
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/exenv/index.js",
+    "size": 466,
+    "originalSize": 711,
+    "time": 21
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_interop_require_wildcard.js",
+    "size": 465,
+    "originalSize": 769,
+    "time": 35
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_create_class.js",
+    "size": 463,
+    "originalSize": 745,
+    "time": 38
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/esm/extends.js",
+    "size": 462,
+    "originalSize": 514,
+    "time": 32
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/focus-lock/dist/es2015/focusIsHidden.js",
+    "size": 462,
+    "originalSize": 526,
+    "time": 10
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/motion/dist/esm/utils/use-force-render.js",
+    "size": 460,
+    "originalSize": 704,
+    "time": 14
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/use-callback-ref/dist/es2015/useMergeRef.js",
+    "size": 455,
+    "originalSize": 1075,
+    "time": 8
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_unicodeToArray.js",
+    "size": 452,
+    "originalSize": 1557,
+    "time": 88
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/focus-lock/dist/es2015/utils/firstFocus.js",
+    "size": 450,
+    "originalSize": 693,
+    "time": 8
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/theme/dist/esm/utils/get-theme.js",
+    "size": 449,
+    "originalSize": 641,
+    "time": 7
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/use-callback-ref/dist/es2015/useRef.js",
+    "size": 448,
+    "originalSize": 1501,
+    "time": 6
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_Hash.js",
+    "size": 446,
+    "originalSize": 735,
+    "time": 6
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-scrolllock/dist/index.js",
+    "size": 442,
+    "originalSize": 610,
+    "time": 102
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/unsupportedIterableToArray.js",
+    "size": 439,
+    "originalSize": 620,
+    "time": 22
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/inherits.js",
+    "size": 439,
+    "originalSize": 691,
+    "time": 97
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_initializer_warning_helper.js",
+    "size": 439,
+    "originalSize": 488,
+    "time": 41
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/focus-lock/dist/es2015/utils/tabbables.js",
+    "size": 439,
+    "originalSize": 511,
+    "time": 2
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-uid/dist/es2015/uid.js",
+    "size": 433,
+    "originalSize": 755,
+    "time": 95
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/modal-dialog/dist/esm/hooks.js",
+    "size": 431,
+    "originalSize": 559,
+    "time": 27
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_possible_constructor_return.js",
+    "size": 430,
+    "originalSize": 634,
+    "time": 21
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/checkbox/dist/esm/internal/index.js",
+    "size": 427,
+    "originalSize": 960,
+    "time": 93
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/modal-dialog/dist/esm/internal/hooks/use-on-motion-finish.js",
+    "size": 427,
+    "originalSize": 723,
+    "time": 9
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_inherits.js",
+    "size": 423,
+    "originalSize": 745,
+    "time": 31
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/possibleConstructorReturn.js",
+    "size": 422,
+    "originalSize": 531,
+    "time": 35
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/flag/dist/esm/internal/title.js",
+    "size": 421,
+    "originalSize": 593,
+    "time": 97
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/objectWithoutProperties.js",
+    "size": 420,
+    "originalSize": 793,
+    "time": 143
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/esm/typeof.js",
+    "size": 418,
+    "originalSize": 650,
+    "time": 110
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/flag/dist/esm/internal/index.js",
+    "size": 417,
+    "originalSize": 948,
+    "time": 9
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/portal/dist/esm/internal/hooks/use-is-subsequent-render.js",
+    "size": 416,
+    "originalSize": 694,
+    "time": 15
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/raf-schd/dist/raf-schd.esm.js",
+    "size": 413,
+    "originalSize": 755,
+    "time": 4
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/modal-dialog/dist/esm/internal/hooks/use-scroll.js",
+    "size": 412,
+    "originalSize": 517,
+    "time": 31
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/flag/dist/esm/index.js",
+    "size": 412,
+    "originalSize": 1106,
+    "time": 170
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/slicedToArray.js",
+    "size": 409,
+    "originalSize": 520,
+    "time": 144
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/analytics-next/dist/esm/hooks/useAnalyticsContext.js",
+    "size": 409,
+    "originalSize": 602,
+    "time": 121
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/checkbox/dist/esm/internal/label-text.js",
+    "size": 408,
+    "originalSize": 604,
+    "time": 94
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/toConsumableArray.js",
+    "size": 403,
+    "originalSize": 519,
+    "time": 36
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/iterableToArrayLimit.js",
+    "size": 403,
+    "originalSize": 776,
+    "time": 14
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/ds-lib/dist/esm/utils/keycodes.js",
+    "size": 401,
+    "originalSize": 630,
+    "time": 120
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/use-sidecar/dist/es2015/index.js",
+    "size": 399,
+    "originalSize": 993,
+    "time": 17
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/motion/dist/esm/utils/curves.js",
+    "size": 399,
+    "originalSize": 486,
+    "time": 33
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/asyncToGenerator.js",
+    "size": 396,
+    "originalSize": 948,
+    "time": 35
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_to_property_key.js",
+    "size": 396,
+    "originalSize": 533,
+    "time": 21
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_get_prototype_of.js",
+    "size": 393,
+    "originalSize": 442,
+    "time": 31
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/flag/dist/esm/internal/description.js",
+    "size": 392,
+    "originalSize": 657,
+    "time": 94
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/memoize.js",
+    "size": 391,
+    "originalSize": 2207,
+    "time": 65
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/focus-lock/dist/es2015/utils/array.js",
+    "size": 391,
+    "originalSize": 507,
+    "time": 8
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_baseToString.js",
+    "size": 390,
+    "originalSize": 1110,
+    "time": 60
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/icon/dist/esm/components/utils.js",
+    "size": 390,
+    "originalSize": 496,
+    "time": 99
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_isKey.js",
+    "size": 386,
+    "originalSize": 940,
+    "time": 5
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_class_private_field_set.js",
+    "size": 382,
+    "originalSize": 522,
+    "time": 37
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/analytics-next/dist/esm/components/AnalyticsContext/index.js",
+    "size": 373,
+    "originalSize": 580,
+    "time": 11
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/portal/dist/esm/internal/constants.js",
+    "size": 373,
+    "originalSize": 587,
+    "time": 34
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/inheritsLoose.js",
+    "size": 372,
+    "originalSize": 365,
+    "time": 109
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_set_prototype_of.js",
+    "size": 371,
+    "originalSize": 423,
+    "time": 26
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_defaults.js",
+    "size": 364,
+    "originalSize": 507,
+    "time": 36
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/button/dist/esm/entry-points/custom-theme-button.js",
+    "size": 360,
+    "originalSize": 460,
+    "time": 32
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_super_prop_base.js",
+    "size": 359,
+    "originalSize": 517,
+    "time": 30
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-uid/dist/es2015/index.js",
+    "size": 359,
+    "originalSize": 962,
+    "time": 142
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/motion/dist/esm/utils/durations.js",
+    "size": 359,
+    "originalSize": 639,
+    "time": 16
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/theme/dist/esm/components/theme.js",
+    "size": 356,
+    "originalSize": 576,
+    "time": 43
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/createClass.js",
+    "size": 354,
+    "originalSize": 787,
+    "time": 35
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/button/dist/esm/shared/get-is-only-single-icon.js",
+    "size": 354,
+    "originalSize": 435,
+    "time": 142
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_stringToPath.js",
+    "size": 348,
+    "originalSize": 839,
+    "time": 5
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_initializer_define_property.js",
+    "size": 341,
+    "originalSize": 544,
+    "time": 35
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/esm/objectWithoutPropertiesLoose.js",
+    "size": 337,
+    "originalSize": 538,
+    "time": 61
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_is_native_reflect_construct.js",
+    "size": 336,
+    "originalSize": 552,
+    "time": 31
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_wrap_async_generator.js",
+    "size": 336,
+    "originalSize": 435,
+    "time": 26
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/esm/setPrototypeOf.js",
+    "size": 333,
+    "originalSize": 359,
+    "time": 20
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/ds-lib/dist/esm/hooks/use-window-event.js",
+    "size": 330,
+    "originalSize": 520,
+    "time": 32
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_array_without_holes.js",
+    "size": 328,
+    "originalSize": 409,
+    "time": 37
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_non_iterable_rest.js",
+    "size": 328,
+    "originalSize": 356,
+    "time": 23
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_async_iterator.js",
+    "size": 327,
+    "originalSize": 624,
+    "time": 39
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/taggedTemplateLiteral.js",
+    "size": 327,
+    "originalSize": 339,
+    "time": 32
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/stylis/src/Serializer.js",
+    "size": 327,
+    "originalSize": 327,
+    "time": 0
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/esm/arrayWithoutHoles.js",
+    "size": 326,
+    "originalSize": 416,
+    "time": 21
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_non_iterable_spread.js",
+    "size": 325,
+    "originalSize": 355,
+    "time": 24
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/superPropBase.js",
+    "size": 322,
+    "originalSize": 380,
+    "time": 10
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_nodeUtil.js",
+    "size": 320,
+    "originalSize": 1000,
+    "time": 91
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/index.js",
+    "size": 318,
+    "originalSize": 65,
+    "time": 18
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/ds-lib/dist/esm/utils/merge-refs.js",
+    "size": 318,
+    "originalSize": 375,
+    "time": 51
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/esm/nonIterableSpread.js",
+    "size": 316,
+    "originalSize": 354,
+    "time": 21
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/analytics-next-stable-react-context/src/context.ts",
+    "size": 315,
+    "originalSize": 315,
+    "time": 0
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@emotion/weak-memoize/dist/weak-memoize.browser.esm.js",
+    "size": 309,
+    "originalSize": 505,
+    "time": 60
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_class_private_field_loose_base.js",
+    "size": 307,
+    "originalSize": 382,
+    "time": 6
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/button/dist/esm/custom-theme-button/index.js",
+    "size": 307,
+    "originalSize": 547,
+    "time": 17
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/objectWithoutPropertiesLoose.js",
+    "size": 304,
+    "originalSize": 494,
+    "time": 15
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/ds-lib/dist/esm/hooks/use-lazy-callback.js",
+    "size": 304,
+    "originalSize": 419,
+    "time": 33
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_baseGetTag.js",
+    "size": 303,
+    "originalSize": 760,
+    "time": 73
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_object_without_properties_loose.js",
+    "size": 302,
+    "originalSize": 538,
+    "time": 26
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-focus-lock/dist/es2015/index.js",
+    "size": 300,
+    "originalSize": 349,
+    "time": 103
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_toKey.js",
+    "size": 298,
+    "originalSize": 510,
+    "time": 78
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_await_async_generator.js",
+    "size": 296,
+    "originalSize": 365,
+    "time": 32
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/motion/dist/esm/entry-points/fade-in.js",
+    "size": 296,
+    "originalSize": 526,
+    "time": 157
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/use-callback-ref/dist/es2015/assignRef.js",
+    "size": 293,
+    "originalSize": 720,
+    "time": 7
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_instanceof.js",
+    "size": 290,
+    "originalSize": 354,
+    "time": 33
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_class_private_field_get.js",
+    "size": 287,
+    "originalSize": 368,
+    "time": 34
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_iterable_to_array.js",
+    "size": 284,
+    "originalSize": 320,
+    "time": 26
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/tiny-invariant/dist/tiny-invariant.esm.js",
+    "size": 284,
+    "originalSize": 538,
+    "time": 142
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/ds-lib/dist/esm/hooks/use-previous-value.js",
+    "size": 284,
+    "originalSize": 374,
+    "time": 35
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/esm/inheritsLoose.js",
+    "size": 283,
+    "originalSize": 510,
+    "time": 68
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/icon/dist/esm/entry-points/base.js",
+    "size": 283,
+    "originalSize": 389,
+    "time": 17
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_iterable_to_array_limit_loose.js",
+    "size": 281,
+    "originalSize": 514,
+    "time": 22
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_tagged_template_literal.js",
+    "size": 280,
+    "originalSize": 383,
+    "time": 21
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/isFunction.js",
+    "size": 279,
+    "originalSize": 974,
+    "time": 2
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_assert_this_initialized.js",
+    "size": 278,
+    "originalSize": 334,
+    "time": 38
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_class_private_method_get.js",
+    "size": 278,
+    "originalSize": 346,
+    "time": 34
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_getRawTag.js",
+    "size": 278,
+    "originalSize": 1136,
+    "time": 4
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/modal-dialog/dist/esm/internal/context.js",
+    "size": 278,
+    "originalSize": 453,
+    "time": 8
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_class_static_private_field_spec_set.js",
+    "size": 277,
+    "originalSize": 512,
+    "time": 36
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_class_static_private_field_spec_get.js",
+    "size": 275,
+    "originalSize": 391,
+    "time": 42
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/getPrototypeOf.js",
+    "size": 275,
+    "originalSize": 435,
+    "time": 35
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_castPath.js",
+    "size": 275,
+    "originalSize": 563,
+    "time": 72
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/motion/dist/esm/entry-points/exiting-persistence.js",
+    "size": 274,
+    "originalSize": 506,
+    "time": 36
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_array_like_to_array.js",
+    "size": 272,
+    "originalSize": 348,
+    "time": 38
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/analytics-next/dist/esm/hooks/useTrackedRef.js",
+    "size": 272,
+    "originalSize": 443,
+    "time": 3
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/esm/arrayLikeToArray.js",
+    "size": 272,
+    "originalSize": 348,
+    "time": 13
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/checkbox/dist/esm/index.js",
+    "size": 271,
+    "originalSize": 476,
+    "time": 74
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/esm/taggedTemplateLiteral.js",
+    "size": 269,
+    "originalSize": 383,
+    "time": 110
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/esm/iterableToArray.js",
+    "size": 269,
+    "originalSize": 320,
+    "time": 20
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/portal/dist/esm/index.js",
+    "size": 267,
+    "originalSize": 576,
+    "time": 102
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/nonIterableRest.js",
+    "size": 265,
+    "originalSize": 311,
+    "time": 15
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/textarea/dist/esm/index.js",
+    "size": 265,
+    "originalSize": 527,
+    "time": 3
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_class_call_check.js",
+    "size": 262,
+    "originalSize": 310,
+    "time": 43
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/portal/dist/esm/constants.js",
+    "size": 262,
+    "originalSize": 413,
+    "time": 73
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/ds-lib/dist/esm/hooks/use-lazy-ref.js",
+    "size": 262,
+    "originalSize": 396,
+    "time": 15
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_class_name_tdz_error.js",
+    "size": 261,
+    "originalSize": 292,
+    "time": 33
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_inherits_loose.js",
+    "size": 261,
+    "originalSize": 351,
+    "time": 33
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/nonIterableSpread.js",
+    "size": 258,
+    "originalSize": 310,
+    "time": 22
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/analytics-next/dist/esm/utils/createAndFireEvent.js",
+    "size": 257,
+    "originalSize": 465,
+    "time": 92
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_new_arrow_check.js",
+    "size": 253,
+    "originalSize": 299,
+    "time": 26
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_hashGet.js",
+    "size": 252,
+    "originalSize": 783,
+    "time": 5
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/isSymbol.js",
+    "size": 251,
+    "originalSize": 768,
+    "time": 90
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/ds-lib/dist/esm/hooks/use-auto-focus.js",
+    "size": 248,
+    "originalSize": 480,
+    "time": 34
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/toString.js",
+    "size": 247,
+    "originalSize": 580,
+    "time": 60
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/motion/dist/esm/utils/use-layout-effect.js",
+    "size": 246,
+    "originalSize": 343,
+    "time": 28
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_is_native_function.js",
+    "size": 242,
+    "originalSize": 264,
+    "time": 41
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/analytics-next-stable-react-context/src/index.ts",
+    "size": 240,
+    "originalSize": 240,
+    "time": 0
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/flag/dist/esm/constants.js",
+    "size": 240,
+    "originalSize": 256,
+    "time": 28
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/setPrototypeOf.js",
+    "size": 238,
+    "originalSize": 410,
+    "time": 3
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_skip_first_generator_next.js",
+    "size": 238,
+    "originalSize": 318,
+    "time": 25
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/visually-hidden/dist/esm/index.js",
+    "size": 238,
+    "originalSize": 350,
+    "time": 104
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_class_private_method_set.js",
+    "size": 237,
+    "originalSize": 266,
+    "time": 35
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_assignValue.js",
+    "size": 237,
+    "originalSize": 877,
+    "time": 71
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/icon/dist/esm/entry-points/svg.js",
+    "size": 236,
+    "originalSize": 306,
+    "time": 51
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_isIndex.js",
+    "size": 234,
+    "originalSize": 834,
+    "time": 77
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@emotion/memoize/dist/memoize.browser.esm.js",
+    "size": 229,
+    "originalSize": 319,
+    "time": 12
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/button/dist/esm/entry-points/standard-button.js",
+    "size": 228,
+    "originalSize": 310,
+    "time": 20
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/blanket/dist/esm/index.js",
+    "size": 228,
+    "originalSize": 314,
+    "time": 103
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/spinner/dist/esm/index.js",
+    "size": 228,
+    "originalSize": 314,
+    "time": 108
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_mapCacheClear.js",
+    "size": 226,
+    "originalSize": 401,
+    "time": 7
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_listCacheDelete.js",
+    "size": 226,
+    "originalSize": 750,
+    "time": 5
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/focus-ring/dist/esm/index.js",
+    "size": 226,
+    "originalSize": 325,
+    "time": 102
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/motion/dist/esm/entry-points/durations.js",
+    "size": 226,
+    "originalSize": 585,
+    "time": 16
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_stringToArray.js",
+    "size": 225,
+    "originalSize": 434,
+    "time": 60
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@emotion/react/_isolated-hnrs/dist/emotion-react-_isolated-hnrs.browser.esm.js",
+    "size": 222,
+    "originalSize": 697,
+    "time": 59
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_type_of.js",
+    "size": 220,
+    "originalSize": 244,
+    "time": 27
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_interop_require_default.js",
+    "size": 219,
+    "originalSize": 275,
+    "time": 37
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_tagged_template_literal_loose.js",
+    "size": 219,
+    "originalSize": 304,
+    "time": 31
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_hashSet.js",
+    "size": 215,
+    "originalSize": 601,
+    "time": 6
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/assertThisInitialized.js",
+    "size": 214,
+    "originalSize": 290,
+    "time": 97
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_stringSize.js",
+    "size": 211,
+    "originalSize": 416,
+    "time": 19
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_read_only_error.js",
+    "size": 209,
+    "originalSize": 243,
+    "time": 23
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/defineProperty.js",
+    "size": 209,
+    "originalSize": 362,
+    "time": 36
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/iterableToArray.js",
+    "size": 203,
+    "originalSize": 276,
+    "time": 22
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_define_property.js",
+    "size": 203,
+    "originalSize": 406,
+    "time": 41
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/isRegExp.js",
+    "size": 203,
+    "originalSize": 635,
+    "time": 60
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/arrayWithoutHoles.js",
+    "size": 199,
+    "originalSize": 267,
+    "time": 22
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_root.js",
+    "size": 199,
+    "originalSize": 297,
+    "time": 75
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_array_with_holes.js",
+    "size": 198,
+    "originalSize": 230,
+    "time": 7
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_getMapData.js",
+    "size": 198,
+    "originalSize": 394,
+    "time": 6
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_mapCacheSet.js",
+    "size": 198,
+    "originalSize": 488,
+    "time": 6
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_isKeyable.js",
+    "size": 197,
+    "originalSize": 514,
+    "time": 5
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/arrayLikeToArray.js",
+    "size": 195,
+    "originalSize": 304,
+    "time": 3
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_await_value.js",
+    "size": 195,
+    "originalSize": 210,
+    "time": 42
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_baseAssignValue.js",
+    "size": 195,
+    "originalSize": 617,
+    "time": 5
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_isMasked.js",
+    "size": 195,
+    "originalSize": 561,
+    "time": 2
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/focus-lock/dist/es2015/tabHook.js",
+    "size": 195,
+    "originalSize": 221,
+    "time": 11
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/classCallCheck.js",
+    "size": 194,
+    "originalSize": 266,
+    "time": 98
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_hasUnicode.js",
+    "size": 194,
+    "originalSize": 926,
+    "time": 60
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_hashHas.js",
+    "size": 194,
+    "originalSize": 624,
+    "time": 6
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_listCacheSet.js",
+    "size": 188,
+    "originalSize": 584,
+    "time": 5
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_baseSlice.js",
+    "size": 187,
+    "originalSize": 727,
+    "time": 90
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_baseIsRegExp.js",
+    "size": 185,
+    "originalSize": 506,
+    "time": 91
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/toFinite.js",
+    "size": 183,
+    "originalSize": 1153,
+    "time": 90
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_getNative.js",
+    "size": 180,
+    "originalSize": 481,
+    "time": 65
+  },
+  {
+    "filePath": "/Users/skanodia/dev/package-build-stats/node_modules/@swc/helpers/src/_throw.js",
+    "size": 179,
+    "originalSize": 183,
+    "time": 27
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/prop-types/lib/ReactPropTypesSecret.js",
+    "size": 179,
+    "originalSize": 311,
+    "time": 32
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/esm/classCallCheck.js",
+    "size": 179,
+    "originalSize": 310,
+    "time": 33
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_defineProperty.js",
+    "size": 171,
+    "originalSize": 268,
+    "time": 19
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_memoizeCapped.js",
+    "size": 171,
+    "originalSize": 631,
+    "time": 18
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_toSource.js",
+    "size": 164,
+    "originalSize": 604,
+    "time": 7
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_castSlice.js",
+    "size": 162,
+    "originalSize": 519,
+    "time": 60
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_baseTrim.js",
+    "size": 161,
+    "originalSize": 435,
+    "time": 68
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/isObject.js",
+    "size": 159,
+    "originalSize": 831,
+    "time": 59
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_listCacheGet.js",
+    "size": 158,
+    "originalSize": 415,
+    "time": 5
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_mapCacheDelete.js",
+    "size": 151,
+    "originalSize": 454,
+    "time": 8
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@atlaskit/spinner/dist/esm/constants.js",
+    "size": 146,
+    "originalSize": 306,
+    "time": 29
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_hashClear.js",
+    "size": 141,
+    "originalSize": 288,
+    "time": 5
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_assocIndexOf.js",
+    "size": 141,
+    "originalSize": 481,
+    "time": 2
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/toInteger.js",
+    "size": 132,
+    "originalSize": 753,
+    "time": 60
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/helpers/arrayWithHoles.js",
+    "size": 132,
+    "originalSize": 186,
+    "time": 15
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_listCacheHas.js",
+    "size": 132,
+    "originalSize": 403,
+    "time": 4
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/react-is/index.js",
+    "size": 132,
+    "originalSize": 76,
+    "time": 19
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_arrayMap.js",
+    "size": 131,
+    "originalSize": 536,
+    "time": 91
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/set.js",
+    "size": 125,
+    "originalSize": 960,
+    "time": 117
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_Map.js",
+    "size": 124,
+    "originalSize": 189,
+    "time": 6
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_mapCacheGet.js",
+    "size": 123,
+    "originalSize": 330,
+    "time": 7
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_mapCacheHas.js",
+    "size": 123,
+    "originalSize": 382,
+    "time": 3
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_hashDelete.js",
+    "size": 120,
+    "originalSize": 450,
+    "time": 6
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_trimmedEndIndex.js",
+    "size": 119,
+    "originalSize": 515,
+    "time": 21
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/prop-types/index.js",
+    "size": 108,
+    "originalSize": 208,
+    "time": 61
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_nativeCreate.js",
+    "size": 105,
+    "originalSize": 185,
+    "time": 2
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_asciiSize.js",
+    "size": 104,
+    "originalSize": 269,
+    "time": 91
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_objectToString.js",
+    "size": 100,
+    "originalSize": 564,
+    "time": 2
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_baseProperty.js",
+    "size": 98,
+    "originalSize": 367,
+    "time": 75
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_coreJsData.js",
+    "size": 98,
+    "originalSize": 155,
+    "time": 6
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/@babel/runtime/regenerator/index.js",
+    "size": 92,
+    "originalSize": 49,
+    "time": 3
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/isObjectLike.js",
+    "size": 88,
+    "originalSize": 615,
+    "time": 74
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_freeGlobal.js",
+    "size": 86,
+    "originalSize": 199,
+    "time": 72
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/isArray.js",
+    "size": 84,
+    "originalSize": 487,
+    "time": 91
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_Symbol.js",
+    "size": 83,
+    "originalSize": 116,
+    "time": 90
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_baseUnary.js",
+    "size": 83,
+    "originalSize": 339,
+    "time": 91
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_getValue.js",
+    "size": 82,
+    "originalSize": 326,
+    "time": 5
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/eq.js",
+    "size": 80,
+    "originalSize": 798,
+    "time": 6
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_listCacheClear.js",
+    "size": 79,
+    "originalSize": 221,
+    "time": 5
+  },
+  {
+    "filePath": "/private/tmp/tmp-build/packages/build-@atlaskitfeedback-collector-ok/node_modules/lodash/_asciiToArray.js",
+    "size": 70,
+    "originalSize": 258,
+    "time": 90
+  }
+]

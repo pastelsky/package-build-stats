@@ -6,7 +6,7 @@ const {
   getPackageStats,
   getPackageExportSizes,
   getAllPackageExports,
-} = require('./src')
+} = require('./packages/package-build-stats')
 
 const PORT = 3000
 console.log(`Starting at port ${PORT}`)
@@ -18,6 +18,7 @@ server({ port: PORT }, [
     try {
       const result = await getPackageStats(packageString, {
         ...ctx.query,
+        installTimeout: 500000,
       })
       return json(result)
     } catch (err) {

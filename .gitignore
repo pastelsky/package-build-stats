@@ -10,6 +10,6 @@ yarn-error.log
 !*fixtures/node_modules/resolve-test/node_modules
 !*fixtures/node_modules/resolve-test/nested-folder/another-nested-folder/node_modules
 
-
+.yarn/cache
 # Serverless directories
 .serverless

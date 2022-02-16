@@ -5,6 +5,7 @@
     /* Basic Options */
     // "incremental": true,                   /* Enable incremental compilation */
     "target": "ES2017",
+    "lib": ["es2019"],
     "resolveJsonModule": true,
     /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019', 'ES2020', or 'ESNEXT'. */
     "module": "commonjs",
@@ -16,9 +17,9 @@
     "declaration": true,
     /* Generates corresponding '.d.ts' file. */
     //    "declarationMap": true /* Generates a sourcemap for each corresponding '.d.ts' file. */,
-    // "sourceMap": true,                     /* Generates corresponding '.map' file. */
+     "sourceMap": true,                     /* Generates corresponding '.map' file. */
     // "outFile": "./",                       /* Concatenate and emit output to single file. */
-    "outDir": "./build",
+//    "outDir": "./build",
     /* Redirect output structure to the directory. */
     // "rootDir": "./",                       /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */
     // "composite": true,                     /* Enable project compilation */
@@ -75,10 +76,20 @@
     "forceConsistentCasingInFileNames": true
     /* Disallow inconsistently-cased references to the same file. */
   },
-  "include": ["./src/**/*", "./typings"],
 
-  "typedocOptions": {
-    "mode": "library",
-    "out": "docs"
-  }
+  "exclude": [
+    "packages/**/build/**"
+  ],
+
+  "references": [
+    {
+      "path": "./packages/parcel-resolver-package-build-stats"
+    },
+    {
+      "path": "./packages/parcel-reporter-package-build-stats"
+    },
+    {
+      "path": "./packages/package-build-stats"
+    },
+  ],
 }

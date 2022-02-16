@@ -1,0 +1,16 @@
+{
+  "name": "parcel-reporter-package-build-stats",
+  "version": "1.0.0",
+  "main": "build/index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc --build"
+  },
+  "devDependencies": {
+    "@types/memoizee": "^0.4.7",
+    "typescript": "^4.5.5"
+  },
+  "dependencies": {
+    "find-up": "^5.0.0"
+  }
+}

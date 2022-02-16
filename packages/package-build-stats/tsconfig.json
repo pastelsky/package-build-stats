@@ -1,0 +1,22 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "incremental": true,
+    "outDir": "./build",
+    "rootDir": "./src"
+  },
+  "include": [
+    "./src",
+  ],
+  "references": [
+    {
+      "path": "../parcel-resolver-package-build-stats"
+    },
+    {
+      "path": "../parcel-reporter-package-build-stats"
+    }
+  ]
+}

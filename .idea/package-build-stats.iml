@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="WEB_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/.tmp" />
+      <excludeFolder url="file://$MODULE_DIR$/build" />
+      <excludeFolder url="file://$MODULE_DIR$/temp" />
+      <excludeFolder url="file://$MODULE_DIR$/tmp" />
+      <excludeFolder url="file://$MODULE_DIR$/src/config/.temp_cache" />
+      <excludeFolder url="file://$MODULE_DIR$/dist-2" />
+      <excludeFolder url="file://$MODULE_DIR$/yarn-next" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/parcel-resolver-package-build-stats/build" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/parcel-reporter-package-build-stats/build" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/package-build-stats/build" />
+      <excludeFolder url="file://$MODULE_DIR$/build-backup" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>

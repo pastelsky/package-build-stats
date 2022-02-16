@@ -1,0 +1,8 @@
+{
+  "ie8": false,
+  "compress": false,
+  "mangle": false,
+  "output": {
+    "comments": false
+  }
+}

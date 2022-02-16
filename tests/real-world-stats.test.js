@@ -108,6 +108,13 @@ const libsWithPeerDeps = [
   },
 ]
 
+const libsWithMissingDeps = [
+  {
+    name: 'playwright-core@1.16.3',
+    size: 365 * 1024,
+  },
+]
+
 expect.extend({
   toBeWithinDeltaOf(original, comparison, name) {
     return {
