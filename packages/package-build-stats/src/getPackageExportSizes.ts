@@ -3,7 +3,11 @@ import { performance } from 'perf_hooks'
 
 const debug = require('debug')('bp:worker')
 
-import { getExternals, parsePackageString } from './utils/common.utils'
+import {
+  getExternals,
+  parsePackageString,
+  updateProjectEntries,
+} from './utils/common.utils'
 import { getAllExports } from './utils/exports.utils'
 import InstallationUtils from './utils/installation.utils'
 import BuildUtils from './utils/build.utils'
@@ -79,17 +83,22 @@ export async function getPackageExportSizes(
 
     const externals = getExternals(packageName, installPath)
 
-    const builtDetails = await BuildUtils.buildPackageIgnoringMissingDeps({
-      name: packageName,
-      installPath,
-      externals,
-      options: {
-        customImports: exports,
-        splitCustomImports: true,
-        includeDependencySizes: false,
-        minifier: options.minifier || 'terser',
+    await updateProjectEntries(installPath, exportMap)
+
+    const builtDetails = await BuildUtils.buildPackageIgnoringMissingDeps(
+      {
+        name: packageName,
+        installPath,
+        externals,
+        options: {
+          customImports: exports,
+          splitCustomImports: true,
+          includeDependencySizes: false,
+          minifier: options.minifier || 'terser',
+        },
       },
-    })
+      0
+    )
 
     Telemetry.packageExportsSizes(packageString, startTime, true, options)
     return {

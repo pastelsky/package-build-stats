@@ -24,7 +24,7 @@ const resolver = new Resolver({
 
     const projectPackageJSON = path.join(options.projectRoot, 'package.json')
 
-    const { peerDependencies } = await readJSONFile(
+    const { peerDependencies, ignoredDeps } = await readJSONFile(
       options.inputFS,
       projectPackageJSON
     )
@@ -53,12 +53,16 @@ const resolver = new Resolver({
       ? specifier.split('/').slice(0, 2).join('/')
       : specifier.split('/')[0]
 
-    const isExcluded = packageName in (peerDependencies || {})
+    const isExcluded =
+      packageName in (peerDependencies || {}) ||
+      packageName in (ignoredDeps || {})
 
-    return {
+    const resolvedIs = {
       ...resolved,
-      isExcluded,
+      filePath: isExcluded ? require.resolve('./noop.js') : resolved?.filePath,
+      // isExcluded,
     }
+    return resolvedIs
   },
 })
 

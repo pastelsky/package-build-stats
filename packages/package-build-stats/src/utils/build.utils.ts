@@ -36,6 +36,14 @@ type CompilePackageArgs = {
   installPath: string
 }
 
+type CompileEntryArgs = {
+  name: string
+  externals: Externals
+  entry: any
+  entryName: string
+  installPath: string
+}
+
 type BuildPackageArgs = {
   name: string
   installPath: string
@@ -87,9 +95,12 @@ const BuildUtils = {
     installPath: string,
     options: CreateEntryPointOptions
   ) {
-    const entryPath = path.join(
+    const entryFilename = options.entryFilename || 'index.js'
+    const entryPath = path.join(installPath, entryFilename)
+
+    const entryPathHTML = path.join(
       installPath,
-      options.entryFilename || 'index.js'
+      options.entryFilename?.replace('.js', '.html') || 'index.html'
     )
 
     let importStatement: string
@@ -116,12 +127,141 @@ const BuildUtils = {
       }
     }
 
+    // REMOVE!!!!
+    // importStatement = `import { addDays } from '${packageName}'; console.log(addDays)`
+
+    console.log('entryPath', options.entryFilename)
     try {
       fs.writeFileSync(entryPath, importStatement, 'utf-8')
+      // fs.writeFileSync(
+      //   entryPathHTML,
+      //   `<script type="module" src="${entryFilename}">`
+      // )
       return entryPath
     } catch (err) {
       throw new EntryPointError(err)
     }
+  },
+
+  async _compileEntry({
+    entry,
+    entryName,
+    externals,
+    installPath,
+  }: CompileEntryArgs): Promise<CompilePackageReturn> {
+    await updateProjectPeerDependencies(
+      installPath,
+      Object.fromEntries(
+        [...externals.externalBuiltIns, ...externals.externalPackages].map(
+          pack => [pack, '*']
+        )
+      )
+    )
+
+    const altOptions = {}
+
+    let bundler = new Parcel({
+      entries: [entry.replace('.js', '.js')],
+      mode: 'production',
+      logLevel: 'verbose',
+      env: Object.assign(Object.assign({}, process.env), {
+        NODE_ENV: 'production',
+      }),
+      defaultConfig: '@parcel/config-default',
+      shouldAutoInstall: false,
+      workerFarm,
+      cacheDir: path.join(__dirname, '..', '..', 'cache'),
+      // outputFS,
+      config: require.resolve('../../.parcelrc'),
+      shouldDisableCache: true,
+      shouldContentHash: false,
+      defaultTargetOptions: {
+        sourceMaps: entry.length === 1,
+        outputFormat: 'global',
+        shouldOptimize: true,
+        isLibrary: false,
+        engines: {
+          browsers: [
+            'last 5 Chrome versions',
+            'last 5 Firefox versions',
+            'Safari >= 9',
+            'edge >= 12',
+          ],
+        },
+      },
+
+      // @ts-ignore
+      // targets: [entryName].reduce((acc, nextEntry) => {
+      //   // @ts-ignore
+      //   acc[nextEntry] = {
+      //     //     context: 'browser',
+      //     //     engines: {
+      //     //       browsers: [
+      //     //         'last 5 Chrome versions',
+      //     //         'last 5 Firefox versions',
+      //     //         'Safari >= 9',
+      //     //         'edge >= 12',
+      //     //       ],
+      //     //     },
+      //     //     optimize: false,
+      //     //     // // sourceMap: false, //entry.length > 1,
+      //     //     scopeHoist: true,
+      //     //     isLibrary: true,
+      //     //     // source: entry.replace('.js', '.html'),
+      //     //     outputFormat: 'global',
+      //     distDir: path.join(installPath, 'dist'),
+      //     //     // distEntry: `${entryName}.js`,
+      //     //     includeNodeModules: Object.fromEntries(
+      //     //       externals.externalPackages.map(dep => [dep, false])
+      //     //     ),
+      //   }
+      //   // return acc
+      // }, {}),
+    })
+
+    const assets = []
+    let { bundleGraph, buildTime } = await bundler.run()
+    for (let bundle of bundleGraph.getBundles()) {
+      console.log(
+        bundle,
+        bundle.stats,
+        bundle.getMainEntry(),
+        bundle.filePath,
+        bundle.name
+      )
+      assets.push({
+        file: bundle.filePath,
+        size: bundle.stats.size,
+      })
+      bundle.traverseAssets(asset => {
+        asset.getDependencies().map(a => ({
+          target: a.target,
+          specifier: a.specifier,
+          sourcePath: a.sourcePath,
+          resolveFrom: a.resolveFrom,
+        }))
+        let filePath = path.normalize(asset.filePath)
+        // console.log(
+        //   'ASSET: ',
+        //   {
+        //     ...asset,
+        //     filePath: asset.filePath,
+        //     type: asset.type,
+        //     isSource: asset.isSource,
+        //     meta: asset.meta,
+        //     k: asset.symbols,
+        //   },
+        //   asset.getDependencies().map(a => ({
+        //     isEntry: a.isEntry,
+        //     sourceAssetType: a.sourceAssetType,
+        //     sourcePath: a.sourcePath,
+        //   })),
+        //   asset.stats
+        // )
+      })
+    }
+
+    return { assets }
   },
 
   async compilePackage({
@@ -133,117 +273,47 @@ const BuildUtils = {
     installPath,
   }: CompilePackageArgs): Promise<CompilePackageReturn> {
     const startTime = performance.now()
-    const nodeFS = new NodeFS()
-    const externalDeps = await updateProjectPeerDependencies(
-      installPath,
-      Object.fromEntries(
-        externals.externalPackages.map(packageName => [packageName, '*'])
-      )
-    )
 
-    // @ts-ignore
-    // @ts-ignore
-    // @ts-ignore
-
-    console.log('entry is ', entry)
-    let bundler = new Parcel({
-      entries: entry.mainIndex,
-      mode: 'production',
-      logLevel: 'verbose',
-      env: Object.assign(Object.assign({}, process.env), {
-        NODE_ENV: 'production',
-      }),
-      defaultConfig: '@parcel/config-default',
-      shouldAutoInstall: false,
-      workerFarm,
-      // outputFS,
-      config: require.resolve('../../.parcelrc'),
-      shouldDisableCache: true,
-      shouldContentHash: false,
-      defaultTargetOptions: {
-        engines: {
-          browsers: [
-            'last 5 Chrome versions',
-            'last 5 Firefox versions',
-            'Safari >= 9',
-            'edge >= 12',
-          ],
-        },
-      },
-      // @ts-ignore
-      targets: {
-        ...Object.fromEntries(
-          Object.entries(entry).map(([entryName, entrySource]) => [
-            entryName,
-            {
-              context: 'browser',
-              optimize: true,
-              sourceMap: true,
-              scopeHoist: true,
-              isLibrary: false,
-              outputFormat: 'commonjs',
-              distDir: path.join(installPath, 'dist'),
-              distEntry: `${entryName}.js`,
-              includeNodeModules: Object.fromEntries(
-                externals.externalPackages.map(dep => [dep, false])
-              ),
-              // @ts-ignore
-              source: 22, //() => 'ok', //path.relative(installPath, entrySource),
-            },
-          ])
-        ),
-      },
-    })
-
-    const assets = []
+    let allAssets: CompiledAssetStat[] = []
+    const entries = Object.entries(entry)
     try {
-      let { bundleGraph, buildTime } = await bundler.run()
-      for (let bundle of bundleGraph.getBundles()) {
-        console.log(
-          bundle,
-          bundle.stats,
-          bundle.getMainEntry(),
-          bundle.filePath,
-          bundle.name
-        )
-        assets.push({
-          file: bundle.filePath,
-          size: bundle.stats.size,
-        })
-        bundle.traverseAssets(asset => {
-          asset.getDependencies().map(a => ({
-            target: a.target,
-            specifier: a.specifier,
-            sourcePath: a.sourcePath,
-            resolveFrom: a.resolveFrom,
-          }))
-          let filePath = path.normalize(asset.filePath)
-          // console.log(
-          //   'ASSET: ',
-          //   {
-          //     ...asset,
-          //     filePath: asset.filePath,
-          //     type: asset.type,
-          //     isSource: asset.isSource,
-          //     meta: asset.meta,
-          //     k: asset.symbols,
-          //   },
-          //   asset.getDependencies().map(a => ({
-          //     isEntry: a.isEntry,
-          //     sourceAssetType: a.sourceAssetType,
-          //     sourcePath: a.sourcePath,
-          //   })),
-          //   asset.stats
-          // )
-        })
+      for (let [entryName, entryPath] of entries.slice(0, 100)) {
+        console.log('building entry', entryName, entryPath)
+        try {
+          const { assets } = await this._compileEntry({
+            name,
+            entry: entryPath,
+            entryName,
+            externals,
+            installPath,
+          })
+          allAssets = [...allAssets, ...assets]
+        } catch (err) {
+          console.log(
+            'building entry',
+            entryName,
+            entryPath,
+            ' failed with error ',
+            err
+          )
+          // throw err
+        }
       }
       Telemetry.compilePackage(name, true, startTime, { minifier })
+      return { assets: allAssets }
     } catch (err) {
-      console.log('Parcel failed becase ', err)
+      // @ts-ignore
+      console.log(
+        'Parcel failed because',
+        // @ts-ignore
+
+        err.diagnostics,
+        // @ts-ignore
+        err.diagnostics?.[0]?.codeFrames
+      )
       Telemetry.compilePackage(name, false, startTime, { minifier }, err)
       throw err
     }
-    return { assets }
   },
 
   _parseMissingModules(errors: Array<Diagnostic>) {
@@ -300,7 +370,7 @@ const BuildUtils = {
       options.customImports.forEach((importt: string) => {
         entry[importt] = BuildUtils.createEntryPoint(name, installPath, {
           customImports: [importt],
-          entryFilename: importt,
+          entryFilename: `${importt}.js`,
           esm: true,
         })
       })
@@ -374,14 +444,11 @@ const BuildUtils = {
       }
     }
   },
-  async buildPackageIgnoringMissingDeps({
-    name,
-    externals,
-    installPath,
-    options,
-  }: BuildPackageArgs) {
+  async buildPackageIgnoringMissingDeps(
+    { name, externals, installPath, options }: BuildPackageArgs,
+    buildIteration: number
+  ): Promise<BuildPackageReturn> {
     const buildStartTime = performance.now()
-    let buildIteration = 1
 
     try {
       const buildResult = await BuildUtils.buildPackage({
@@ -400,24 +467,39 @@ const BuildUtils = {
       if (
         e instanceof MissingDependencyError &&
         e.missingModules.length <= 6 &&
-        e.missingModules.every(mod => isValidNPMName(mod))
+        e.missingModules.every(mod => isValidNPMName(mod)) &&
+        buildIteration < 4
       ) {
         const { missingModules } = e.extra
         const newExternals = {
           ...externals,
           externalPackages: externals.externalPackages.concat(missingModules),
         }
+
+        console.log(
+          'BUILD ITERATION: ',
+          buildIteration,
+          'Before externals: ',
+          externals,
+          'new externals to add: ',
+          e.missingModules,
+          ' new externals are:',
+          newExternals
+        )
         log(
           '%s has missing dependencies, rebuilding without %o',
           name,
           missingModules
         )
-        const rebuiltResult = await BuildUtils.buildPackage({
-          name,
-          externals: newExternals,
-          installPath,
-          options,
-        })
+        const rebuiltResults = await BuildUtils.buildPackageIgnoringMissingDeps(
+          {
+            name,
+            externals: newExternals,
+            installPath,
+            options,
+          },
+          buildIteration
+        )
 
         Telemetry.buildPackage(name, true, buildStartTime, {
           ...options,
@@ -425,10 +507,7 @@ const BuildUtils = {
           missingModules,
         })
 
-        return {
-          ignoredMissingDependencies: missingModules,
-          ...rebuiltResult,
-        }
+        return rebuiltResults
       } else {
         Telemetry.buildPackage(
           name,

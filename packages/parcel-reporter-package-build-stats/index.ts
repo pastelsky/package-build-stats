@@ -70,12 +70,12 @@ const resolveRequiredDependency = async (
       resolvedVersion: version,
     }
   } catch (err) {
-    console.warn(
-      'Unable to resolve required dependency  ' +
-        specifier +
-        ' at ' +
-        mainAssetPath
-    )
+    // console.warn(
+    //   'Unable to resolve required dependency  ' +
+    //     specifier +
+    //     ' at ' +
+    //     mainAssetPath
+    // )
     return null
   }
 }
@@ -198,10 +198,8 @@ export default new Reporter({
     }
 
     const projectPackageJSON = path.join(options.projectRoot, 'package.json')
-    const { peerDependencies, dependencies } = await readJSONFileFromFS(
-      options.inputFS,
-      projectPackageJSON
-    )
+    const { peerDependencies = {}, dependencies = {} } =
+      await readJSONFileFromFS(options.inputFS, projectPackageJSON)
 
     const dependenciesTyped = dependencies as { [k: string]: string }
 
@@ -211,7 +209,6 @@ export default new Reporter({
     }
 
     const allBundles = event.bundleGraph.getBundles()
-    console.log('IN REPORTER, BUNDLES', allBundles)
     graphCache = []
 
     const bundlesFormatted = allBundles.map(bundle => ({
@@ -271,18 +268,16 @@ export default new Reporter({
     }
 
     await fs.writeFile(
-      './build-results.json',
+      './logs/build-results.json',
       JSON.stringify(bundlesFormatted, null, 2),
       'utf8'
     )
 
     await fs.writeFile(
-      './graph-cache.json',
+      './logs/graph-cache.json',
       JSON.stringify(bundleGraphCache, null, 2),
       'utf8'
     )
-
-    console.log('written to disk')
 
     await Promise.all(
       allBundles.map(bundle =>
@@ -355,7 +350,7 @@ async function getBundleNode(
         // These are assets injected by Parcel-SWC transformer, ignore them
         return null
       }
-      console.warn("Couldn't find graph cache for asset: ", asset.filePath)
+      // console.warn("Couldn't find graph cache for asset: ", asset.filePath)
       return {
         ...asset,
         details: checkForNodePolyfill(asset.filePath),
@@ -421,13 +416,13 @@ async function getBundleNode(
     .filter(notEmpty)
 
   await fs.writeFile(
-    `./build-metrics-assets-raw.json`,
+    `./logs/build-metrics-assets-raw.json`,
     JSON.stringify(buildMetrics.bundles[0].assets, null, 2),
     'utf8'
   )
 
   await fs.writeFile(
-    `./build-metrics-smap-${bundle.name}.json`,
+    `./logs/build-metrics-smap-${bundle.name}.json`,
     JSON.stringify(assets, null, 2),
     'utf8'
   )
@@ -443,7 +438,7 @@ async function getBundleNode(
   )
 
   await fs.writeFile(
-    './composition.json',
+    './logs/composition.json',
     JSON.stringify(constituents, null, 2),
     'utf8'
   )

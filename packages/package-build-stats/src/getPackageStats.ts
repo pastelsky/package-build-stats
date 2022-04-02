@@ -84,17 +84,20 @@ export default async function getPackageStats(
     const externals = getExternals(packageName, installPath)
     const [packageJSONDetails, builtDetails] = await Promise.all([
       getPackageJSONDetails(packageName, installPath),
-      BuildUtils.buildPackageIgnoringMissingDeps({
-        name: packageName,
-        installPath,
-        externals,
-        options: {
-          debug: options.debug,
-          customImports: options.customImports,
-          minifier: options.minifier,
-          includeDependencySizes: true,
+      BuildUtils.buildPackageIgnoringMissingDeps(
+        {
+          name: packageName,
+          installPath,
+          externals,
+          options: {
+            debug: options.debug,
+            customImports: options.customImports,
+            minifier: options.minifier,
+            includeDependencySizes: true,
+          },
         },
-      }),
+        0
+      ),
     ])
 
     if (!packageJSONDetails) {
@@ -120,6 +123,7 @@ export default async function getPackageStats(
     const hasCSSAsset = builtDetails.assets?.some(
       asset => asset?.type === 'css'
     )
+
     const mainAsset = builtDetails.assets?.find(
       asset =>
         asset?.name === 'main' && asset?.type === (hasCSSAsset ? 'css' : 'js')

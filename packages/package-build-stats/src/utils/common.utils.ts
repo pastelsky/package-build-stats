@@ -195,6 +195,7 @@ export async function updateProjectPeerDependencies(
     [key: string]: string
   }
 ) {
+  // return
   const packageJSONPath = path.join(projectPath, 'package.json')
   const packageJSONContents = JSON.parse(
     await fs.promises.readFile(packageJSONPath, 'utf-8')
@@ -210,11 +211,43 @@ export async function updateProjectPeerDependencies(
     //     ),
     //   },
     // },
-    peerDependencies: {
+    ignoredDeps: {
       ...packageJSONContents.peerDependencies,
       ...peerDependencies,
     },
   }
+  await fs.promises.writeFile(
+    packageJSONPath,
+    JSON.stringify(updatedJSON, null, 2),
+    'utf-8'
+  )
+}
+
+export async function updateProjectEntries(
+  projectPath: string,
+  entries: {
+    [key: string]: string
+  }
+) {
+  return
+  const packageJSONPath = path.join(projectPath, 'package.json')
+  const packageJSONContents = JSON.parse(
+    await fs.promises.readFile(packageJSONPath, 'utf-8')
+  )
+  const updatedJSON = {
+    ...packageJSONContents,
+    targets: Object.fromEntries(
+      Object.entries(entries).map(([entryName, entryPath]) => [
+        entryName,
+        {
+          source: entryName + '.html',
+        },
+      ])
+    ),
+  }
+
+  console.log('updatedJSON', updatedJSON)
+
   await fs.promises.writeFile(
     packageJSONPath,
     JSON.stringify(updatedJSON, null, 2),

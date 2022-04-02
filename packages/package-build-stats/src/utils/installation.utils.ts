@@ -41,7 +41,8 @@ const InstallationUtils = {
     await fs.writeFile(
       path.join(installPath, 'package.json'),
       JSON.stringify({
-        source: './index.js',
+        // source: './index.js',
+        sideEffects: false,
         // main: './dist/index.js',
         // targets: {
         //   main: {
