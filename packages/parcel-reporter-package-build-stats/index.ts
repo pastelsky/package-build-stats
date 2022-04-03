@@ -14,7 +14,7 @@ import {
 } from './utils'
 
 let graphCache = []
-let debug = true
+let debug = false
 
 type RequireeDetails = {
   packageName: string
@@ -70,12 +70,6 @@ const resolveRequiredDependency = async (
       resolvedVersion: version,
     }
   } catch (err) {
-    // console.warn(
-    //   'Unable to resolve required dependency  ' +
-    //     specifier +
-    //     ' at ' +
-    //     mainAssetPath
-    // )
     return null
   }
 }
@@ -198,8 +192,13 @@ export default new Reporter({
     }
 
     const projectPackageJSON = path.join(options.projectRoot, 'package.json')
-    const { peerDependencies = {}, dependencies = {} } =
-      await readJSONFileFromFS(options.inputFS, projectPackageJSON)
+    const {
+      peerDependencies = {},
+      dependencies = {},
+      measureComposition,
+    } = await readJSONFileFromFS(options.inputFS, projectPackageJSON)
+
+    if (!measureComposition) return
 
     const dependenciesTyped = dependencies as { [k: string]: string }
 
@@ -267,17 +266,19 @@ export default new Reporter({
       await Promise.all(promises)
     }
 
-    await fs.writeFile(
-      './logs/build-results.json',
-      JSON.stringify(bundlesFormatted, null, 2),
-      'utf8'
-    )
+    if (debug)
+      await fs.writeFile(
+        '../../logs/build-results.json',
+        JSON.stringify(bundlesFormatted, null, 2),
+        'utf8'
+      )
 
-    await fs.writeFile(
-      './logs/graph-cache.json',
-      JSON.stringify(bundleGraphCache, null, 2),
-      'utf8'
-    )
+    if (debug)
+      await fs.writeFile(
+        '../../logs/graph-cache.json',
+        JSON.stringify(bundleGraphCache, null, 2),
+        'utf8'
+      )
 
     await Promise.all(
       allBundles.map(bundle =>
@@ -363,7 +364,6 @@ async function getBundleNode(
         details.requiredBy.versionRangePeerDependency
 
       if (!range) {
-        console.log('WASTE details ', details)
         throw new Error(
           `Couldn't find version range for ${details.assetFilePath}`
         )
@@ -404,7 +404,6 @@ async function getBundleNode(
 
   const assets = buildMetrics.bundles[0].assets
     // Sourcemaps sometimes contain unmapped paths
-    // .filter(asset => !!asset.filePath)
     // Filter out the setup file (projectRoot/index.js), because we wrote it to disk already
     .filter(asset => {
       const assetRoot = getPackageRoot(asset.filePath, '')
@@ -415,33 +414,35 @@ async function getBundleNode(
     .map(asset => augmentAsset(asset))
     .filter(notEmpty)
 
-  await fs.writeFile(
-    `./logs/build-metrics-assets-raw.json`,
-    JSON.stringify(buildMetrics.bundles[0].assets, null, 2),
-    'utf8'
-  )
+  if (debug)
+    await fs.writeFile(
+      `../../logs/build-metrics-assets-raw.json`,
+      JSON.stringify(buildMetrics.bundles[0].assets, null, 2),
+      'utf8'
+    )
 
-  await fs.writeFile(
-    `./logs/build-metrics-smap-${bundle.name}.json`,
-    JSON.stringify(assets, null, 2),
-    'utf8'
-  )
+  if (debug)
+    await fs.writeFile(
+      `../../logs/build-metrics-smap-${bundle.name}.json`,
+      JSON.stringify(assets, null, 2),
+      'utf8'
+    )
 
   const constituents = calculateComposition(assets).sort(
     (a, b) => b.size - a.size
   )
-
   await fs.writeFile(
     path.join(options.projectRoot, 'composition.json'),
     JSON.stringify(constituents, null, 2),
     'utf8'
   )
 
-  await fs.writeFile(
-    './logs/composition.json',
-    JSON.stringify(constituents, null, 2),
-    'utf8'
-  )
+  if (debug)
+    await fs.writeFile(
+      '../../logs/composition.json',
+      JSON.stringify(constituents, null, 2),
+      'utf8'
+    )
 
   return
 }

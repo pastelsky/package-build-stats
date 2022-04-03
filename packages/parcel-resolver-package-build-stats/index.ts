@@ -53,9 +53,7 @@ const resolver = new Resolver({
       ? specifier.split('/').slice(0, 2).join('/')
       : specifier.split('/')[0]
 
-    const isExcluded =
-      packageName in (peerDependencies || {}) ||
-      packageName in (ignoredDeps || {})
+    const isExcluded = packageName in (peerDependencies || {})
 
     const resolvedIs = {
       ...resolved,

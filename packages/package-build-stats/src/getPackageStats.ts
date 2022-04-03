@@ -3,17 +3,40 @@
  * @see https://github.com/wix/import-cost/blob/master/packages/import-cost/src/webpack.js
  */
 
+const log = require('debug')('bp:package-stats')
 import { promises as fs } from 'fs'
 import path from 'path'
 import { getExternals, parsePackageString } from './utils/common.utils'
 import InstallationUtils from './utils/installation.utils'
+import type { BuildPackageReturn, BuiltAssetStat } from './utils/build.utils'
 import BuildUtils from './utils/build.utils'
+
 import { BuildError, UnexpectedBuildError } from './errors/CustomError'
 import { GetPackageStatsOptions } from './common.types'
 import Telemetry from './utils/telemetry.utils'
 import { performance } from 'perf_hooks'
 
-function getPackageJSONDetails(packageName: string, installPath: string) {
+type PackageJSONDetails = {
+  dependencyCount: number
+  mainFields: string[]
+  hasJSNext: boolean | string
+  hasJSModule: boolean | string | string[]
+  isModuleType: boolean
+  hasSideEffects: boolean | string | string[]
+  peerDependencies: string[]
+}
+
+type PackageStatsResponse = PackageJSONDetails & {
+  buildVersion: string
+  size: number
+  gzip: number
+  parse: BuiltAssetStat['parse']
+} & BuildPackageReturn
+
+function getPackageJSONDetails(
+  packageName: string,
+  installPath: string
+): Promise<PackageJSONDetails | void> {
   const startTime = performance.now()
   const packageJSONPath = path.join(
     installPath,
@@ -57,7 +80,7 @@ function getPackageJSONDetails(packageName: string, installPath: string) {
 export default async function getPackageStats(
   packageString: string,
   optionsRaw: GetPackageStatsOptions
-) {
+): Promise<PackageStatsResponse> {
   const startTime = performance.now()
   const defaultMinifier: 'terser' = 'terser'
 
@@ -119,14 +142,19 @@ export default async function getPackageStats(
       )
     }
 
-    console.log('builtDetails are', builtDetails)
+    log(
+      'builtDetails are %o %o',
+      builtDetails.assets,
+      // @ts-ignore
+      builtDetails.dependencySizes
+    )
     const hasCSSAsset = builtDetails.assets?.some(
       asset => asset?.type === 'css'
     )
 
     const mainAsset = builtDetails.assets?.find(
       asset =>
-        asset?.name === 'main' && asset?.type === (hasCSSAsset ? 'css' : 'js')
+        asset?.name === 'index' && asset?.type === (hasCSSAsset ? 'css' : 'js')
     )
 
     if (!mainAsset) {

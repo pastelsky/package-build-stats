@@ -1,0 +1,71 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`error tests throws if entry point is not defined 1`] = `
+Array [
+  Object {
+    "codeFrames": Array [
+      Object {
+        "code": "const p = require('without-entry-point'); console.log(p)",
+        "codeHighlights": Array [
+          Object {
+            "end": Object {
+              "column": 39,
+              "line": 1,
+            },
+            "start": Object {
+              "column": 19,
+              "line": 1,
+            },
+          },
+        ],
+        "filePath": "/private/tmp/tmp-build/packages/build-without-entry-point-tes/index.js",
+      },
+    ],
+    "message": "Failed to resolve 'without-entry-point' from '/private/tmp/tmp-build/packages/build-without-entry-point-tes/index.js'",
+    "origin": "@parcel/core",
+  },
+]
+`;
+
+exports[`error tests throws if package is not available throws for "npm" 1`] = `
+"npm ERR! code E404
+npm ERR! 404 Not Found - GET https://registry.npmjs.org/some-path-not-existing - Not found
+npm ERR! 404 
+npm ERR! 404  'some-path-not-existing@*' is not in this registry.
+npm ERR! 404 You should bug the author to publish it (or use the name yourself!)
+npm ERR! 404 
+npm ERR! 404 Note that you can also install from a
+npm ERR! 404 tarball, folder, http url, or git url.
+{
+  \\"error\\": {
+    \\"code\\": \\"E404\\",
+    \\"summary\\": \\"Not Found - GET https://registry.npmjs.org/some-path-not-existing - Not found\\",
+    \\"detail\\": \\"\\\\n 'some-path-not-existing@*' is not in this registry.\\\\nYou should bug the author to publish it (or use the name yourself!)\\\\n\\\\nNote that you can also install from a\\\\ntarball, folder, http url, or git url.\\"
+  }
+}
+
+npm ERR! A complete log of this run can be found in:
+"
+`;
+
+exports[`error tests throws if package is not available throws for "pnpm" 1`] = `
+"[41m[30m ERR_PNPM_FETCH_404 [39m[49m [31mGET https://registry.npmjs.org/some-path-not-existing: Not Found - 404[39m
+
+some-path-not-existing is not in the npm registry, or you have no permission to fetch it.
+
+An authorization header was used: Bearer npm_[hidden]
+"
+`;
+
+exports[`error tests throws if package is not available throws for "yarn" 1`] = `
+"[91m➤[39m ]8;;https://yarnpkg.com/advanced/error-codes#yn0027---cant_suggest_resolutionsYN0027]8;;: [38;5;173msome-path-not-existing[39m[38;5;37m@[39m[38;5;37munknown[39m can't be resolved to a satisfying range
+[91m➤[39m ]8;;https://yarnpkg.com/advanced/error-codes#yn0035---network_errorYN0035]8;;: The remote server failed to provide the requested resource
+[91m➤[39m ]8;;https://yarnpkg.com/advanced/error-codes#yn0035---network_errorYN0035]8;;:   [38;5;111mResponse Code[39m: ]8;;https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404404 (Not Found)]8;;
+[91m➤[39m ]8;;https://yarnpkg.com/advanced/error-codes#yn0035---network_errorYN0035]8;;:   [38;5;111mRequest Method[39m: GET
+[91m➤[39m ]8;;https://yarnpkg.com/advanced/error-codes#yn0035---network_errorYN0035]8;;:   [38;5;111mRequest URL[39m: [38;5;170mhttps://registry.yarnpkg.com/some-path-not-existing[39m
+
+[91m➤[39m Errors happened when preparing the environment required to run this command.
+"
+`;
+
+exports[`error tests throws on invalid syntax 1`] = `[BuildError: Parenthesized expression cannot be empty]`;

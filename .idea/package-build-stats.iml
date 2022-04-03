@@ -10,6 +10,7 @@
       <excludeFolder url="file://$MODULE_DIR$/packages/parcel-reporter-package-build-stats/build" />
       <excludeFolder url="file://$MODULE_DIR$/packages/parcel-resolver-package-build-stats/build" />
       <excludeFolder url="file://$MODULE_DIR$/.yarn" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/package-build-stats-cli/build" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

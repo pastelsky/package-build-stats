@@ -4,6 +4,8 @@ import builtInModules from 'builtin-modules'
 import fs from 'fs'
 import os from 'os'
 import memoize from 'memoizee'
+import ThrowableDiagnostic from '@parcel/diagnostic'
+import { codeFrameColumns } from '@babel/code-frame'
 
 const homeDirectory = os.homedir()
 
@@ -15,7 +17,7 @@ export function exec(command: string, options: any, timeout?: number) {
       options,
       (error, stdout, stderr) => {
         if (error) {
-          reject(stderr)
+          reject(stderr || stdout)
         } else {
           resolve(stdout)
         }
@@ -195,26 +197,35 @@ export async function updateProjectPeerDependencies(
     [key: string]: string
   }
 ) {
-  // return
   const packageJSONPath = path.join(projectPath, 'package.json')
   const packageJSONContents = JSON.parse(
     await fs.promises.readFile(packageJSONPath, 'utf-8')
   )
   const updatedJSON = {
     ...packageJSONContents,
-    // targets: {
-    //   ...packageJSONContents.targets,
-    //   main: {
-    //     ...packageJSONContents.targets.main,
-    //     includeNodeModules: Object.fromEntries(
-    //       Object.keys(peerDependencies).map(dep => [dep, false])
-    //     ),
-    //   },
-    // },
-    ignoredDeps: {
+    peerDependencies: {
       ...packageJSONContents.peerDependencies,
       ...peerDependencies,
     },
+  }
+  await fs.promises.writeFile(
+    packageJSONPath,
+    JSON.stringify(updatedJSON, null, 2),
+    'utf-8'
+  )
+}
+
+export async function updateMeasureComposition(
+  projectPath: string,
+  measureComposition: boolean
+) {
+  const packageJSONPath = path.join(projectPath, 'package.json')
+  const packageJSONContents = JSON.parse(
+    await fs.promises.readFile(packageJSONPath, 'utf-8')
+  )
+  const updatedJSON = {
+    ...packageJSONContents,
+    measureComposition,
   }
   await fs.promises.writeFile(
     packageJSONPath,
@@ -246,8 +257,6 @@ export async function updateProjectEntries(
     ),
   }
 
-  console.log('updatedJSON', updatedJSON)
-
   await fs.promises.writeFile(
     packageJSONPath,
     JSON.stringify(updatedJSON, null, 2),
@@ -278,4 +287,19 @@ exports.cleanWebpackPath = cleanWebpackPath
 
 export function isReactNativePackage(packageName: string) {
   return packageName.startsWith('react-native')
+}
+
+export function printDiagnosticError(error: ThrowableDiagnostic) {
+  error.diagnostics.forEach(diagnostic => {
+    console.error(
+      ...[diagnostic.name, diagnostic.origin, diagnostic.message].filter(
+        Boolean
+      )
+    )
+    diagnostic.codeFrames?.forEach(codeFrame => {
+      codeFrame.codeHighlights.forEach(highlight => {
+        if (codeFrame.code) codeFrameColumns(codeFrame.code, highlight)
+      })
+    })
+  })
 }

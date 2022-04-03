@@ -107,20 +107,6 @@ export default class Telemetry {
     })
   }
 
-  static parseWebpackStats(
-    packageName: string,
-    isSuccessful: boolean,
-    startTime: number,
-    error: any = null
-  ) {
-    emitter.emit('TASK_PACKAGE_PARSE_WEBPACK_STATS', {
-      package: { name: packageName },
-      isSuccessful,
-      duration: performance.now() - startTime,
-      error: errorToObject(error),
-    })
-  }
-
   static dependencySizes(
     packageName: string,
     startTime: number,
@@ -134,13 +120,6 @@ export default class Telemetry {
       isSuccessful,
       options,
       error: errorToObject(error),
-    })
-  }
-
-  static assetsGZIPParseTime(packageName: string, startTime: number) {
-    emitter.emit('TASK_PACKAGE_ASSETS_GZIP_PARSE_TIME', {
-      package: { name: packageName },
-      duration: performance.now() - startTime,
     })
   }
 

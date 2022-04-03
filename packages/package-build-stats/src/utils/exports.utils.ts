@@ -3,7 +3,6 @@ import traverse from '@babel/traverse'
 import path from 'path'
 import { promises as fs } from 'fs'
 import enhancedResolve from 'enhanced-resolve'
-import makeWebpackConfig from '../config/makeWebpackConfig'
 import {
   ArrayPattern,
   AssignmentPattern,
@@ -47,8 +46,8 @@ export function getExportsDetails(code: string) {
             result.push(property.value.name)
           }
           break
-        // default:
-        //   assertUnreachable(property.type)
+        default:
+          assertUnreachable(property)
       }
     })
   }
@@ -73,8 +72,8 @@ export function getExportsDetails(code: string) {
       case 'MemberExpression':
         // unhandled
         break
-      // default:
-      //   assertUnreachable(element.left.type)
+      default:
+        assertUnreachable(element.left)
     }
   }
 
@@ -109,8 +108,8 @@ export function getExportsDetails(code: string) {
             processAssignmentPattern(element, result)
             break
 
-          // default:
-          //   assertUnreachable(element.type)
+          default:
+            assertUnreachable(element)
         }
       }
     })
@@ -149,8 +148,8 @@ export function getExportsDetails(code: string) {
                 case 'TSParameterProperty':
                   // unhandled
                   break
-                // default:
-                //   assertUnreachable(dec.id.type)
+                default:
+                  assertUnreachable(dec.id)
               }
             })
             break
@@ -221,18 +220,20 @@ export function getExportsDetails(code: string) {
   }
 }
 
-const webpackConfig = makeWebpackConfig({
-  packageName: '',
-  entry: '',
-  externals: { externalPackages: [], externalBuiltIns: [] },
-  minifier: 'terser',
-})
-
 const resolver = enhancedResolve.create({
-  extensions: webpackConfig?.resolve?.extensions,
-  modules: webpackConfig?.resolve?.modules,
-  // @ts-ignore Error due to unsynced types for enhanced resolve and webpack
-  mainFields: webpackConfig?.resolve?.mainFields,
+  modules: ['node_modules'],
+  extensions: [
+    '.web.mjs',
+    '.mjs',
+    '.web.js',
+    '.js',
+    '.mjs',
+    '.json',
+    '.css',
+    '.sass',
+    '.scss',
+  ],
+  mainFields: ['browser', 'module', 'main', 'style'],
   conditionNames: ['module', 'import', 'style', 'default'],
 })
 

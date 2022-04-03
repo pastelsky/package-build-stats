@@ -2,9 +2,17 @@
   "name": "parcel-resolver-package-build-stats",
   "version": "1.0.0",
   "main": "build/index.js",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "files": [
+    "build"
+  ],
   "license": "MIT",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc --build --listEmittedFiles",
+    "build:watch": "tsc --build --watch",
+    "prepublish": "yarn build"
   },
   "devDependencies": {
     "find-up": "5.0.0",

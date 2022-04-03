@@ -1,13 +1,14 @@
-import shortId from 'shortid'
 import rimraf from 'rimraf'
+import shortId from 'shortid'
 import path from 'path'
 import { promises as fs } from 'fs'
 import sanitize from 'sanitize-filename'
+import semver from 'semver'
 
 const debug = require('debug')('bp:worker')
 import { InstallError, PackageNotFoundError } from '../errors/CustomError'
-import { exec } from './common.utils'
-import config from '../config/config'
+import { exec, parsePackageString } from './common.utils'
+import config from '../config'
 import { InstallPackageOptions } from '../common.types'
 import Telemetry from './telemetry.utils'
 import { performance } from 'perf_hooks'
@@ -19,7 +20,7 @@ const wrapPackCommand = (packagePath: string) =>
 
 const InstallationUtils = {
   getInstallPath(packageName: string) {
-    const id = 'ok' //shortId.generate().slice(0, 3)
+    const id = shortId.generate().slice(0, 3)
     return path.join(
       config.tmp,
       'packages',
@@ -41,18 +42,6 @@ const InstallationUtils = {
     await fs.writeFile(
       path.join(installPath, 'package.json'),
       JSON.stringify({
-        // source: './index.js',
-        sideEffects: false,
-        // main: './dist/index.js',
-        // targets: {
-        //   main: {
-        //     optimize: true,
-        //     sourceMap: true,
-        //     scopeHoist: true,
-        //     isLibrary: false,
-        //     includeNodeModules: true,
-        //   },
-        // },
         dependencies: {},
         browserslist: [
           'last 5 Chrome versions',
@@ -73,6 +62,7 @@ const InstallationUtils = {
   ) {
     let flags, command
     let installStartTime = performance.now()
+    const { version } = parsePackageString(packageString)
 
     const {
       client = 'npm',
@@ -84,32 +74,13 @@ const InstallationUtils = {
     } = installOptions
 
     if (client === 'yarn') {
-      flags = [
-        'ignore-flags',
-        'ignore-engines',
-        'skip-integrity-check',
-        'exact',
-        'json',
-        'no-progress',
-        'silent',
-        'no-lockfile',
-        'no-bin-links',
-        'no-audit',
-        'no-fund',
-        'ignore-optional',
-      ]
-      if (limitConcurrency) {
-        flags.push('mutex network')
-      }
-
-      if (networkConcurrency) {
-        flags.push(`network-concurrency ${networkConcurrency}`)
-      }
+      flags = ['exact', 'cached']
       command = `yarn add ${packageString} ${additionalPackages.join(
         ' '
       )} --${flags.join(' --')}`
     } else if (client === 'npm') {
       flags = [
+        'registry=https://registry.npmjs.org',
         // Setting cache is required for concurrent `npm install`s to work
         `cache=${path.join(config.tmp, 'cache')}`,
         'no-package-lock',
@@ -129,11 +100,28 @@ const InstallationUtils = {
         isLocal ? wrapPackCommand(packageString) : packageString
       } ${additionalPackages.join(' ')} --${flags.join(' --')}`
     } else if (client === 'pnpm') {
-      flags = ['no-optional', 'loglevel error', 'ignore-scripts', 'save-exact']
+      flags = [
+        'registry=https://registry.npmjs.org',
+        'no-color',
+        'no-optional',
+        'loglevel error',
+        'ignore-scripts',
+        'save-exact',
+        `store-dir=${path.join(config.tmp, 'cache', 'pnpm-cache')}`,
+        `virtual-store-dir=${path.join(
+          config.tmp,
+          'cache',
+          'pnpm-cache-virtual'
+        )}`,
+      ]
+
+      if (semver.valid(version)) {
+        flags.push(`prefer-offline`)
+      }
 
       command = `pnpm add ${packageString} ${additionalPackages.join(
         ' '
-      )} --${[].join(' --')}`
+      )} --${flags.join(' --')}`
     } else {
       console.error('No valid client specified')
       process.exit(1)
@@ -159,14 +147,20 @@ const InstallationUtils = {
         installOptions
       )
     } catch (err) {
-      console.log(err)
+      console.error('Install failed due to ', err)
       Telemetry.installPackage(
         packageString,
         false,
         installStartTime,
         installOptions
       )
-      if (typeof err === 'string' && err.includes('code E404')) {
+
+      // @ts-ignore
+      if (
+        typeof err === 'string' &&
+        // Yarn NPM || PNPM
+        /\b404\b/.test(err)
+      ) {
         throw new PackageNotFoundError(err)
       } else {
         throw new InstallError(err)
@@ -175,7 +169,6 @@ const InstallationUtils = {
   },
 
   async cleanupPath(installPath: string) {
-    return /// PLESE REMOVE THIS
     const noop = () => {}
     try {
       await rimraf(installPath, noop)

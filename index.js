@@ -36,6 +36,7 @@ server({ port: PORT }, [
       const result = await getPackageExportSizes(packageString, {
         debug: !!ctx.query.debug,
         minifier: ctx.query.minifier,
+        client: ctx.query.client,
       })
       return json(result)
     } catch (err) {

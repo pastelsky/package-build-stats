@@ -3,8 +3,16 @@
   "version": "1.0.0",
   "main": "build/index.js",
   "license": "MIT",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "files": [
+    "build"
+  ],
   "scripts": {
-    "build": "tsc --build"
+    "build": "tsc --build --listEmittedFiles",
+    "build:watch": "tsc --build --watch",
+    "prepublish": "yarn build"
   },
   "devDependencies": {
     "@types/memoizee": "^0.4.7",

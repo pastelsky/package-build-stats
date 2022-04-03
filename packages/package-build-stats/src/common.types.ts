@@ -7,7 +7,7 @@ export type AllOptions = {
   calcParse?: boolean
   esm?: boolean
   entryFilename?: string
-  client?: 'npm' | 'yarn'
+  client?: 'npm' | 'yarn' | 'pnpm'
   limitConcurrency?: boolean
   networkConcurrency?: number
   additionalPackages?: Array<string>

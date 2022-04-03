@@ -14,3 +14,6 @@ yarn-error.log
 # Serverless directories
 .serverless
 cache
+tsconfig.tsbuildinfo
+logs
+version-packs.sh

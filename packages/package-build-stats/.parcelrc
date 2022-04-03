@@ -31,7 +31,7 @@
       "@parcel/optimizer-htmlnano"
     ],
     "*.{js,mjs,cjs}": [
-      "@parcel/optimizer-terser"
+      "@parcel/optimizer-swc"
     ]
   }
 }
