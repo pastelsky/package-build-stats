@@ -63,7 +63,7 @@ const InstallationUtils = {
       networkConcurrency,
       additionalPackages = [],
       isLocal,
-      installTimeout = 30000,
+      installTimeout = 45000,
     } = installOptions
 
     if (client === 'yarn') {
@@ -97,6 +97,7 @@ const InstallationUtils = {
         `cache=${path.join(config.tmp, 'cache')}`,
         'no-package-lock',
         'no-shrinkwrap',
+        'legacy-peer-deps',
         'no-optional',
         'no-bin-links',
         'progress false',
