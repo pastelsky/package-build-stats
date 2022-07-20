@@ -47,6 +47,7 @@ export default function makeWebpackConfig({
   const builtInNode: NodeBuiltIn = {}
   builtinModules.forEach(mod => {
     builtInNode[mod] = 'empty'
+    builtInNode[`node:${mod}`] = 'empty'
   })
 
   builtInNode['setImmediate'] = false
