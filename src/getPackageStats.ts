@@ -60,14 +60,14 @@ export default async function getPackageStats(
     ...optionsRaw,
   }
 
-  const { name: packageName, isLocal } = parsePackageString(packageString)
+  const { name: packageName, isLocal, normalPath, importPath } = parsePackageString(packageString)
   const installPath = await InstallationUtils.preparePath(packageName)
 
   if (options.debug) {
     console.log('Install path:', installPath)
   }
   try {
-    await InstallationUtils.installPackage(packageString, installPath, {
+    await InstallationUtils.installPackage(normalPath, installPath, {
       isLocal,
       client: options.client,
       limitConcurrency: options.limitConcurrency,
@@ -76,10 +76,11 @@ export default async function getPackageStats(
     })
 
     const externals = getExternals(packageName, installPath)
-    const [pacakgeJSONDetails, builtDetails] = await Promise.all([
+    const [packageJSONDetails, builtDetails] = await Promise.all([
       getPackageJSONDetails(packageName, installPath),
       BuildUtils.buildPackageIgnoringMissingDeps({
         name: packageName,
+        importPath,
         installPath,
         externals,
         options: {
@@ -91,17 +92,24 @@ export default async function getPackageStats(
       }),
     ])
 
-    const hasCSSAsset = builtDetails.assets.some(asset => asset.type === 'css')
-    const mainAsset = builtDetails.assets.find(
-      asset =>
-        asset.name === 'main' && asset.type === (hasCSSAsset ? 'css' : 'js')
-    )
+    const mainAssets = builtDetails.assets.filter(asset => asset.name === 'main')
 
-    if (!mainAsset) {
+    if (!mainAssets.length) {
       throw new UnexpectedBuildError(
         'Did not find a main asset in the built bundle'
       )
     }
+
+    const mainSizes = mainAssets.reduce((acc, asset) => {
+      acc.size += asset.size
+      acc.gzip += asset.gzip
+      if (asset.parse) {
+        acc.parse = acc.parse || {baseParseTime: 0, scriptParseTime: 0}
+        acc.parse.baseParseTime += asset.parse.baseParseTime || 0
+        acc.parse.scriptParseTime += asset.parse.scriptParseTime || 0
+      }
+      return acc
+    }, { size: 0, gzip: 0, parse: null as null | { baseParseTime: number, scriptParseTime: number } })
 
     Telemetry.packageStats(
       packageString,
@@ -110,11 +118,11 @@ export default async function getPackageStats(
       options
     )
     return {
-      ...pacakgeJSONDetails,
+      ...packageJSONDetails,
       ...builtDetails,
-      size: mainAsset.size,
-      gzip: mainAsset.gzip,
-      parse: mainAsset.parse,
+      size: mainSizes.size,
+      gzip: mainSizes.gzip,
+      parse: mainSizes.parse,
     }
   } catch (e) {
     Telemetry.packageStats(
