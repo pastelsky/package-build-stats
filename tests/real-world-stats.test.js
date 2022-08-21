@@ -133,19 +133,19 @@ describe('real world stats', () => {
     done()
   }
 
-  test('Sizes of popular UI Frameworks', async done => {
-    await testPackages(UIPackages, done)
+  test('Sizes of popular UI Frameworks', done => {
+    testPackages(UIPackages, done)
   })
 
-  test('Sizes of popular JS Frameworks', async done => {
-    await testPackages(popularPackages, done)
+  test('Sizes of popular JS Frameworks', done => {
+    testPackages(popularPackages, done)
   })
 
-  test('Sizes of popular UI Libraries', async done => {
-    await testPackages(UILibraries, done)
+  test('Sizes of popular UI Libraries', done => {
+    testPackages(UILibraries, done)
   })
 
-  test('Sizes of libraries with peer dependencies', async done => {
-    await testPackages(libsWithPeerDeps, done)
+  test('Sizes of libraries with peer dependencies', done => {
+    testPackages(libsWithPeerDeps, done)
   })
 })

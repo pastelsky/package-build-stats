@@ -191,7 +191,11 @@ export function getExportsDetails(code: string) {
         }
       } else {
         specifiers.forEach(specifier => {
-          exportsList.push(specifier.exported.name)
+          exportsList.push(
+            specifier.exported.type === 'StringLiteral'
+              ? specifier.exported.value
+              : specifier.exported.name
+          )
         })
       }
     },
@@ -239,6 +243,7 @@ const resolve = async (context: string, path: string): Promise<string> =>
 type ResolvedExports = {
   [key: string]: string
 }
+
 /**
  * Recursively get all exports starting
  * from a given path

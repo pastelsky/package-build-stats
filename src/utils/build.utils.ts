@@ -114,7 +114,7 @@ const BuildUtils = {
 
     return new Promise<CompilePackageReturn>(resolve => {
       compiler.run((err, stats) => {
-        const error = (err as unknown) as WebpackError // Webpack types incorrect
+        const error = err as unknown as WebpackError // Webpack types incorrect
         // stats object can be empty if there are build errors
         resolve({ stats, error, memoryFileSystem })
 

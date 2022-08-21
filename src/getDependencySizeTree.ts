@@ -244,7 +244,7 @@ async function bundleSizeTree(
           name: treeItem.packageName,
           approximateSize: size,
         }
-      } catch (error) {
+      } catch (error: any) {
         const { message, filename } = error
         throw new MinifyError(error, {
           message: message,
