@@ -47,7 +47,7 @@ type BuildPackageArgs = {
   options: BuildPackageOptions
 }
 
-type WebpackStatsAsset = NonNullable<webpack.Stats.ToJsonOutput['assets']>[0]
+type WebpackStatsAsset = NonNullable<webpack.StatsCompilation['assets']>[0]
 
 const BuildUtils = {
   createEntryPoint(
@@ -116,7 +116,7 @@ const BuildUtils = {
       compiler.run((err, stats) => {
         const error = err as unknown as WebpackError // Webpack types incorrect
         // stats object can be empty if there are build errors
-        resolve({ stats, error, memoryFileSystem })
+        resolve({ stats: stats as webpack.Stats, error, memoryFileSystem })
 
         if (error) {
           console.error(error)
@@ -187,11 +187,15 @@ const BuildUtils = {
         return { assets: [] }
       }
       options.customImports.forEach(importt => {
-        entry[importt] = BuildUtils.createEntryPoint(name, installPath, {
-          customImports: [importt],
-          entryFilename: importt,
-          esm: true,
-        })
+        ;(entry as any)[importt] = BuildUtils.createEntryPoint(
+          name,
+          installPath,
+          {
+            customImports: [importt],
+            entryFilename: importt,
+            esm: true,
+          }
+        )
       })
     } else {
       entry['main'] = BuildUtils.createEntryPoint(name, installPath, {
@@ -223,7 +227,7 @@ const BuildUtils = {
       errorDetails: false,
       entrypoints: false,
       reasons: false,
-      maxModules: 500,
+      chunkGroupMaxAssets: 500,
       performance: false,
       source: true,
       depth: true,
@@ -245,7 +249,7 @@ const BuildUtils = {
       throw new BuildError(error)
     } else if (stats.compilation.errors && stats.compilation.errors.length) {
       const missingModules = BuildUtils._parseMissingModules(
-        stats.compilation.errors
+        stats.compilation.errors as any
       )
 
       if (missingModules.length) {
@@ -306,8 +310,14 @@ const BuildUtils = {
       }
 
       const assetsGzipStartTime = performance.now()
+
       const assetStats = jsonStats?.assets
-        ?.filter(asset => !asset.chunkNames.includes('runtime'))
+        ?.filter(
+          asset =>
+            !asset.chunkNames?.some(chunkName =>
+              (chunkName as string).startsWith('runtime~')
+            )
+        )
         .filter(asset => !asset.name.endsWith('LICENSE.txt'))
         .map(getAssetStats)
       Telemetry.assetsGZIPParseTime(name, assetsGzipStartTime)
