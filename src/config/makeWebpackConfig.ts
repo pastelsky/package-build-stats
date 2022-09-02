@@ -1,16 +1,13 @@
 import autoprefixer from 'autoprefixer'
-import TerserPlugin from 'terser-webpack-plugin'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import CssoWebpackPlugin from 'csso-webpack-plugin'
 import WriteFilePlugin from 'write-file-webpack-plugin'
 
 const log = require('debug')('bp:webpack')
 import escapeRegex from 'escape-string-regexp'
-import builtinModules from 'builtin-modules'
 import webpack, { Entry } from 'webpack'
 import { ESBuildMinifyPlugin } from 'esbuild-loader'
-// @ts-ignore
-import VueLoaderPlugin from 'vue-loader/dist/plugin'
+import { VueLoaderPlugin } from 'vue-loader'
 
 import { Externals } from '../common.types'
 
@@ -22,12 +19,7 @@ type MakeWebpackConfigOptions = {
   minifier: 'esbuild' | 'terser'
 }
 
-type NodeBuiltIn = {
-  [key: string]: boolean | 'empty'
-}
-
 export default function makeWebpackConfig({
-  packageName,
   entry,
   externals,
   debug,
@@ -43,23 +35,6 @@ export default function makeWebpackConfig({
   }
 
   log('external packages %o', externalsRegex)
-
-  const builtInNode: NodeBuiltIn = {}
-  builtinModules.forEach(mod => {
-    builtInNode[mod] = 'empty'
-    builtInNode[`node:${mod}`] = 'empty'
-  })
-
-  builtInNode['setImmediate'] = false
-  builtInNode['console'] = false
-  builtInNode['process'] = false
-  builtInNode['Buffer'] = false
-
-  // Don't mark an import as built in if it is the name of the package itself
-  // eg. `events`
-  if (builtInNode[packageName]) {
-    builtInNode[packageName] = false
-  }
 
   // @ts-ignore
   // @ts-ignore
@@ -85,17 +60,7 @@ export default function makeWebpackConfig({
       // @ts-ignore: Appears that the library CssoWebpackPlugin might have incorrect definitions
       minimizer: [
         ...(minifier === 'terser'
-          ? [
-              new TerserPlugin({
-                parallel: true,
-                terserOptions: {
-                  ie8: false,
-                  output: {
-                    comments: false,
-                  },
-                },
-              }),
-            ]
+          ? ['...']
           : [
               new ESBuildMinifyPlugin({
                 target: 'esnext',
@@ -105,11 +70,8 @@ export default function makeWebpackConfig({
       ],
     },
     plugins: [
-      new webpack.IgnorePlugin({
-        contextRegExp: /^electron$/,
-        resourceRegExp: /^electron$/,
-      }),
-      // new VueLoaderPlugin(),
+      new webpack.IgnorePlugin({ resourceRegExp: /^electron$/ }),
+      new VueLoaderPlugin(),
       new MiniCssExtractPlugin({
         // Options similar to the same options in webpackOptions.output
         // both options are optional
@@ -137,6 +99,10 @@ export default function makeWebpackConfig({
     },
     module: {
       rules: [
+        {
+          test: /\.vue$/,
+          loader: require.resolve('vue-loader'),
+        },
         {
           test: /\.css$/,
           use: [MiniCssExtractPlugin.loader, require.resolve('css-loader')],
@@ -175,10 +141,6 @@ export default function makeWebpackConfig({
               emitCss: true,
             },
           },
-        },
-        {
-          test: /\.vue$/,
-          loader: require.resolve('vue-loader'),
         },
         {
           test: /\.(scss|sass)$/,
