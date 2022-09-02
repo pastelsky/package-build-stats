@@ -124,7 +124,7 @@ type StatsTree = {
 
 async function bundleSizeTree(
   packageName: string,
-  stats: webpack.Stats.ToJsonOutput,
+  stats: webpack.StatsCompilation,
   minifier: 'terser' | 'esbuild'
 ) {
   let startTime = performance.now()
@@ -138,21 +138,21 @@ async function bundleSizeTree(
 
   // extract source path for each module
   let modules: MakeModule[] = []
-  const makeModule = (mod: webpack.Stats.FnModules): MakeModule => {
+  const makeModule = (mod: webpack.StatsModule): MakeModule => {
     // Uglifier cannot minify a json file, hence we need
     // to make it valid javascript syntax
-    const isJSON = mod.identifier.endsWith('.json')
+    const isJSON = mod.identifier!.endsWith('.json')
     const source = isJSON ? `$a$=${mod.source}` : mod.source
 
     return {
-      path: modulePath(mod.identifier),
-      sources: [source || ''],
-      source: source || '',
+      path: modulePath(mod.identifier!),
+      sources: [(source as any) || ''],
+      source: (source as any) || '',
     }
   }
 
   stats.modules
-    .filter(mod => !mod.name.startsWith('external'))
+    .filter(mod => !mod.name!.startsWith('external'))
     .forEach(mod => {
       if (mod.modules) {
         mod.modules.forEach(subMod => {

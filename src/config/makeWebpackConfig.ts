@@ -1,16 +1,13 @@
 import autoprefixer from 'autoprefixer'
-import TerserPlugin from 'terser-webpack-plugin'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import CssoWebpackPlugin from 'csso-webpack-plugin'
 import WriteFilePlugin from 'write-file-webpack-plugin'
 
 const log = require('debug')('bp:webpack')
 import escapeRegex from 'escape-string-regexp'
-import builtinModules from 'builtin-modules'
 import webpack, { Entry } from 'webpack'
 import { ESBuildMinifyPlugin } from 'esbuild-loader'
-// @ts-ignore
-import VueLoaderPlugin from 'vue-loader/lib/plugin'
+import { VueLoaderPlugin } from 'vue-loader'
 
 import { Externals } from '../common.types'
 
@@ -22,12 +19,7 @@ type MakeWebpackConfigOptions = {
   minifier: 'esbuild' | 'terser'
 }
 
-type NodeBuiltIn = {
-  [key: string]: boolean | 'empty'
-}
-
 export default function makeWebpackConfig({
-  packageName,
   entry,
   externals,
   debug,
@@ -44,23 +36,6 @@ export default function makeWebpackConfig({
 
   log('external packages %o', externalsRegex)
 
-  const builtInNode: NodeBuiltIn = {}
-  builtinModules.forEach(mod => {
-    builtInNode[mod] = 'empty'
-    builtInNode[`node:${mod}`] = 'empty'
-  })
-
-  builtInNode['setImmediate'] = false
-  builtInNode['console'] = false
-  builtInNode['process'] = false
-  builtInNode['Buffer'] = false
-
-  // Don't mark an import as built in if it is the name of the package itself
-  // eg. `events`
-  if (builtInNode[packageName]) {
-    builtInNode[packageName] = false
-  }
-
   // @ts-ignore
   // @ts-ignore
   // @ts-ignore
@@ -69,8 +44,8 @@ export default function makeWebpackConfig({
     mode: 'production',
     // bail: true,
     optimization: {
-      namedChunks: true,
-      runtimeChunk: { name: 'runtime' },
+      chunkIds: 'named',
+      runtimeChunk: 'multiple',
       minimize: true,
       splitChunks: {
         cacheGroups: {
@@ -85,17 +60,7 @@ export default function makeWebpackConfig({
       // @ts-ignore: Appears that the library CssoWebpackPlugin might have incorrect definitions
       minimizer: [
         ...(minifier === 'terser'
-          ? [
-              new TerserPlugin({
-                parallel: true,
-                terserOptions: {
-                  ie8: false,
-                  output: {
-                    comments: false,
-                  },
-                },
-              }),
-            ]
+          ? ['...']
           : [
               new ESBuildMinifyPlugin({
                 target: 'esnext',
@@ -105,7 +70,7 @@ export default function makeWebpackConfig({
       ],
     },
     plugins: [
-      new webpack.IgnorePlugin(/^electron$/),
+      new webpack.IgnorePlugin({ resourceRegExp: /^electron$/ }),
       new VueLoaderPlugin(),
       new MiniCssExtractPlugin({
         // Options similar to the same options in webpackOptions.output
@@ -113,7 +78,7 @@ export default function makeWebpackConfig({
         filename: '[name].bundle.css',
         chunkFilename: '[id].bundle.css',
       }),
-      ...(debug ? [new WriteFilePlugin()] : []),
+      ...(debug ? ([new WriteFilePlugin()] as any) : []),
     ],
     resolve: {
       modules: ['node_modules'],
@@ -129,10 +94,15 @@ export default function makeWebpackConfig({
         '.sass',
         '.scss',
       ],
-      mainFields: ['browser', 'module', 'main', 'style'],
+      mainFields: ['browser', 'import', 'module', 'main', 'style'],
+      conditionNames: ['browser', 'import', 'module', 'main', 'style'],
     },
     module: {
       rules: [
+        {
+          test: /\.vue$/,
+          loader: require.resolve('vue-loader'),
+        },
         {
           test: /\.css$/,
           use: [MiniCssExtractPlugin.loader, require.resolve('css-loader')],
@@ -145,7 +115,7 @@ export default function makeWebpackConfig({
         },
         {
           test: /\.js$/,
-          loader: [
+          use: [
             // support CLI tools that start with a #!/usr/bin/node
             require.resolve('shebang-loader'),
             // ESBuild Minifier doesn't auto-remove license comments from code
@@ -173,12 +143,8 @@ export default function makeWebpackConfig({
           },
         },
         {
-          test: /\.vue$/,
-          loader: require.resolve('vue-loader'),
-        },
-        {
           test: /\.(scss|sass)$/,
-          loader: [
+          use: [
             MiniCssExtractPlugin.loader,
             require.resolve('css-loader'),
             {
@@ -192,7 +158,7 @@ export default function makeWebpackConfig({
         },
         {
           test: /\.less$/,
-          loader: [
+          use: [
             MiniCssExtractPlugin.loader,
             require.resolve('css-loader'),
             {
@@ -229,14 +195,15 @@ export default function makeWebpackConfig({
         },
       ],
     },
-    node: builtInNode,
+    node: false,
     output: {
-      filename: 'bundle.js',
+      filename: '[name].bundle.js',
+      chunkFilename: '[name].bundle.js',
       pathinfo: false,
     },
-    externals: (context, request, callback) =>
-      isExternalRequest(request)
-        ? callback(null, 'commonjs ' + request)
+    externals: (context, callback) =>
+      context.request && isExternalRequest(context.request)
+        ? callback(undefined, 'commonjs ' + context.request)
         : callback(),
   }
 }
