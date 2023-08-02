@@ -3,6 +3,7 @@ import TerserPlugin from 'terser-webpack-plugin'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import CssoWebpackPlugin from 'csso-webpack-plugin'
 import WriteFilePlugin from 'write-file-webpack-plugin'
+import path from 'path'
 
 const log = require('debug')('bp:webpack')
 import escapeRegex from 'escape-string-regexp'
@@ -13,6 +14,7 @@ import { ESBuildMinifyPlugin } from 'esbuild-loader'
 import VueLoaderPlugin from 'vue-loader/lib/plugin'
 
 import { Externals } from '../common.types'
+import config from './config'
 
 type MakeWebpackConfigOptions = {
   packageName: string
@@ -88,6 +90,7 @@ export default function makeWebpackConfig({
           ? [
               new TerserPlugin({
                 parallel: true,
+                cache: path.join(config.tmp, 'cache', 'terser-cache'),
                 terserOptions: {
                   ie8: false,
                   output: {
