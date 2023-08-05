@@ -3,6 +3,7 @@ import path from 'path'
 import builtInModules from 'builtin-modules'
 import fs from 'fs'
 import os from 'os'
+import { last } from 'lodash'
 
 const homeDirectory = os.homedir()
 
@@ -92,8 +93,9 @@ type ParsePackageResult = {
   name: string
   version: string | null
   scoped: boolean
+  importPath: string
   isLocal?: boolean
-  normalPath?: string
+  normalPath: string
 }
 
 function parseLocalPackageString(packageString: string): ParsePackageResult {
@@ -104,6 +106,7 @@ function parseLocalPackageString(packageString: string): ParsePackageResult {
     name: packageJSON.name,
     version: packageJSON.version,
     scoped: packageJSON.name.startsWith('@'),
+    importPath: packageString,
     normalPath: packageString,
     isLocal: true,
   }
@@ -111,26 +114,55 @@ function parseLocalPackageString(packageString: string): ParsePackageResult {
 
 function parseScopedPackageString(packageString: string): ParsePackageResult {
   const lastAtIndex = packageString.lastIndexOf('@')
+  const firstSlashIndex = packageString.indexOf('/')
+  const secondSlashIndex = packageString.indexOf('/', firstSlashIndex + 1)
+
+  const name = lastAtIndex === 0
+    ? secondSlashIndex === -1
+      ? packageString
+      : packageString.substring(0, secondSlashIndex)
+    : packageString.substring(0, lastAtIndex)
+  const version = lastAtIndex === 0
+    ? null
+    : secondSlashIndex === -1
+      ? packageString.substring(lastAtIndex + 1)
+      : packageString.substring(lastAtIndex + 1, secondSlashIndex)
+  const path = secondSlashIndex === -1
+    ? null
+    : packageString.substring(secondSlashIndex + 1)
+
   return {
-    name:
-      lastAtIndex === 0
-        ? packageString
-        : packageString.substring(0, lastAtIndex),
-    version:
-      lastAtIndex === 0 ? null : packageString.substring(lastAtIndex + 1),
+    name,
+    importPath: name + (path ? '/' + path : ''),
+    version,
+    normalPath: name + (version ? '@' + version : ''),
     scoped: true,
   }
 }
 
 function parseUnscopedPackageString(packageString: string): ParsePackageResult {
   const lastAtIndex = packageString.lastIndexOf('@')
+  const firstSlashIndex = packageString.indexOf('/')
+
+  const name = lastAtIndex === -1
+    ? firstSlashIndex === -1
+      ? packageString
+      : packageString.substring(0, firstSlashIndex)
+    : packageString.substring(0, lastAtIndex)
+  const version = lastAtIndex === -1
+    ? null
+    : firstSlashIndex === -1
+      ? packageString.substring(lastAtIndex + 1)
+      : packageString.substring(lastAtIndex + 1, firstSlashIndex)
+  const path = firstSlashIndex === -1
+    ? null
+    : packageString.substring(firstSlashIndex + 1)
+
   return {
-    name:
-      lastAtIndex === -1
-        ? packageString
-        : packageString.substring(0, lastAtIndex),
-    version:
-      lastAtIndex === -1 ? null : packageString.substring(lastAtIndex + 1),
+    name,
+    importPath: name + (path ? '/' + path : ''),
+    version,
+    normalPath: name + (version ? '@' + version : ''),
     scoped: false,
   }
 }

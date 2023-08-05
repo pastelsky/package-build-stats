@@ -28,7 +28,7 @@ server({ port: PORT }, [
       })
     }
   }),
-  get('/export-sizes', async ctx => {
+  get('/exports-sizes', async ctx => {
     const packageString = decodeURIComponent(ctx.query.p)
 
     try {

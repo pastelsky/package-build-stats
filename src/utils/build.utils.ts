@@ -25,6 +25,7 @@ import {
   CreateEntryPointOptions,
 } from '../common.types'
 import Telemetry from './telemetry.utils'
+import { resolve } from './exports.utils'
 
 type CompilePackageArgs = {
   name: string
@@ -43,6 +44,7 @@ type CompilePackageReturn = {
 type BuildPackageArgs = {
   name: string
   installPath: string
+  importPath: string,
   externals: Externals
   options: BuildPackageOptions
 }
@@ -51,7 +53,7 @@ type WebpackStatsAsset = NonNullable<webpack.Stats.ToJsonOutput['assets']>[0]
 
 const BuildUtils = {
   createEntryPoint(
-    packageName: string,
+    importPath: string,
     installPath: string,
     options: CreateEntryPointOptions
   ) {
@@ -65,23 +67,24 @@ const BuildUtils = {
     if (options.esm) {
       if (options.customImports) {
         importStatement = `
-          import { ${options.customImports.join(', ')} } from '${packageName}'; 
+          import { ${options.customImports.join(', ')} } from '${importPath}'; 
           console.log(${options.customImports.join(', ')})
      `
       } else {
-        importStatement = `import p from '${packageName}'; console.log(p)`
+        importStatement = `import p from '${importPath}'; console.log(p)`
       }
     } else {
       if (options.customImports) {
         importStatement = `
         const { ${options.customImports.join(
           ', '
-        )} } = require('${packageName}'); 
+        )} } = await import(/* webpackMode: 'eager' */'${importPath}'); 
         console.log(${options.customImports.join(', ')})
         `
       } else {
-        importStatement = `const p = require('${packageName}'); console.log(p)`
+        importStatement = `const p = await import(/* webpackMode: 'eager' */'${importPath}'); console.log(p)`
       }
+      importStatement = `;(async () => { ${importStatement} })();`
     }
 
     try {
@@ -177,6 +180,7 @@ const BuildUtils = {
   async buildPackage({
     name,
     installPath,
+    importPath,
     externals,
     options,
   }: BuildPackageArgs) {
@@ -187,14 +191,14 @@ const BuildUtils = {
         return { assets: [] }
       }
       options.customImports.forEach(importt => {
-        entry[importt] = BuildUtils.createEntryPoint(name, installPath, {
+        entry[importt] = BuildUtils.createEntryPoint(importPath, installPath, {
           customImports: [importt],
           entryFilename: importt,
           esm: true,
         })
       })
     } else {
-      entry['main'] = BuildUtils.createEntryPoint(name, installPath, {
+      entry['main'] = BuildUtils.createEntryPoint(importPath, installPath, {
         esm: false,
         customImports: options.customImports,
       })
@@ -330,16 +334,20 @@ const BuildUtils = {
     name,
     externals,
     installPath,
+    importPath,
     options,
   }: BuildPackageArgs) {
     const buildStartTime = performance.now()
     let buildIteration = 1
+
+    importPath = await resolve(installPath, importPath)
 
     try {
       const buildResult = await BuildUtils.buildPackage({
         name,
         externals,
         installPath,
+        importPath,
         options,
       })
       Telemetry.buildPackage(name, true, buildStartTime, {
@@ -367,6 +375,7 @@ const BuildUtils = {
         const rebuiltResult = await BuildUtils.buildPackage({
           name,
           externals: newExternals,
+          importPath,
           installPath,
           options,
         })

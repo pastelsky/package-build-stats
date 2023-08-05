@@ -30,15 +30,15 @@ export async function getAllPackageExports(
   options: InstallPackageOptions = {}
 ) {
   const startTime = performance.now()
-  const { name: packageName, normalPath } = parsePackageString(packageString)
+  const { name: packageName, normalPath, importPath, isLocal } = parsePackageString(packageString)
   const installPath = await InstallationUtils.preparePath(packageName)
 
   try {
-    await installPackage(packageString, installPath, options)
+    await installPackage(normalPath, installPath, options)
     const results = await getAllExports(
       packageString,
-      normalPath || installPath,
-      packageName
+      isLocal ? normalPath : installPath,
+      importPath
     )
     Telemetry.packageExports(packageString, startTime, true)
     return results
@@ -57,16 +57,16 @@ export async function getPackageExportSizes(
   }
 ) {
   const startTime = performance.now()
-  const { name: packageName, normalPath } = parsePackageString(packageString)
+  const { name: packageName, normalPath, importPath, isLocal } = parsePackageString(packageString)
   const installPath = await InstallationUtils.preparePath(packageName)
 
   try {
-    await installPackage(packageString, installPath, options)
+    await installPackage(normalPath, installPath, options)
 
     const exportMap = await getAllExports(
       packageString,
-      normalPath || installPath,
-      packageName
+      isLocal ? normalPath : installPath,
+      importPath
     )
 
     const exports = Object.keys(exportMap).filter(exp => !(exp === 'default'))
@@ -77,6 +77,7 @@ export async function getPackageExportSizes(
     const builtDetails = await BuildUtils.buildPackageIgnoringMissingDeps({
       name: packageName,
       installPath,
+      importPath,
       externals,
       options: {
         customImports: exports,
