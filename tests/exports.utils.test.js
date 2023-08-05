@@ -199,6 +199,7 @@ describe('getAllExports', () => {
       default:
         'node_modules/resolve-test/nested-folder/another-nested-folder/node_modules/dependency/dependency-entry-1.js',
       AClass: 'node_modules/resolve-test/another-file-1.js',
+      Foo: 'node_modules/resolve-test/entry-1.js',
       aVariable: 'node_modules/resolve-test/another-file-1.js',
       bFunction: 'node_modules/resolve-test/another-file-2.js',
       dependencyEntry:

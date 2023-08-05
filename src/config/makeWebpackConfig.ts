@@ -163,6 +163,13 @@ export default function makeWebpackConfig({
                 ],
               },
             },
+            {
+              loader: 'esbuild-loader',
+              options: {
+                // Fail building package with anything more recent than es2019 as a target
+                target: 'es2019',
+              },
+            }
           ],
         },
 
