@@ -56,6 +56,9 @@ const InstallationUtils = {
   ) {
     let flags, command
     let installStartTime = performance.now()
+     const registryString: string = process.env.REGISTRY_URL
+      ? `--registry ${process.env.REGISTRY_URL}`
+      : ''
 
     const {
       client = 'npm',
@@ -88,7 +91,7 @@ const InstallationUtils = {
       if (networkConcurrency) {
         flags.push(`network-concurrency ${networkConcurrency}`)
       }
-      command = `yarn add ${packageString} ${additionalPackages.join(
+      command = `yarn add ${registryString} ${packageString} ${additionalPackages.join(
         ' '
       )} --${flags.join(' --')}`
     } else if (client === 'npm') {
@@ -108,13 +111,13 @@ const InstallationUtils = {
         'json',
       ]
 
-      command = `npm install ${
+      command = `npm install ${registryString} ${
         isLocal ? wrapPackCommand(packageString) : packageString
       } ${additionalPackages.join(' ')} --${flags.join(' --')}`
     } else if (client === 'pnpm') {
       flags = ['no-optional', 'loglevel error', 'ignore-scripts', 'save-exact']
 
-      command = `pnpm add ${packageString} ${additionalPackages.join(
+      command = `pnpm add ${registryString} ${packageString} ${additionalPackages.join(
         ' '
       )} --${[].join(' --')}`
     } else {
@@ -122,7 +125,7 @@ const InstallationUtils = {
       process.exit(1)
     }
 
-    debug('install start %s', packageString)
+    debug('install start %s %s', packageString, registryString)
 
     try {
       await exec(
