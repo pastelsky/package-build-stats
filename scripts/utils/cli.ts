@@ -61,7 +61,9 @@ export function showHelp(): void {
   logger.info('EXAMPLES:')
   console.log('  package-stats list                    # List top 50 packages')
   console.log('  package-stats list --all              # List all packages')
-  console.log('  package-stats test lodash react       # Test specific packages')
+  console.log(
+    '  package-stats test lodash react       # Test specific packages',
+  )
   console.log('  package-stats top 10                  # Test top 10 packages')
   console.log('  package-stats compare lodash --minification')
   logger.blank()
@@ -69,7 +71,9 @@ export function showHelp(): void {
   logger.info('OPTIONS:')
   console.log('  --all              Show all results (list command)')
   console.log('  --concurrency N    Number of parallel tests (default: 5)')
-  console.log('  --timeout MS       Test timeout in milliseconds (default: 120000)')
+  console.log(
+    '  --timeout MS       Test timeout in milliseconds (default: 120000)',
+  )
   console.log('  --minification     Compare with minification enabled')
   console.log('  --exports          Include export size analysis')
   console.log('  --json             Output results as JSON')
@@ -144,23 +148,35 @@ export function showCommandHelp(command: string): void {
 /**
  * Validate command arguments
  */
-export function validateCommand(command: string, args: string[]): { valid: boolean; error?: string } {
+export function validateCommand(
+  command: string,
+  args: string[],
+): { valid: boolean; error?: string } {
   switch (command) {
     case 'test':
       if (args.length === 0) {
-        return { valid: false, error: 'test command requires at least one package name' }
+        return {
+          valid: false,
+          error: 'test command requires at least one package name',
+        }
       }
       break
 
     case 'compare':
       if (args.length === 0) {
-        return { valid: false, error: 'compare command requires at least one package name' }
+        return {
+          valid: false,
+          error: 'compare command requires at least one package name',
+        }
       }
       break
 
     case 'top':
       if (args.length > 1) {
-        return { valid: false, error: 'top command takes at most one argument (number of packages)' }
+        return {
+          valid: false,
+          error: 'top command takes at most one argument (number of packages)',
+        }
       }
       if (args.length === 1 && isNaN(parseInt(args[0], 10))) {
         return { valid: false, error: 'top command argument must be a number' }
@@ -169,7 +185,10 @@ export function validateCommand(command: string, args: string[]): { valid: boole
 
     case 'list':
       if (args.length > 1) {
-        return { valid: false, error: 'list command takes at most one argument' }
+        return {
+          valid: false,
+          error: 'list command takes at most one argument',
+        }
       }
       break
 

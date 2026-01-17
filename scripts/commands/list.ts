@@ -6,7 +6,10 @@ import { logger } from '../utils/logger'
 import { loadPackageList, formatPackageList } from '../utils/package-loader'
 import { config } from '../utils/config'
 
-export async function listCommand(args: string[], options: Record<string, any>): Promise<void> {
+export async function listCommand(
+  args: string[],
+  options: Record<string, any>,
+): Promise<void> {
   logger.box('Top NPM Packages', 'blue')
   logger.blank()
 

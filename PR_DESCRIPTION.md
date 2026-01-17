@@ -7,6 +7,7 @@ This PR represents a comprehensive modernization of the package-build-stats libr
 ## 📋 Key Changes
 
 ### 🔧 Build System Modernization
+
 - **Migrated from Jest to Vitest** for faster test execution and better ESM support
 - **Upgraded to Yarn v4** with corepack for modern package management
 - **Added Oxlint** for faster code linting
@@ -15,6 +16,7 @@ This PR represents a comprehensive modernization of the package-build-stats libr
 - Removed Babel (no longer needed with modern Node.js)
 
 ### 🖥️ CLI Implementation
+
 - **New command-line interface** with yargs for robust argument parsing
 - Support for multiple commands (stats, compare, etc.)
 - Debug mode for dependency size tree exploration
@@ -22,12 +24,14 @@ This PR represents a comprehensive modernization of the package-build-stats libr
 - All package managers supported (npm, yarn, pnpm, bun)
 
 ### 📦 Expanded Package Manager Support
+
 - **Bun support** with significantly improved installation performance (13x faster)
 - **pnpm support** for efficient disk space usage and stricter dependency management
 - Refactored installation utilities to support multiple package managers
 - Comprehensive documentation for all supported package managers
 
 ### 🧪 Test Infrastructure Overhaul
+
 - Reorganized tests into `fast/` and `slow/` directories for better organization
 - Migrated all tests to TypeScript + Vitest
 - **Added 40+ comprehensive test fixtures** covering:
@@ -40,12 +44,14 @@ This PR represents a comprehensive modernization of the package-build-stats libr
 - Significantly improved test coverage and reliability
 
 ### 🔍 Core Feature Improvements
+
 - Enhanced **dependency size tree debugging** capabilities
 - Improved **export size calculation** accuracy
 - Better package stats aggregation and reporting
 - Updated telemetry tracking for usage insights
 
 ### 📊 Comparison & Benchmarking Tools
+
 - New scripts for comparing package sizes across versions
 - Top packages analysis tools for real-world testing
 - Performance benchmarking utilities
@@ -53,6 +59,7 @@ This PR represents a comprehensive modernization of the package-build-stats libr
 - Comprehensive documentation for all scripts
 
 ### 🎨 Type System Modernization
+
 - Reorganized types to `src/types/` directory
 - Expanded `PackageManager` type to include pnpm and bun
 - Updated option types for new features
@@ -61,11 +68,13 @@ This PR represents a comprehensive modernization of the package-build-stats libr
 ## 🔄 Migration Guide
 
 ### For Users
+
 - **Node.js 20+** is now required (update your environment)
 - New package managers available: Use `--packageManager bun` or `--packageManager pnpm` for faster installs
 - CLI is now available: `npx package-build-stats <package-name>`
 
 ### For Contributors
+
 - **Install dependencies** with `yarn install` (Yarn v4)
 - **Run tests** with `npm test` (now using Vitest)
 - **Linting** now uses Oxlint for faster feedback
@@ -74,18 +83,21 @@ This PR represents a comprehensive modernization of the package-build-stats libr
 ## 📊 Impact
 
 ### Performance Improvements
+
 - ✅ Faster test execution with Vitest
 - ✅ Faster builds with Rspack
 - ✅ Faster installs with Bun support (13x improvement)
 - ✅ Faster linting with Oxlint
 
 ### Developer Experience
+
 - ✅ CLI for easier package analysis
 - ✅ Better test organization and coverage
 - ✅ Improved debugging capabilities
 - ✅ Comprehensive comparison tools
 
 ### Reliability
+
 - ✅ TypeScript tests for better type safety
 - ✅ 40+ new test fixtures
 - ✅ Better error handling and reporting
@@ -124,6 +136,7 @@ This PR contains 9 logical commits, each focusing on a specific theme:
 ## 🔗 Related Issues
 
 <!-- Add any related Jira issues or GitHub issues here -->
+
 - Project: https://hello.atlassian.com/devsphere
 
 ## 🚀 Breaking Changes
@@ -150,6 +163,7 @@ This refactor sets the foundation for future improvements and positions the libr
 ---
 
 **Review Checklist:**
+
 - [ ] Code changes reviewed
 - [ ] Tests passing
 - [ ] Documentation updated

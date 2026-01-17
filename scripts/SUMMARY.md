@@ -3,11 +3,13 @@
 ## ✅ What's New
 
 ### 🚀 Parallel Execution
+
 - Tests now run **5 packages at a time** in parallel
 - Dramatically faster for testing multiple packages
 - Example: Testing 20 packages is **~5x faster** than sequential
 
 ### 📦 Static Package List
+
 - **200 popular packages** hardcoded in `top-packages-list.txt`
 - **No network calls** needed for listing packages
 - Instant list command
@@ -44,6 +46,7 @@ cd scripts
 ## ⚡ Performance Example
 
 **Sequential (old way):**
+
 ```
 Package 1: ████████ 60s
 Package 2: ████████ 60s
@@ -54,6 +57,7 @@ Total: 300 seconds
 ```
 
 **Parallel (new way - 5 at once):**
+
 ```
 Batch 1: ████████ 60s
   ├─ Package 1
@@ -123,34 +127,38 @@ Edit `top-packages-list.txt` - add/remove packages as needed.
 Based on average package test time of ~60 seconds:
 
 | Packages | Sequential | Parallel (5x) | Time Saved |
-|----------|-----------|---------------|------------|
-| 5        | 5 min     | 1 min         | 4 min      |
-| 10       | 10 min    | 2 min         | 8 min      |
-| 20       | 20 min    | 4 min         | 16 min     |
-| 50       | 50 min    | 10 min        | 40 min     |
-| 100      | 100 min   | 20 min        | 80 min     |
+| -------- | ---------- | ------------- | ---------- |
+| 5        | 5 min      | 1 min         | 4 min      |
+| 10       | 10 min     | 2 min         | 8 min      |
+| 20       | 20 min     | 4 min         | 16 min     |
+| 50       | 50 min     | 10 min        | 40 min     |
+| 100      | 100 min    | 20 min        | 80 min     |
 
 ## 🎯 Use Cases
 
 ### Quick Development Testing
+
 ```bash
 # Test just the packages you care about
 ./compare.sh test lodash react
 ```
 
 ### Pre-PR Testing
+
 ```bash
 # Test top 10 most popular packages
 ./compare.sh top 10
 ```
 
 ### Comprehensive Regression Testing
+
 ```bash
 # Test top 50 packages
 ./compare.sh top 50
 ```
 
 ### Custom Package Set
+
 ```bash
 # Test a specific category
 ./compare.sh test webpack vite rollup esbuild  # Build tools

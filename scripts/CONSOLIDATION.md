@@ -9,13 +9,15 @@ This document explains the consolidation of comparison scripts from multiple imp
 ### Before Consolidation
 
 **Redundant Implementations:**
+
 - `compare.sh` (491 lines) - Bash script
-- `compare.js` (419 lines) - Node.js version  
+- `compare.js` (419 lines) - Node.js version
 - `compare-versions.sh` (419 lines) - Bash version comparison
 - `compare-top-packages.ts` (524 lines) - TypeScript variant
 - Multiple other scripts (quick-compare.sh, test-top-packages.sh, etc.)
 
 **Issues:**
+
 1. **Code Duplication**: Same logic implemented 3+ times
 2. **Maintenance Burden**: Bug fixes needed in multiple files
 3. **Inconsistency**: Different behavior depending on script used
@@ -50,6 +52,7 @@ scripts/
 ### Code Statistics
 
 **Before Consolidation:**
+
 - Lines of Code: ~3,246
 - Files: 15+
 - Languages: Bash, JavaScript, TypeScript
@@ -57,6 +60,7 @@ scripts/
 - Type Safety: Low
 
 **After Consolidation:**
+
 - Lines of Code: ~1,200 (including utilities and commands)
 - Files: 10
 - Languages: TypeScript only
@@ -72,6 +76,7 @@ scripts/
 **Purpose:** Unified logging with consistent formatting
 
 **Before:**
+
 ```bash
 # Duplicated in compare.sh and compare.js
 RED='\033[0;31m'
@@ -81,6 +86,7 @@ YELLOW='\033[1;33m'
 ```
 
 **After:**
+
 ```typescript
 // Single implementation
 export class Logger {
@@ -96,11 +102,13 @@ export class Logger {
 **Purpose:** Centralized configuration
 
 **Before:**
+
 - Scattered throughout scripts
 - Hardcoded values
 - Environment variables not standardized
 
 **After:**
+
 ```typescript
 export function getConfig(): ScriptConfig {
   return {
@@ -117,6 +125,7 @@ export function getConfig(): ScriptConfig {
 **Purpose:** Package list management
 
 **Before:**
+
 ```bash
 # Duplicated in multiple scripts
 grep -v '^#' "$LIST_FILE" | grep -v '^$' | while read -r pkg; do
@@ -125,9 +134,11 @@ done
 ```
 
 **After:**
+
 ```typescript
 export function loadPackageList(): string[] {
-  return fs.readFileSync(packageListFile, 'utf8')
+  return fs
+    .readFileSync(packageListFile, 'utf8')
     .split('\n')
     .map(line => line.trim())
     .filter(line => line && !line.startsWith('#'))
@@ -139,6 +150,7 @@ export function loadPackageList(): string[] {
 **Purpose:** Unified results formatting and storage
 
 **Features:**
+
 - Consistent JSON result format
 - Markdown report generation
 - Automatic timestamp directories
@@ -149,15 +161,17 @@ export function loadPackageList(): string[] {
 **Purpose:** Execute package tests with concurrency
 
 **Before:**
+
 - Inline test execution in each script
 - Error handling varied
 - Concurrency implemented differently
 
 **After:**
+
 ```typescript
 export async function comparePackagesParallel(
   packages: string[],
-  concurrency: number
+  concurrency: number,
 ): Promise<ComparisonResult[]> {
   // Centralized, tested implementation
 }
@@ -176,26 +190,31 @@ All commands reuse utils, eliminating duplication.
 ## Benefits
 
 ### 1. Maintainability
+
 - Single source of truth for each concern
 - Bug fixes in one place help all commands
 - Clear separation of concerns
 
 ### 2. Type Safety
+
 - Full TypeScript support
 - Compile-time error checking
 - Better IDE support
 
 ### 3. Consistency
+
 - Same behavior across all commands
 - Unified logging format
 - Standard error handling
 
 ### 4. Extensibility
+
 - Easy to add new commands
 - Reusable utilities
 - Well-structured for testing
 
 ### 5. Performance
+
 - 63% code reduction
 - Faster to maintain
 - Faster to understand
@@ -205,16 +224,19 @@ All commands reuse utils, eliminating duplication.
 ### For Users
 
 **Old way:**
+
 ```bash
 ./compare.sh test lodash react
 ```
 
 **New way:**
+
 ```bash
 tsx index.ts test lodash react
 ```
 
 **Convenience wrapper (in package.json):**
+
 ```json
 {
   "scripts": {
@@ -269,21 +291,21 @@ PKG_MANAGER=yarn      # Package manager to use
 
 Testing 20 packages (concurrency=5):
 
-| Operation | Before | After | Improvement |
-|-----------|--------|-------|-------------|
-| Startup | ~2s | ~0.5s | 4x faster |
-| List command | ~3s | ~0.2s | 15x faster |
-| Test 20 packages | ~8 min | ~8 min | Same (limited by network) |
-| Startup overhead | Per script | Once | Reduced |
+| Operation        | Before     | After  | Improvement               |
+| ---------------- | ---------- | ------ | ------------------------- |
+| Startup          | ~2s        | ~0.5s  | 4x faster                 |
+| List command     | ~3s        | ~0.2s  | 15x faster                |
+| Test 20 packages | ~8 min     | ~8 min | Same (limited by network) |
+| Startup overhead | Per script | Once   | Reduced                   |
 
 ### Code Complexity
 
-| Metric | Before | After |
-|--------|--------|-------|
-| Cyclomatic Complexity | High | Low |
-| Functions > 50 LOC | 8 | 2 |
-| Nested Conditions | Deep | Shallow |
-| Type Safety | Low | High |
+| Metric                | Before | After   |
+| --------------------- | ------ | ------- |
+| Cyclomatic Complexity | High   | Low     |
+| Functions > 50 LOC    | 8      | 2       |
+| Nested Conditions     | Deep   | Shallow |
+| Type Safety           | Low    | High    |
 
 ## Documentation
 
@@ -313,6 +335,7 @@ The following scripts are now deprecated but functional:
 - `fetch-top-packages.sh`
 
 **Migration Timeline:**
+
 - Phase 1 (Now): Both old and new work
 - Phase 2 (v8.0): Deprecation warnings
 - Phase 3 (v9.0): Remove old scripts

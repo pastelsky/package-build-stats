@@ -85,12 +85,3 @@ export function formatNumber(value, decimals = 2) {
   }
   return value.toFixed(decimals)
 }
-
-
-
-
-
-
-
-
-

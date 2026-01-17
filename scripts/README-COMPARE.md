@@ -19,6 +19,7 @@ Single comprehensive script to compare published vs local versions of package-bu
 Displays the top npm packages from a hardcoded static list (no network calls).
 
 **Example output:**
+
 ```
 Rank  Package
 ----  -------
@@ -45,6 +46,7 @@ Tests specific packages and compares published vs local HEAD versions.
 **⚡ Parallel Execution:** Tests run 5 packages in parallel at a time for faster results.
 
 **Examples:**
+
 ```bash
 # Test single package
 ./compare.sh test lodash
@@ -57,13 +59,15 @@ Tests specific packages and compares published vs local HEAD versions.
 ```
 
 **What it tests:**
+
 - `getPackageStats()` - Size, gzip, dependencies, assets
 - `getAllPackageExports()` - Export discovery and count
 - `getPackageExportSizes()` - Per-export size analysis
 
 **Output:** Creates timestamped directory with:
+
 - `<package>_published.json` - Published version results
-- `<package>_local.json` - Local HEAD results  
+- `<package>_local.json` - Local HEAD results
 - `report.md` - Comparison tables
 
 ---
@@ -79,6 +83,7 @@ Tests the top N packages (default: 20) from the static list.
 **⚡ Parallel Execution:** Tests run 5 packages in parallel at a time.
 
 **Examples:**
+
 ```bash
 # Test top 20 packages (runs in batches of 5)
 ./compare.sh top
@@ -113,6 +118,7 @@ Tests the top N packages (default: 20) from the static list.
 Results are saved to: `comparison-results/YYYYMMDD_HHMMSS/`
 
 Example structure:
+
 ```
 comparison-results/20251102_123456/
 ├── lodash_published.json       # Published version results
@@ -134,22 +140,22 @@ The `report.md` contains comparison tables for each package:
 #### getPackageStats
 
 | Metric       | Published | Local  | Diff |
-|-------------|-----------|--------|------|
-| Size        | 71,657    | 71,659 | +2   |
-| Gzip        | 25,426    | 25,428 | +2   |
-| Dependencies| 0         | 0      | 0    |
-| Assets      | 1         | 1      | 0    |
+| ------------ | --------- | ------ | ---- |
+| Size         | 71,657    | 71,659 | +2   |
+| Gzip         | 25,426    | 25,428 | +2   |
+| Dependencies | 0         | 0      | 0    |
+| Assets       | 1         | 1      | 0    |
 
 #### getAllPackageExports
 
 | Metric  | Published | Local | Diff |
-|---------|-----------|-------|------|
+| ------- | --------- | ----- | ---- |
 | Exports | 352       | 352   | 0    |
 
 #### getPackageExportSizes
 
 | Metric | Published | Local  | Diff |
-|--------|-----------|--------|------|
+| ------ | --------- | ------ | ---- |
 | Size   | 71,657    | 71,659 | +2   |
 | Gzip   | 25,426    | 25,428 | +2   |
 | Assets | 352       | 352    | 0    |
@@ -160,6 +166,7 @@ The `report.md` contains comparison tables for each package:
 The script uses a hardcoded list of 200 popular packages stored in [`top-packages-list.txt`](./top-packages-list.txt:1).
 
 **Top 20 from the list:**
+
 1. semver
 2. debug
 3. chalk
@@ -186,21 +193,25 @@ The list includes utilities, frameworks, build tools, testing libraries, and mor
 ## Tips
 
 ### For quick testing during development:
+
 ```bash
 ./compare.sh test lodash
 ```
 
 ### Before submitting a PR:
+
 ```bash
 ./compare.sh test lodash react vue axios express
 ```
 
 ### For comprehensive regression testing:
+
 ```bash
 ./compare.sh top 20
 ```
 
 ### To view results:
+
 ```bash
 # List all result directories
 ls -lt comparison-results/

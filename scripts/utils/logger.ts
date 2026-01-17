@@ -35,7 +35,15 @@ export class Logger {
   private colors: LogColors
 
   constructor(useColors = true) {
-    this.colors = useColors ? COLORS : { ...COLORS, ...Object.keys(COLORS).reduce((acc, key) => ({ ...acc, [key]: '' }), {}) }
+    this.colors = useColors
+      ? COLORS
+      : {
+          ...COLORS,
+          ...Object.keys(COLORS).reduce(
+            (acc, key) => ({ ...acc, [key]: '' }),
+            {},
+          ),
+        }
   }
 
   private colorize(text: string, color: keyof LogColors): string {
@@ -75,10 +83,12 @@ export class Logger {
 
   table(rows: string[][], columnWidths?: number[]): void {
     rows.forEach(row => {
-      const formatted = row.map((cell, i) => {
-        const width = columnWidths?.[i] || 15
-        return cell.padEnd(width)
-      }).join('')
+      const formatted = row
+        .map((cell, i) => {
+          const width = columnWidths?.[i] || 15
+          return cell.padEnd(width)
+        })
+        .join('')
       console.log(formatted)
     })
   }

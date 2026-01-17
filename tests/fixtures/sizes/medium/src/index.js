@@ -24,12 +24,3 @@ export function formatResult(value) {
 export function validateInput(input) {
   return typeof input === 'number' && !isNaN(input)
 }
-
-
-
-
-
-
-
-
-

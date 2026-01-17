@@ -114,7 +114,13 @@ const BuildUtils = {
     }
   },
 
-  compilePackage({ name, entry, externals, debug, minify }: CompilePackageArgs) {
+  compilePackage({
+    name,
+    entry,
+    externals,
+    debug,
+    minify,
+  }: CompilePackageArgs) {
     const startTime = performance.now()
 
     const options = makeRspackConfig({
@@ -240,8 +246,6 @@ const BuildUtils = {
     } else {
       Telemetry.parseWebpackStats(name, true, jsonStatsStartTime)
     }
-
-
 
     const compilationErrors = getCompilationErrors(stats)
 

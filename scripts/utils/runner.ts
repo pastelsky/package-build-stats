@@ -80,7 +80,7 @@ export async function runPublished(packageName: string): Promise<PackageStats> {
 export async function runLocal(packageName: string): Promise<PackageStats> {
   return new Promise((resolve, reject) => {
     const runnerPath = path.join(config.scriptDir, 'runner.ts')
-    
+
     const child = spawn('tsx', [runnerPath, packageName], {
       cwd: config.projectRoot,
       stdio: ['pipe', 'pipe', 'pipe'],
@@ -157,13 +157,25 @@ export async function comparePackageWithMinification(
 export async function comparePackagesParallel(
   packages: string[],
   concurrency: number = config.concurrency,
-): Promise<Array<{ package: string; published: PackageStats; local: PackageStats; error?: string }>> {
-  const results: Array<{ package: string; published: PackageStats; local: PackageStats; error?: string }> = []
+): Promise<
+  Array<{
+    package: string
+    published: PackageStats
+    local: PackageStats
+    error?: string
+  }>
+> {
+  const results: Array<{
+    package: string
+    published: PackageStats
+    local: PackageStats
+    error?: string
+  }> = []
   const queue = [...packages]
   let running = 0
   let completed = 0
 
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     const processNext = () => {
       if (queue.length === 0 && running === 0) {
         resolve(results)
@@ -180,11 +192,11 @@ export async function comparePackagesParallel(
           })
           .catch(error => {
             logger.error(`Failed: ${pkg} - ${error.message}`)
-            results.push({ 
-              package: pkg, 
-              published: {} as any, 
-              local: {} as any, 
-              error: error.message 
+            results.push({
+              package: pkg,
+              published: {} as any,
+              local: {} as any,
+              error: error.message,
             })
           })
           .finally(() => {

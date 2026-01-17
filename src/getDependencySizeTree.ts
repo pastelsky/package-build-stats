@@ -17,11 +17,12 @@ function modulePath(identifier: string) {
 
 function getUtf8Size(value: string) {
   const size = Buffer.byteLength(value, 'utf8')
-  
-  if (process.env.DEBUG_SIZE && Math.random() < 0.01) { // Only debug 1% to avoid spam
+
+  if (process.env.DEBUG_SIZE && Math.random() < 0.01) {
+    // Only debug 1% to avoid spam
     console.log(`Size: ${size} bytes`)
   }
-  
+
   return size
 }
 
@@ -33,9 +34,12 @@ function getUtf8Size(value: string) {
 function extractPackageNamesFromPath(moduleFilePath: string): string[] {
   // pnpm will serve packages from a global symlink (.pnpm/package@version/node_modules/package)
   // needs to be stripped off
-  const pnpmPrefix = '.pnpm\\' + path.sep + '.+\\' + path.sep + 'node_modules\\' + path.sep
+  const pnpmPrefix =
+    '.pnpm\\' + path.sep + '.+\\' + path.sep + 'node_modules\\' + path.sep
   const packages = moduleFilePath.split(
-    new RegExp('\\' + path.sep + 'node_modules\\' + path.sep + `(?:${pnpmPrefix})?`)
+    new RegExp(
+      '\\' + path.sep + 'node_modules\\' + path.sep + `(?:${pnpmPrefix})?`,
+    ),
   )
 
   if (packages.length <= 1) return []
@@ -50,15 +54,15 @@ function extractPackageNamesFromPath(moduleFilePath: string): string[] {
     const offset = lastSegment.indexOf(path.sep) + 1
     lastPackageName = lastSegment.slice(
       0,
-      offset + lastSegment.slice(offset).indexOf(path.sep)
+      offset + lastSegment.slice(offset).indexOf(path.sep),
     )
   } else {
     lastPackageName = lastSegment.slice(0, lastSegment.indexOf(path.sep))
   }
-  
+
   packages.push(lastPackageName)
   packages.shift() // Remove the first empty element
-  
+
   return packages
 }
 
@@ -66,7 +70,7 @@ async function minifyDependencyCode(source: string) {
   if (process.env.DEBUG_SIZE) {
     console.log('Minifying dependency code...')
   }
-  
+
   try {
     const startTime = Date.now()
     const result = await minify(source, {
@@ -75,11 +79,11 @@ async function minifyDependencyCode(source: string) {
       module: true, // Treat as ES module to support import/export
     })
     const minifyTime = Date.now() - startTime
-    
+
     if (process.env.DEBUG_SIZE) {
       console.log(`Minify completed in ${minifyTime}ms`)
     }
-    
+
     return { code: result.code }
   } catch (error) {
     if (process.env.DEBUG_SIZE) {
@@ -148,7 +152,7 @@ function normaliseModuleSource(mod: RspackModule) {
   if (process.env.DEBUG_SIZE) {
     console.log(`Module source normalised (length: ${finalSource.length})`)
   }
-  
+
   return finalSource
 }
 
@@ -167,41 +171,46 @@ async function bundleSizeTree(
 
   // Collect modules with their sources
   const modules: Array<{ path: string; source: string }> = []
-  
-  const makeModule = (mod: RspackModule): { path: string; source: string } | null => {
+
+  const makeModule = (
+    mod: RspackModule,
+  ): { path: string; source: string } | null => {
     const identifier = mod.identifier || ''
     const resolvedPath = modulePath(identifier)
     const source = normaliseModuleSource(mod)
-    
+
     if (!source) return null
-    
+
     return {
       path: resolvedPath,
       source,
     }
   }
 
-  const filteredModules = stats.modules
-    .filter(mod => !(mod.name?.startsWith('external') || mod.moduleType === 'runtime'))
-  
+  const filteredModules = stats.modules.filter(
+    mod => !(mod.name?.startsWith('external') || mod.moduleType === 'runtime'),
+  )
+
   if (process.env.DEBUG_SIZE) {
-    console.log(`\n[LOCAL] ==================== ${packageName} ====================`)
+    console.log(
+      `\n[LOCAL] ==================== ${packageName} ====================`,
+    )
   }
 
   filteredModules.forEach(mod => {
-      if (mod.modules) {
-        if (process.env.DEBUG_SIZE) {
-          console.log(`Module has ${mod.modules.length} sub-modules`)
-        }
-        mod.modules.forEach(subMod => {
-          const made = makeModule(subMod)
-          if (made) modules.push(made)
-        })
-      } else {
-        const made = makeModule(mod)
-        if (made) modules.push(made)
+    if (mod.modules) {
+      if (process.env.DEBUG_SIZE) {
+        console.log(`Module has ${mod.modules.length} sub-modules`)
       }
-    })
+      mod.modules.forEach(subMod => {
+        const made = makeModule(subMod)
+        if (made) modules.push(made)
+      })
+    } else {
+      const made = makeModule(mod)
+      if (made) modules.push(made)
+    }
+  })
 
   if (process.env.DEBUG_SIZE) {
     console.log(`Collected ${modules.length} total modules`)
@@ -218,11 +227,11 @@ async function bundleSizeTree(
   // Build tree structure from module paths
   modules.forEach((mod, modIndex) => {
     const packages = extractPackageNamesFromPath(mod.path)
-    
+
     if (process.env.DEBUG_SIZE && modIndex < 5) {
       console.log(`[${modIndex}] Extracted packages: ${packages.join(' > ')}`)
     }
-    
+
     if (packages.length === 0) {
       if (process.env.DEBUG_SIZE && modIndex < 5) {
         console.log(`[${modIndex}] No packages found in path`)
@@ -232,7 +241,9 @@ async function bundleSizeTree(
 
     let parent = statsTree
     packages.forEach((pkg, pkgIndex) => {
-      const existing = parent.children.filter(child => child.packageName === pkg)
+      const existing = parent.children.filter(
+        child => child.packageName === pkg,
+      )
       if (existing.length > 0) {
         existing[0].sources.push(mod.source)
         if (process.env.DEBUG_SIZE && modIndex < 5) {
@@ -260,7 +271,9 @@ async function bundleSizeTree(
   const flattenedItems = statsTree.children
 
   if (process.env.DEBUG_SIZE) {
-    console.log(`\n[LOCAL] Tree structure built with ${flattenedItems.length} top-level dependencies:`)
+    console.log(
+      `\n[LOCAL] Tree structure built with ${flattenedItems.length} top-level dependencies:`,
+    )
   }
 
   const resultPromises = flattenedItems
@@ -269,35 +282,39 @@ async function bundleSizeTree(
       sources: treeItem.sources.filter(source => !!source),
     }))
     .filter(treeItem => treeItem.sources.length)
-    .map(async (treeItem) => {
+    .map(async treeItem => {
       if (process.env.DEBUG_SIZE) {
         console.log(`\n[LOCAL] Processing dependency: ${treeItem.packageName}`)
       }
 
-      const sourceMinifiedPromises = treeItem.sources.map(async (code: string, idx) => {
-        const originalSize = getUtf8Size(code)
-        
-        if (process.env.DEBUG_SIZE) {
-          console.log(`Source ${idx}: ${originalSize} bytes (original)`)
-        }
-        
-        const minified = await minifyDependencyCode(code)
-        const minifiedSize = getUtf8Size(minified.code || '')
-        const minifiedCode = minified.code || ''
-        
-        if (process.env.DEBUG_SIZE) {
-          console.log(`Source ${idx}: ${minifiedSize} bytes (minified)`)
-        }
-        
-        return minified
-      })
+      const sourceMinifiedPromises = treeItem.sources.map(
+        async (code: string, idx) => {
+          const originalSize = getUtf8Size(code)
+
+          if (process.env.DEBUG_SIZE) {
+            console.log(`Source ${idx}: ${originalSize} bytes (original)`)
+          }
+
+          const minified = await minifyDependencyCode(code)
+          const minifiedSize = getUtf8Size(minified.code || '')
+          const minifiedCode = minified.code || ''
+
+          if (process.env.DEBUG_SIZE) {
+            console.log(`Source ${idx}: ${minifiedSize} bytes (minified)`)
+          }
+
+          return minified
+        },
+      )
 
       try {
         const sources = await Promise.all(sourceMinifiedPromises)
         const size = sources.reduce((acc: number, source, idx) => {
           const sourceSize = getUtf8Size(source.code || '')
           if (process.env.DEBUG_SIZE) {
-            console.log(`Total accumulation at idx ${idx}: ${acc + sourceSize} bytes`)
+            console.log(
+              `Total accumulation at idx ${idx}: ${acc + sourceSize} bytes`,
+            )
           }
           return acc + sourceSize
         }, 0)

@@ -39,7 +39,8 @@ export async function getAllPackageExports(
   try {
     await installPackage(packageString, installPath, options)
     // The package is installed in node_modules subdirectory
-    const packagePath = normalPath || path.join(installPath, 'node_modules', packageName)
+    const packagePath =
+      normalPath || path.join(installPath, 'node_modules', packageName)
     const results = await getAllExports(
       packageString,
       packagePath,
@@ -68,7 +69,8 @@ export async function getPackageExportSizes(
     await installPackage(packageString, installPath, options)
 
     // The package is installed in node_modules subdirectory
-    const packagePath = normalPath || path.join(installPath, 'node_modules', packageName)
+    const packagePath =
+      normalPath || path.join(installPath, 'node_modules', packageName)
     const exportMap = await getAllExports(
       packageString,
       packagePath,

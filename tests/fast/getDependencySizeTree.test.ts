@@ -3,9 +3,7 @@ import { minify } from '@swc/core'
 import getDependencySizeTree from '../../src/getDependencySizeTree'
 import { MinifyError } from '../../src/errors/CustomError'
 
-type RspackStatsCompilation = Parameters<
-  typeof getDependencySizeTree
->[1]
+type RspackStatsCompilation = Parameters<typeof getDependencySizeTree>[1]
 
 type FakeModule = {
   identifier?: string
@@ -57,7 +55,10 @@ describe('getDependencySizeTree - accuracy', () => {
       ],
     }
 
-    const result = await getDependencySizeTree('fixture-pkg', createStats(stats.modules ?? []))
+    const result = await getDependencySizeTree(
+      'fixture-pkg',
+      createStats(stats.modules ?? []),
+    )
 
     const names = result.map(r => r.name)
 
@@ -82,10 +83,17 @@ describe('getDependencySizeTree - accuracy', () => {
     }
 
     // Compute the expected size using the same minifier, but measure size via Buffer.byteLength
-    const minified = await minify(source, { compress: true, mangle: true, module: true })
+    const minified = await minify(source, {
+      compress: true,
+      mangle: true,
+      module: true,
+    })
     const expectedSize = Buffer.byteLength(minified.code || '', 'utf8')
 
-    const result = await getDependencySizeTree('fixture-pkg', createStats(stats.modules ?? []))
+    const result = await getDependencySizeTree(
+      'fixture-pkg',
+      createStats(stats.modules ?? []),
+    )
     const emojiEntry = result.find(r => r.name === 'emoji-pkg')
     expect(emojiEntry).toBeDefined()
 
@@ -111,7 +119,10 @@ describe('getDependencySizeTree - accuracy', () => {
     }
 
     try {
-      await getDependencySizeTree('fixture-pkg', createStats(stats.modules ?? []))
+      await getDependencySizeTree(
+        'fixture-pkg',
+        createStats(stats.modules ?? []),
+      )
       // If it doesn't throw, that's actually okay - SWC might handle it
       // This test documents the expected behavior when minification fails
     } catch (error) {
@@ -188,8 +199,13 @@ describe('getDependencySizeTree - accuracy', () => {
       ],
     }
 
-    const result = await getDependencySizeTree('fixture-pkg', createStats(stats.modules ?? []))
-    const resultMap = new Map(result.map(dep => [dep.name, dep.approximateSize]))
+    const result = await getDependencySizeTree(
+      'fixture-pkg',
+      createStats(stats.modules ?? []),
+    )
+    const resultMap = new Map(
+      result.map(dep => [dep.name, dep.approximateSize]),
+    )
 
     const expectedLevelOne = await minifiedUtf8Size(levelOneSource)
     const expectedLevelTwo =
@@ -209,5 +225,3 @@ describe('getDependencySizeTree - accuracy', () => {
     expect(resultMap.size).toBe(5)
   })
 })
-
-

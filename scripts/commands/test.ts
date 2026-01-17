@@ -4,14 +4,24 @@
 
 import { logger } from '../utils/logger'
 import { comparePackagesParallel } from '../utils/runner'
-import { createResultsDir, saveResult, saveReport, calculateDifferences } from '../utils/results'
+import {
+  createResultsDir,
+  saveResult,
+  saveReport,
+  calculateDifferences,
+} from '../utils/results'
 import { config } from '../utils/config'
 
-export async function testCommand(packages: string[], options: Record<string, any>): Promise<void> {
+export async function testCommand(
+  packages: string[],
+  options: Record<string, any>,
+): Promise<void> {
   logger.box('Package Comparison: Published vs Local', 'blue')
   logger.blank()
 
-  const concurrency = options.concurrency ? parseInt(options.concurrency, 10) : config.concurrency
+  const concurrency = options.concurrency
+    ? parseInt(options.concurrency, 10)
+    : config.concurrency
 
   logger.info(`Testing ${packages.length} package(s)`)
   logger.info(`Concurrency: ${concurrency} at a time`)
@@ -23,7 +33,7 @@ export async function testCommand(packages: string[], options: Record<string, an
   logger.blank()
 
   const resultDir = createResultsDir()
-  
+
   const results = await comparePackagesParallel(packages, concurrency)
 
   logger.blank()
@@ -55,9 +65,15 @@ export async function testCommand(packages: string[], options: Record<string, an
   logger.blank()
 
   // Show summary
-  const improved = comparisonResults.filter(r => r.differences!.sizeChange < 0).length
-  const regressed = comparisonResults.filter(r => r.differences!.sizeChange > 0).length
-  const unchanged = comparisonResults.filter(r => r.differences!.sizeChange === 0).length
+  const improved = comparisonResults.filter(
+    r => r.differences!.sizeChange < 0,
+  ).length
+  const regressed = comparisonResults.filter(
+    r => r.differences!.sizeChange > 0,
+  ).length
+  const unchanged = comparisonResults.filter(
+    r => r.differences!.sizeChange === 0,
+  ).length
   const failed = results.filter(r => r.error).length
 
   logger.info('SUMMARY:')

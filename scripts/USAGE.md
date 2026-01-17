@@ -34,14 +34,17 @@ No additional installation required! The scripts use `tsx` (TypeScript execute) 
 Shows the curated list of popular npm packages for testing.
 
 **Usage:**
+
 ```bash
 tsx index.ts list [options]
 ```
 
 **Options:**
+
 - `--all` - Show all packages (default shows first 50)
 
 **Examples:**
+
 ```bash
 # Show first 50 packages
 tsx index.ts list
@@ -51,6 +54,7 @@ tsx index.ts list --all
 ```
 
 **Output:**
+
 - Displays rank and package name
 - Shows total count
 - Provides usage tips
@@ -62,16 +66,19 @@ tsx index.ts list --all
 Compare published vs local version for specific packages.
 
 **Usage:**
+
 ```bash
 tsx index.ts test <package1> [package2] [...] [options]
 ```
 
 **Options:**
+
 - `--concurrency N` - Number of parallel tests (default: 5)
 - `--timeout MS` - Timeout in milliseconds (default: 120000)
 - `--json` - Output results as JSON
 
 **Examples:**
+
 ```bash
 # Test single package
 tsx index.ts test lodash
@@ -90,6 +97,7 @@ tsx index.ts test lodash --json
 ```
 
 **Output:**
+
 - Progress tracking
 - Individual test results
 - Summary (improved/regressed/unchanged)
@@ -103,17 +111,21 @@ tsx index.ts test lodash --json
 Test the most popular packages from the curated list.
 
 **Usage:**
+
 ```bash
 tsx index.ts top [N] [options]
 ```
 
 **Arguments:**
+
 - `N` - Number of packages to test (default: 20)
 
 **Options:**
+
 - Same as `test` command
 
 **Examples:**
+
 ```bash
 # Test top 20 packages (default)
 tsx index.ts top
@@ -129,6 +141,7 @@ tsx index.ts top 5 --concurrency 10
 ```
 
 **Performance Estimates:**
+
 - Average test time: ~60 seconds per package
 - With concurrency=5: 20 packages in ~4 minutes
 - With concurrency=10: 20 packages in ~2 minutes
@@ -297,6 +310,7 @@ tsx index.ts test lodash@4.17.20 lodash@4.17.21
 ### Tests Timing Out
 
 Increase timeout:
+
 ```bash
 tsx index.ts test large-package --timeout 300000
 ```
@@ -304,6 +318,7 @@ tsx index.ts test large-package --timeout 300000
 ### Network Issues
 
 Reduce concurrency:
+
 ```bash
 tsx index.ts top 20 --concurrency 2
 ```
@@ -311,6 +326,7 @@ tsx index.ts top 20 --concurrency 2
 ### Memory Issues
 
 Test in smaller batches:
+
 ```bash
 tsx index.ts top 10
 # Wait for completion
@@ -389,6 +405,7 @@ For easier access, add to your package.json:
 ```
 
 Then use:
+
 ```bash
 npm run compare:list
 npm run compare:test lodash react
@@ -409,10 +426,10 @@ tsx index.ts test lodash react axios
 # ╔══════════════════════════════════════════════════════════╗
 # ║ Package Comparison: Published vs Local                  ║
 # ╚══════════════════════════════════════════════════════════╝
-# 
+#
 # Testing 3 package(s)
 # Concurrency: 5 at a time
-# 
+#
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # ℹ Testing: lodash
 # ℹ Testing: react
@@ -421,10 +438,10 @@ tsx index.ts test lodash react axios
 # ✓ Completed: lodash
 # ✓ Completed: react
 # ℹ Progress: 3/3 packages
-# 
+#
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # ✓ All package tests completed!
-# 
+#
 # SUMMARY:
 #   Improved:  2 packages (smaller size)
 #   Regressed: 1 packages (larger size)
@@ -467,6 +484,7 @@ When adding new features:
 ## Support
 
 For issues or questions:
+
 - Check this usage guide first
 - Review error messages (they're descriptive)
 - Check the generated reports in `comparison-results/`

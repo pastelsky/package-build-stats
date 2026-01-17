@@ -5,6 +5,7 @@ This directory contains scripts to compare the published version of `package-bui
 ## Available Scripts
 
 ### 1. `fetch-top-packages.sh` - Get Top NPM Packages
+
 Fetches the current top packages from npm by weekly downloads and saves them to `top-20-packages.txt`.
 
 ```bash
@@ -12,11 +13,13 @@ Fetches the current top packages from npm by weekly downloads and saves them to 
 ```
 
 **Output:**
+
 - Displays top 30 packages ranked by weekly downloads
 - Saves top 20 to `top-20-packages.txt` for easy use
 - Shows real-time download statistics from npm API
 
 **Current Top 20 (as of Nov 2025):**
+
 1. semver (460M+ weekly downloads)
 2. debug (408M+ weekly downloads)
 3. chalk (328M+ weekly downloads)
@@ -41,6 +44,7 @@ Fetches the current top packages from npm by weekly downloads and saves them to 
 ---
 
 ### 2. `compare-versions.sh` - Full Comparison Suite
+
 Comprehensive comparison script that tests multiple functions for each package.
 
 ```bash
@@ -52,16 +56,19 @@ Comprehensive comparison script that tests multiple functions for each package.
 ```
 
 **What it tests:**
+
 - `getPackageStats()` - Size, gzip, dependencies, metadata
 - `getAllPackageExports()` - Export discovery
 - `getPackageExportSizes()` - Per-export size analysis
 
 **Output:**
+
 - Creates timestamped directory in `comparison-results/`
 - Generates JSON files for published and local versions
 - Creates markdown comparison report with tables
 
 **Generated files:**
+
 ```
 comparison-results/YYYYMMDD_HHMMSS/
 ├── <package>_published.json
@@ -74,6 +81,7 @@ comparison-results/YYYYMMDD_HHMMSS/
 ---
 
 ### 3. `quick-compare.sh` - Interactive CLI Comparison
+
 Quick, interactive comparison using the CLI tool.
 
 ```bash
@@ -84,6 +92,7 @@ Quick, interactive comparison using the CLI tool.
 ```
 
 **Features:**
+
 - Shows output from published version CLI
 - Shows output from local version
 - Interactive pauses between packages
@@ -92,6 +101,7 @@ Quick, interactive comparison using the CLI tool.
 ---
 
 ### 4. `test-top-packages.sh` - Automated Top Package Testing
+
 Tests all top 20 packages automatically.
 
 ```bash
@@ -99,6 +109,7 @@ Tests all top 20 packages automatically.
 ```
 
 This script:
+
 1. Loads the top 20 packages from `top-20-packages.txt`
 2. Runs full comparison on all of them
 3. Generates comprehensive report
@@ -108,6 +119,7 @@ This script:
 ## Quick Start
 
 ### Test a few popular packages:
+
 ```bash
 # Fetch latest top packages
 ./fetch-top-packages.sh
@@ -120,6 +132,7 @@ This script:
 ```
 
 ### Test with versions:
+
 ```bash
 ./compare-versions.sh lodash@4.17.21 react@18.2.0 axios@1.6.0
 ```
@@ -155,6 +168,7 @@ The markdown report includes tables comparing:
 ## Tips
 
 ### For CI/CD Integration:
+
 ```bash
 # Non-interactive version
 ./compare-versions.sh $(head -5 top-20-packages.txt)
@@ -167,6 +181,7 @@ const results = require('./comparison-results/latest/lodash_published.json');
 ```
 
 ### For Development:
+
 ```bash
 # Quick test during development
 ./quick-compare.sh lodash
@@ -176,6 +191,7 @@ const results = require('./comparison-results/latest/lodash_published.json');
 ```
 
 ### Filtering Packages:
+
 ```bash
 # Test only utility packages
 ./compare-versions.sh semver debug chalk ms uuid
@@ -192,13 +208,17 @@ const results = require('./comparison-results/latest/lodash_published.json');
 ## Troubleshooting
 
 ### "Package not found"
+
 Some packages might not be publicly available or might have been removed. Skip them or update the list.
 
 ### Timeout errors
+
 Large packages (like webpack, typescript) might take longer. The script has appropriate timeouts set, but you can modify them in the test runner scripts.
 
 ### Out of memory
+
 Testing many packages simultaneously can be memory-intensive. Test in smaller batches:
+
 ```bash
 # Instead of all 20 at once
 ./compare-versions.sh $(head -5 top-20-packages.txt)

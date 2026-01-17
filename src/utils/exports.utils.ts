@@ -138,10 +138,10 @@ async function walkExportsRecursive(
   exports.forEach(exp => {
     // Use path.relative() to calculate the relative path from root to resolvedPath
     // This works correctly since symlinks are not resolved (symlinks: false in resolver config)
-    const relativePath = root 
-      ? path.relative(root, resolvedPath) 
+    const relativePath = root
+      ? path.relative(root, resolvedPath)
       : path.basename(resolvedPath)
-    
+
     resolvedExports[exp] = relativePath
   })
 
@@ -191,7 +191,13 @@ export async function getAllExports(
 
     // Resolve the entry point relative to context
     // Pass installPath as rootContext for calculating relative paths
-    const results = await walkExportsRecursive(context, entryPoint, visited, installPath, true)
+    const results = await walkExportsRecursive(
+      context,
+      entryPoint,
+      visited,
+      installPath,
+      true,
+    )
     Telemetry.walkPackageExportsTree(packageString, startTime, true)
     return results
   } catch (err) {

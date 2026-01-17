@@ -6,7 +6,10 @@ import { logger } from '../utils/logger'
 import { getTopPackages } from '../utils/package-loader'
 import { testCommand } from './test'
 
-export async function topCommand(args: string[], options: Record<string, any>): Promise<void> {
+export async function topCommand(
+  args: string[],
+  options: Record<string, any>,
+): Promise<void> {
   const count = args.length > 0 ? parseInt(args[0], 10) : 20
 
   if (isNaN(count) || count <= 0) {
@@ -25,7 +28,9 @@ export async function topCommand(args: string[], options: Record<string, any>): 
   }
 
   if (packages.length < count) {
-    logger.warning(`Only ${packages.length} packages available (requested ${count})`)
+    logger.warning(
+      `Only ${packages.length} packages available (requested ${count})`,
+    )
   }
 
   // Use test command with the top packages

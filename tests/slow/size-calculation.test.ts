@@ -16,18 +16,21 @@ describe('Bundle Size Calculation', () => {
     expect(result.size).toBeLessThanOrEqual(240)
     expect(result.gzip).toBeGreaterThan(0)
     // Note: gzip can sometimes be larger than uncompressed size for very small files
-    
+
     result.assets.forEach(asset => {
       expect(asset.gzip).toBeGreaterThan(0)
       expect(asset.size).toBeGreaterThanOrEqual(230)
       expect(asset.size).toBeLessThanOrEqual(240)
     })
-    
+
     // Snapshot stable properties only (exclude size and gzip)
     const { gzip: _gzip, size: _size, ...resultWithoutVolatile } = result
-    const assetsWithoutVolatile = result.assets.map(({ gzip, size, ...asset }) => asset)
-    
-    expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile }).toMatchInlineSnapshot(`
+    const assetsWithoutVolatile = result.assets.map(
+      ({ gzip, size, ...asset }) => asset,
+    )
+
+    expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile })
+      .toMatchInlineSnapshot(`
       {
         "assets": [
           {
@@ -55,18 +58,21 @@ describe('Bundle Size Calculation', () => {
     expect(result.size).toBeLessThanOrEqual(530)
     expect(result.gzip).toBeGreaterThan(0)
     expect(result.gzip).toBeLessThan(result.size)
-    
+
     result.assets.forEach(asset => {
       expect(asset.gzip).toBeGreaterThan(0)
       expect(asset.size).toBeGreaterThanOrEqual(515)
       expect(asset.size).toBeLessThanOrEqual(530)
     })
-    
+
     // Snapshot stable properties only
     const { gzip: _gzip, size: _size, ...resultWithoutVolatile } = result
-    const assetsWithoutVolatile = result.assets.map(({ gzip, size, ...asset }) => asset)
-    
-    expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile }).toMatchInlineSnapshot(`
+    const assetsWithoutVolatile = result.assets.map(
+      ({ gzip, size, ...asset }) => asset,
+    )
+
+    expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile })
+      .toMatchInlineSnapshot(`
       {
         "assets": [
           {
@@ -94,18 +100,21 @@ describe('Bundle Size Calculation', () => {
     expect(result.size).toBeLessThanOrEqual(1470)
     expect(result.gzip).toBeGreaterThan(0)
     expect(result.gzip).toBeLessThan(result.size)
-    
+
     result.assets.forEach(asset => {
       expect(asset.gzip).toBeGreaterThan(0)
       expect(asset.size).toBeGreaterThanOrEqual(1450)
       expect(asset.size).toBeLessThanOrEqual(1470)
     })
-    
+
     // Snapshot stable properties only
     const { gzip: _gzip, size: _size, ...resultWithoutVolatile } = result
-    const assetsWithoutVolatile = result.assets.map(({ gzip, size, ...asset }) => asset)
-    
-    expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile }).toMatchInlineSnapshot(`
+    const assetsWithoutVolatile = result.assets.map(
+      ({ gzip, size, ...asset }) => asset,
+    )
+
+    expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile })
+      .toMatchInlineSnapshot(`
       {
         "assets": [
           {
@@ -133,31 +142,39 @@ describe('Bundle Size Calculation', () => {
     expect(result.size).toBeLessThanOrEqual(210)
     expect(result.gzip).toBeGreaterThan(0)
     expect(result.gzip).toBeLessThan(result.size)
-    
+
     // Validate each asset
     expect(result.assets).toHaveLength(2)
     const jsAsset = result.assets.find(a => a.type === 'js')
     const cssAsset = result.assets.find(a => a.type === 'css')
-    
+
     expect(jsAsset?.size).toBeGreaterThanOrEqual(235)
     expect(jsAsset?.size).toBeLessThanOrEqual(245)
     expect(jsAsset?.gzip).toBeGreaterThan(0)
-    
+
     expect(cssAsset?.size).toBeGreaterThanOrEqual(195)
     expect(cssAsset?.size).toBeLessThanOrEqual(210)
     expect(cssAsset?.gzip).toBeGreaterThan(0)
-    
+
     // Snapshot stable properties only
     const { gzip: _gzip, size: _size, ...resultWithoutVolatile } = result
-    const assetsWithoutVolatile = result.assets.map(({ gzip, size, ...asset }) => asset)
-    
+    const assetsWithoutVolatile = result.assets.map(
+      ({ gzip, size, ...asset }) => asset,
+    )
+
     // Remove approximateSize from dependencySizes (also non-deterministic)
-    const dependencySizesStable = result.dependencySizes?.map(({ approximateSize, ...dep }) => ({
-      ...dep,
-      approximateSizeRange: approximateSize > 0 ? 'positive' : 'zero'
-    }))
-    
-    expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile, dependencySizes: dependencySizesStable }).toMatchInlineSnapshot(`
+    const dependencySizesStable = result.dependencySizes?.map(
+      ({ approximateSize, ...dep }) => ({
+        ...dep,
+        approximateSizeRange: approximateSize > 0 ? 'positive' : 'zero',
+      }),
+    )
+
+    expect({
+      ...resultWithoutVolatile,
+      assets: assetsWithoutVolatile,
+      dependencySizes: dependencySizesStable,
+    }).toMatchInlineSnapshot(`
       {
         "assets": [
           {
@@ -197,31 +214,39 @@ describe('Bundle Size Calculation', () => {
     expect(result.size).toBeLessThanOrEqual(200)
     expect(result.gzip).toBeGreaterThan(0)
     expect(result.gzip).toBeLessThan(result.size)
-    
+
     // Validate each asset
     expect(result.assets).toHaveLength(2)
     const jsAsset = result.assets.find(a => a.type === 'js')
     const cssAsset = result.assets.find(a => a.type === 'css')
-    
+
     expect(jsAsset?.size).toBeGreaterThanOrEqual(240)
     expect(jsAsset?.size).toBeLessThanOrEqual(250)
     expect(jsAsset?.gzip).toBeGreaterThan(0)
-    
+
     expect(cssAsset?.size).toBeGreaterThanOrEqual(185)
     expect(cssAsset?.size).toBeLessThanOrEqual(200)
     expect(cssAsset?.gzip).toBeGreaterThan(0)
-    
+
     // Snapshot stable properties only
     const { gzip: _gzip, size: _size, ...resultWithoutVolatile } = result
-    const assetsWithoutVolatile = result.assets.map(({ gzip, size, ...asset }) => asset)
-    
+    const assetsWithoutVolatile = result.assets.map(
+      ({ gzip, size, ...asset }) => asset,
+    )
+
     // Remove approximateSize from dependencySizes (also non-deterministic)
-    const dependencySizesStable = result.dependencySizes?.map(({ approximateSize, ...dep }) => ({
-      ...dep,
-      approximateSizeRange: approximateSize > 0 ? 'positive' : 'zero'
-    }))
-    
-    expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile, dependencySizes: dependencySizesStable }).toMatchInlineSnapshot(`
+    const dependencySizesStable = result.dependencySizes?.map(
+      ({ approximateSize, ...dep }) => ({
+        ...dep,
+        approximateSizeRange: approximateSize > 0 ? 'positive' : 'zero',
+      }),
+    )
+
+    expect({
+      ...resultWithoutVolatile,
+      assets: assetsWithoutVolatile,
+      dependencySizes: dependencySizesStable,
+    }).toMatchInlineSnapshot(`
       {
         "assets": [
           {
@@ -295,18 +320,21 @@ describe('Gzip Compression', () => {
     expect(result.size).toBeLessThanOrEqual(240)
     expect(result.gzip).toBeGreaterThan(0)
     expect(result.gzip).toBeLessThan(result.size)
-    
+
     result.assets.forEach(asset => {
       expect(asset.gzip).toBeGreaterThan(0)
       expect(asset.size).toBeGreaterThanOrEqual(230)
       expect(asset.size).toBeLessThanOrEqual(240)
     })
-    
+
     // Snapshot stable properties only
     const { gzip: _gzip, size: _size, ...resultWithoutVolatile } = result
-    const assetsWithoutVolatile = result.assets.map(({ gzip, size, ...asset }) => asset)
-    
-    expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile }).toMatchInlineSnapshot(`
+    const assetsWithoutVolatile = result.assets.map(
+      ({ gzip, size, ...asset }) => asset,
+    )
+
+    expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile })
+      .toMatchInlineSnapshot(`
       {
         "assets": [
           {
@@ -334,18 +362,21 @@ describe('Gzip Compression', () => {
     expect(result.size).toBeLessThanOrEqual(530)
     expect(result.gzip).toBeGreaterThan(0)
     expect(result.gzip).toBeLessThan(result.size)
-    
+
     result.assets.forEach(asset => {
       expect(asset.gzip).toBeGreaterThan(0)
       expect(asset.size).toBeGreaterThanOrEqual(515)
       expect(asset.size).toBeLessThanOrEqual(530)
     })
-    
+
     // Snapshot stable properties only
     const { gzip: _gzip, size: _size, ...resultWithoutVolatile } = result
-    const assetsWithoutVolatile = result.assets.map(({ gzip, size, ...asset }) => asset)
-    
-    expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile }).toMatchInlineSnapshot(`
+    const assetsWithoutVolatile = result.assets.map(
+      ({ gzip, size, ...asset }) => asset,
+    )
+
+    expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile })
+      .toMatchInlineSnapshot(`
       {
         "assets": [
           {
@@ -373,18 +404,21 @@ describe('Gzip Compression', () => {
     expect(result.size).toBeLessThanOrEqual(1470)
     expect(result.gzip).toBeGreaterThan(0)
     expect(result.gzip).toBeLessThan(result.size)
-    
+
     result.assets.forEach(asset => {
       expect(asset.gzip).toBeGreaterThan(0)
       expect(asset.size).toBeGreaterThanOrEqual(1450)
       expect(asset.size).toBeLessThanOrEqual(1470)
     })
-    
+
     // Snapshot stable properties only
     const { gzip: _gzip, size: _size, ...resultWithoutVolatile } = result
-    const assetsWithoutVolatile = result.assets.map(({ gzip, size, ...asset }) => asset)
-    
-    expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile }).toMatchInlineSnapshot(`
+    const assetsWithoutVolatile = result.assets.map(
+      ({ gzip, size, ...asset }) => asset,
+    )
+
+    expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile })
+      .toMatchInlineSnapshot(`
       {
         "assets": [
           {
@@ -412,23 +446,31 @@ describe('Gzip Compression', () => {
     expect(result.size).toBeLessThanOrEqual(210)
     expect(result.gzip).toBeGreaterThan(0)
     expect(result.gzip).toBeLessThan(result.size)
-    
+
     expect(result.assets).toHaveLength(2)
     result.assets.forEach(asset => {
       expect(asset.gzip).toBeGreaterThan(0)
       expect(asset.size).toBeGreaterThan(0)
     })
-    
+
     // Snapshot stable properties only
     const { gzip: _gzip, size: _size, ...resultWithoutVolatile } = result
-    const assetsWithoutVolatile = result.assets.map(({ gzip, size, ...asset }) => asset)
-    
-    const dependencySizesStable = result.dependencySizes?.map(({ approximateSize, ...dep }) => ({
-      ...dep,
-      approximateSizeRange: approximateSize > 0 ? 'positive' : 'zero'
-    }))
-    
-    expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile, dependencySizes: dependencySizesStable }).toMatchInlineSnapshot(`
+    const assetsWithoutVolatile = result.assets.map(
+      ({ gzip, size, ...asset }) => asset,
+    )
+
+    const dependencySizesStable = result.dependencySizes?.map(
+      ({ approximateSize, ...dep }) => ({
+        ...dep,
+        approximateSizeRange: approximateSize > 0 ? 'positive' : 'zero',
+      }),
+    )
+
+    expect({
+      ...resultWithoutVolatile,
+      assets: assetsWithoutVolatile,
+      dependencySizes: dependencySizesStable,
+    }).toMatchInlineSnapshot(`
       {
         "assets": [
           {
@@ -475,14 +517,16 @@ describe('Gzip Compression', () => {
         expect(asset.size).toBeGreaterThan(0)
       })
     })
-    
+
     // Snapshot stable properties only
     const resultsWithoutVolatile = results.map(result => {
       const { gzip: _gzip, size: _size, ...resultWithoutVolatile } = result
-      const assetsWithoutVolatile = result.assets.map(({ gzip, size, ...asset }) => asset)
+      const assetsWithoutVolatile = result.assets.map(
+        ({ gzip, size, ...asset }) => asset,
+      )
       return { ...resultWithoutVolatile, assets: assetsWithoutVolatile }
     })
-    
+
     expect(resultsWithoutVolatile).toMatchInlineSnapshot(`
       [
         {
@@ -566,17 +610,20 @@ describe('Dependency Size Trees', () => {
     expect(result.size).toBeLessThanOrEqual(240)
     expect(result.gzip).toBeGreaterThan(0)
     expect(result.gzip).toBeLessThan(result.size)
-    
+
     result.assets.forEach(asset => {
       expect(asset.gzip).toBeGreaterThan(0)
       expect(asset.size).toBeGreaterThan(0)
     })
-    
+
     // Snapshot stable properties only
     const { gzip: _gzip, size: _size, ...resultWithoutVolatile } = result
-    const assetsWithoutVolatile = result.assets.map(({ gzip, size, ...asset }) => asset)
-    
-    expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile }).toMatchInlineSnapshot(`
+    const assetsWithoutVolatile = result.assets.map(
+      ({ gzip, size, ...asset }) => asset,
+    )
+
+    expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile })
+      .toMatchInlineSnapshot(`
       {
         "assets": [
           {
@@ -604,17 +651,20 @@ describe('Dependency Size Trees', () => {
     expect(result.size).toBeLessThanOrEqual(530)
     expect(result.gzip).toBeGreaterThan(0)
     expect(result.gzip).toBeLessThan(result.size)
-    
+
     result.assets.forEach(asset => {
       expect(asset.gzip).toBeGreaterThan(0)
       expect(asset.size).toBeGreaterThan(0)
     })
-    
+
     // Snapshot stable properties only
     const { gzip: _gzip, size: _size, ...resultWithoutVolatile } = result
-    const assetsWithoutVolatile = result.assets.map(({ gzip, size, ...asset }) => asset)
-    
-    expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile }).toMatchInlineSnapshot(`
+    const assetsWithoutVolatile = result.assets.map(
+      ({ gzip, size, ...asset }) => asset,
+    )
+
+    expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile })
+      .toMatchInlineSnapshot(`
       {
         "assets": [
           {
@@ -642,17 +692,20 @@ describe('Dependency Size Trees', () => {
     expect(result.size).toBeLessThanOrEqual(1470)
     expect(result.gzip).toBeGreaterThan(0)
     expect(result.gzip).toBeLessThan(result.size)
-    
+
     result.assets.forEach(asset => {
       expect(asset.gzip).toBeGreaterThan(0)
       expect(asset.size).toBeGreaterThan(0)
     })
-    
+
     // Snapshot stable properties only
     const { gzip: _gzip, size: _size, ...resultWithoutVolatile } = result
-    const assetsWithoutVolatile = result.assets.map(({ gzip, size, ...asset }) => asset)
-    
-    expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile }).toMatchInlineSnapshot(`
+    const assetsWithoutVolatile = result.assets.map(
+      ({ gzip, size, ...asset }) => asset,
+    )
+
+    expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile })
+      .toMatchInlineSnapshot(`
       {
         "assets": [
           {
@@ -685,7 +738,7 @@ describe('Complex Dependency Scenarios', () => {
     expect(result.size).toBeLessThanOrEqual(2420)
     expect(result.gzip).toBeGreaterThan(0)
     expect(result.gzip).toBeLessThan(result.size)
-    
+
     result.assets.forEach(asset => {
       expect(asset.gzip).toBeGreaterThan(0)
       expect(asset.size).toBeGreaterThan(0)
@@ -693,11 +746,11 @@ describe('Complex Dependency Scenarios', () => {
 
     // Verify peer dependencies are reported
     expect(result.peerDependencies).toEqual(['react', 'react-dom'])
-    
+
     // Should have at least one dependency (lodash-es)
     expect(result.dependencyCount).toBeGreaterThan(0)
     expect(result.dependencySizes?.length).toBeGreaterThan(0)
-    
+
     // Should have lodash-es in dependencies
     const lodashDep = result.dependencySizes?.find(d => d.name === 'lodash-es')
     expect(lodashDep).toBeDefined()
@@ -705,15 +758,23 @@ describe('Complex Dependency Scenarios', () => {
 
     // Snapshot stable properties only
     const { gzip: _gzip, size: _size, ...resultWithoutVolatile } = result
-    const assetsWithoutVolatile = result.assets.map(({ gzip, size, ...asset }) => asset)
-    
+    const assetsWithoutVolatile = result.assets.map(
+      ({ gzip, size, ...asset }) => asset,
+    )
+
     // Remove approximateSize from dependencySizes (non-deterministic)
-    const dependencySizesStable = result.dependencySizes?.map(({ approximateSize, ...dep }) => ({
-      ...dep,
-      approximateSizeRange: approximateSize > 0 ? 'positive' : 'zero'
-    }))
-    
-    expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile, dependencySizes: dependencySizesStable }).toMatchInlineSnapshot(`
+    const dependencySizesStable = result.dependencySizes?.map(
+      ({ approximateSize, ...dep }) => ({
+        ...dep,
+        approximateSizeRange: approximateSize > 0 ? 'positive' : 'zero',
+      }),
+    )
+
+    expect({
+      ...resultWithoutVolatile,
+      assets: assetsWithoutVolatile,
+      dependencySizes: dependencySizesStable,
+    }).toMatchInlineSnapshot(`
       {
         "assets": [
           {
@@ -756,7 +817,7 @@ describe('Complex Dependency Scenarios', () => {
     expect(result.size).toBeLessThanOrEqual(6310)
     expect(result.gzip).toBeGreaterThan(0)
     expect(result.gzip).toBeLessThan(result.size)
-    
+
     result.assets.forEach(asset => {
       expect(asset.gzip).toBeGreaterThan(0)
       expect(asset.size).toBeGreaterThan(0)
@@ -765,11 +826,11 @@ describe('Complex Dependency Scenarios', () => {
     // Should have multiple dependencies (ms and debug)
     expect(result.dependencyCount).toBeGreaterThanOrEqual(2)
     expect(result.dependencySizes?.length).toBeGreaterThanOrEqual(2)
-    
+
     // Verify both direct dependencies are tracked
     const debugDep = result.dependencySizes?.find(d => d.name === 'debug')
     const msDep = result.dependencySizes?.find(d => d.name === 'ms')
-    
+
     expect(debugDep).toBeDefined()
     expect(msDep).toBeDefined()
     expect(debugDep!.approximateSize).toBeGreaterThan(0)
@@ -777,15 +838,23 @@ describe('Complex Dependency Scenarios', () => {
 
     // Snapshot stable properties only
     const { gzip: _gzip, size: _size, ...resultWithoutVolatile } = result
-    const assetsWithoutVolatile = result.assets.map(({ gzip, size, ...asset }) => asset)
-    
+    const assetsWithoutVolatile = result.assets.map(
+      ({ gzip, size, ...asset }) => asset,
+    )
+
     // Remove approximateSize from dependencySizes (non-deterministic)
-    const dependencySizesStable = result.dependencySizes?.map(({ approximateSize, ...dep }) => ({
-      ...dep,
-      approximateSizeRange: approximateSize > 0 ? 'positive' : 'zero'
-    }))
-    
-    expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile, dependencySizes: dependencySizesStable }).toMatchInlineSnapshot(`
+    const dependencySizesStable = result.dependencySizes?.map(
+      ({ approximateSize, ...dep }) => ({
+        ...dep,
+        approximateSizeRange: approximateSize > 0 ? 'positive' : 'zero',
+      }),
+    )
+
+    expect({
+      ...resultWithoutVolatile,
+      assets: assetsWithoutVolatile,
+      dependencySizes: dependencySizesStable,
+    }).toMatchInlineSnapshot(`
       {
         "assets": [
           {
@@ -829,7 +898,7 @@ describe('Complex Dependency Scenarios', () => {
     expect(result.size).toBeLessThanOrEqual(35350)
     expect(result.gzip).toBeGreaterThan(0)
     expect(result.gzip).toBeLessThan(result.size)
-    
+
     result.assets.forEach(asset => {
       expect(asset.gzip).toBeGreaterThan(0)
       expect(asset.size).toBeGreaterThan(0)
@@ -838,7 +907,7 @@ describe('Complex Dependency Scenarios', () => {
     // Should have at least one dependency (axios might be tree-shaken or bundled)
     expect(result.dependencyCount).toBeGreaterThanOrEqual(1)
     expect(result.dependencySizes?.length).toBeGreaterThanOrEqual(1)
-    
+
     // Verify axios is in the dependency tree
     const axiosDep = result.dependencySizes?.find(d => d.name === 'axios')
     expect(axiosDep).toBeDefined()
@@ -846,15 +915,23 @@ describe('Complex Dependency Scenarios', () => {
 
     // Snapshot stable properties only
     const { gzip: _gzip, size: _size, ...resultWithoutVolatile } = result
-    const assetsWithoutVolatile = result.assets.map(({ gzip, size, ...asset }) => asset)
-    
+    const assetsWithoutVolatile = result.assets.map(
+      ({ gzip, size, ...asset }) => asset,
+    )
+
     // Remove approximateSize from dependencySizes (non-deterministic)
-    const dependencySizesStable = result.dependencySizes?.map(({ approximateSize, ...dep }) => ({
-      ...dep,
-      approximateSizeRange: approximateSize > 0 ? 'positive' : 'zero'
-    }))
-    
-    expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile, dependencySizes: dependencySizesStable }).toMatchInlineSnapshot(`
+    const dependencySizesStable = result.dependencySizes?.map(
+      ({ approximateSize, ...dep }) => ({
+        ...dep,
+        approximateSizeRange: approximateSize > 0 ? 'positive' : 'zero',
+      }),
+    )
+
+    expect({
+      ...resultWithoutVolatile,
+      assets: assetsWithoutVolatile,
+      dependencySizes: dependencySizesStable,
+    }).toMatchInlineSnapshot(`
       {
         "assets": [
           {

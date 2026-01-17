@@ -1,6 +1,5 @@
 import autoprefixer from 'autoprefixer'
 
-
 import escapeRegex from 'escape-string-regexp'
 import type { Entry, Configuration } from '@rspack/core'
 import rspack from '@rspack/core'
@@ -30,8 +29,6 @@ export default function makeRspackConfig({
     const isBuiltIn = externals.externalBuiltIns.includes(request)
     return isPeerDep || isBuiltIn
   }
-
-
 
   const configuration: Configuration = {
     entry: entry,

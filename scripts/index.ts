@@ -5,7 +5,12 @@
  * Main entry point for all comparison commands
  */
 
-import { parseArgs, showHelp, showCommandHelp, validateCommand } from './utils/cli'
+import {
+  parseArgs,
+  showHelp,
+  showCommandHelp,
+  validateCommand,
+} from './utils/cli'
 import { logger } from './utils/logger'
 import { listCommand } from './commands/list'
 import { testCommand } from './commands/test'

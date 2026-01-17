@@ -25,15 +25,10 @@ export interface ComparisonResult {
  * Create a timestamped results directory
  */
 export function createResultsDir(): string {
-  const timestamp = new Date()
-    .toISOString()
-    .replace(/[:.]/g, '-')
-    .split('T')[0] +
+  const timestamp =
+    new Date().toISOString().replace(/[:.]/g, '-').split('T')[0] +
     '_' +
-    new Date()
-      .toTimeString()
-      .split(' ')[0]
-      .replace(/:/g, '')
+    new Date().toTimeString().split(' ')[0].replace(/:/g, '')
 
   const resultDir = path.join(config.resultsDir, timestamp)
   fs.mkdirSync(resultDir, { recursive: true })
@@ -83,8 +78,12 @@ export function formatComparisonReport(results: ComparisonResult[]): string {
 
   const summary = {
     totalPackages: results.length,
-    improved: results.filter(r => r.differences?.sizeChange && r.differences.sizeChange < 0).length,
-    regressed: results.filter(r => r.differences?.sizeChange && r.differences.sizeChange > 0).length,
+    improved: results.filter(
+      r => r.differences?.sizeChange && r.differences.sizeChange < 0,
+    ).length,
+    regressed: results.filter(
+      r => r.differences?.sizeChange && r.differences.sizeChange > 0,
+    ).length,
     unchanged: results.filter(r => r.differences?.sizeChange === 0).length,
   }
 
@@ -99,14 +98,22 @@ export function formatComparisonReport(results: ComparisonResult[]): string {
 
   results.forEach(result => {
     const diff = result.differences
-    const sizeIcon = diff && diff.sizeChange < 0 ? '📉' : diff && diff.sizeChange > 0 ? '📈' : '➡️'
-    const gzipIcon = diff && diff.gzipChange < 0 ? '📉' : diff && diff.gzipChange > 0 ? '📈' : '➡️'
+    const sizeIcon =
+      diff && diff.sizeChange < 0
+        ? '📉'
+        : diff && diff.sizeChange > 0
+          ? '📈'
+          : '➡️'
+    const gzipIcon =
+      diff && diff.gzipChange < 0
+        ? '📉'
+        : diff && diff.gzipChange > 0
+          ? '📈'
+          : '➡️'
 
     lines.push(`### ${result.package}`)
     lines.push('')
-    lines.push(
-      `| Metric | Published | Local | Change |`,
-    )
+    lines.push(`| Metric | Published | Local | Change |`)
     lines.push(`|--------|-----------|-------|--------|`)
     lines.push(
       `| Size | ${result.publishedStats.size} | ${result.localStats.size} | ${sizeIcon} ${diff?.sizeChange}B (${diff?.sizeChangePercent.toFixed(2)}%) |`,
@@ -123,7 +130,10 @@ export function formatComparisonReport(results: ComparisonResult[]): string {
 /**
  * Save report to file
  */
-export function saveReport(resultDir: string, results: ComparisonResult[]): void {
+export function saveReport(
+  resultDir: string,
+  results: ComparisonResult[],
+): void {
   const report = formatComparisonReport(results)
   const filepath = path.join(resultDir, 'report.md')
   fs.writeFileSync(filepath, report)

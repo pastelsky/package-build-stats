@@ -68,7 +68,9 @@ export function formatPackageList(packages: string[], showCount = 50): void {
 
   if (packages.length > showCount) {
     logger.blank()
-    logger.info(`... (showing first ${showCount} of ${packages.length} packages)`)
+    logger.info(
+      `... (showing first ${showCount} of ${packages.length} packages)`,
+    )
   }
 
   logger.blank()

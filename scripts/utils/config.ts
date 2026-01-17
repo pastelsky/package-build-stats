@@ -24,8 +24,8 @@ export interface ScriptConfig {
 }
 
 export function getConfig(): ScriptConfig {
-  const scriptDir = __dirname.endsWith('/utils') 
-    ? path.join(__dirname, '..') 
+  const scriptDir = __dirname.endsWith('/utils')
+    ? path.join(__dirname, '..')
     : __dirname
   const projectRoot = path.join(scriptDir, '..')
 
