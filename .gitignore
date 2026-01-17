@@ -6,9 +6,27 @@ dist
 docs
 .env
 yarn-error.log
+.nyc_output
+coverage
 !*fixtures/node_modules
 !*fixtures/node_modules/resolve-test/node_modules
 !*fixtures/node_modules/resolve-test/nested-folder/another-nested-folder/node_modules
 .idea
 # Serverless directories
 .serverless
+# Comparison script cache
+scripts/.master-cache
+scripts/comparison-results
+
+# Duplicate original folder (use parent directory instead)
+package-build-stats-original/
+
+# Reports and analysis output
+reports/
+*.json.backup
+
+# Temporary files
+tmp_*
+debug-*
+*.tmp
+.DS_Store

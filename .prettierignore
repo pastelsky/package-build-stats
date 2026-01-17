@@ -1,1 +1,13 @@
-dist
+# Build outputs
+build/
+coverage/
+.nyc_output/
+
+# Intentionally invalid test fixtures
+tests/fixtures/errors/invalid-syntax/
+
+# Dependencies
+node_modules/
+
+# Generated files
+*.min.js
