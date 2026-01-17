@@ -1,0 +1,23 @@
+/* SCSS with variables and nesting */
+
+$primary-color: #007bff;
+$hover-color: #0056b3;
+$padding: 10px 20px;
+
+.button {
+  padding: $padding;
+  background-color: $primary-color;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $hover-color;
+  }
+
+  &--large {
+    padding: 15px 30px;
+    font-size: 18px;
+  }
+}

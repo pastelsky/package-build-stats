@@ -1,0 +1,6 @@
+{
+  "name": "pattern-exports-fixture",
+  "version": "1.0.0",
+  "description": "Tests for array and object pattern exports",
+  "main": "src/index.js"
+}

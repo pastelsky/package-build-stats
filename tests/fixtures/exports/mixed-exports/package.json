@@ -1,0 +1,7 @@
+{
+  "name": "mixed-exports-fixture",
+  "version": "1.0.0",
+  "description": "Package with both default and named exports",
+  "main": "src/index.js",
+  "type": "module"
+}

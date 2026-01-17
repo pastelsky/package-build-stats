@@ -1,0 +1,6 @@
+{
+  "name": "cli-build-error-fixture",
+  "version": "1.0.0",
+  "description": "Fixture with CLI-specific build error (shebang handling)",
+  "main": "src/cli.js"
+}

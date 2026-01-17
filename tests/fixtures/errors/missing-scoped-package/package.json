@@ -1,0 +1,6 @@
+{
+  "name": "missing-scoped-package-fixture",
+  "version": "1.0.0",
+  "description": "Fixture with missing scoped package",
+  "main": "src/index.js"
+}

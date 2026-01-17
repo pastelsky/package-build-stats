@@ -1,12 +1,11 @@
-const { getPackageStats } = require('../src')
-const pSeries = require('p-series')
-
-require('dotenv').config()
+import { getPackageStats } from '../src'
+import pSeries from 'p-series'
+import 'dotenv/config'
 
 const MAX_SIZE_DELTA = 7 * 1024 // in bytes
 const MIN_SIZE_DELTA = 3 * 1024 // in bytes
 
-const isDeltaOk = (originalSize, builtSize) => {
+const isDeltaOk = (originalSize: number, builtSize: number): boolean => {
   const diff = Math.abs(originalSize - builtSize)
 
   if (diff > MAX_SIZE_DELTA) {
@@ -119,7 +118,6 @@ expect.extend({
     }
   },
 })
-jest.setTimeout(70000)
 
 describe('real world stats', () => {
   let testPackages = async (packages, done) => {

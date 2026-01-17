@@ -1,0 +1,10 @@
+{
+  "name": "invalid-exports-fixture",
+  "version": "1.0.0",
+  "description": "Fixture with exports pointing to non-existent files",
+  "type": "module",
+  "exports": {
+    ".": "./src/does-not-exist.js",
+    "./utils": "./src/also-missing.js"
+  }
+}

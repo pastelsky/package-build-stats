@@ -1,0 +1,6 @@
+{
+  "name": "missing-entry-point-fixture",
+  "version": "1.0.0",
+  "description": "Fixture with missing entry point to trigger EntryPointError",
+  "main": "src/does-not-exist.js"
+}

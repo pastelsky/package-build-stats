@@ -1,0 +1,7 @@
+{
+  "name": "re-exports-fixture",
+  "version": "1.0.0",
+  "description": "Package with re-exports from multiple modules",
+  "main": "src/index.js",
+  "type": "module"
+}
