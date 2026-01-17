@@ -62,27 +62,45 @@ export async function getPackageExportSizes(
   options: GetPackageStatsOptions = {},
 ) {
   const startTime = performance.now()
+  const timings: Record<string, number> = {}
+
   const { name: packageName, normalPath } = parsePackageString(packageString)
+  
+  const preparePathStart = performance.now()
   const installPath = await InstallationUtils.preparePath(packageName)
+  timings.preparePath = performance.now() - preparePathStart
+  console.log(`[PERF] [ExportSizes] preparePath: ${timings.preparePath.toFixed(2)}ms`)
 
   try {
+    const installStart = performance.now()
     await installPackage(packageString, installPath, options)
+    timings.install = performance.now() - installStart
+    console.log(`[PERF] [ExportSizes] installPackage: ${timings.install.toFixed(2)}ms`)
 
     // The package is installed in node_modules subdirectory
     const packagePath =
       normalPath || path.join(installPath, 'node_modules', packageName)
+    
+    const getAllExportsStart = performance.now()
     const exportMap = await getAllExports(
       packageString,
       packagePath,
       packageName,
       installPath, // Pass installPath as base for relative path calculation
     )
+    timings.getAllExports = performance.now() - getAllExportsStart
+    console.log(`[PERF] [ExportSizes] getAllExports: ${timings.getAllExports.toFixed(2)}ms`)
 
     const exports = Object.keys(exportMap).filter(exp => !(exp === 'default'))
     debug('Got %d exports for %s', exports.length, packageString)
+    console.log(`[PERF] [ExportSizes] Found ${exports.length} exports`)
 
+    const externalsStart = performance.now()
     const externals = getExternals(packageName, installPath)
+    timings.getExternals = performance.now() - externalsStart
+    console.log(`[PERF] [ExportSizes] getExternals: ${timings.getExternals.toFixed(2)}ms`)
 
+    const buildStart = performance.now()
     const builtDetails = await BuildUtils.buildPackageIgnoringMissingDeps({
       name: packageName,
       installPath,
@@ -93,6 +111,8 @@ export async function getPackageExportSizes(
         includeDependencySizes: false,
       },
     })
+    timings.build = performance.now() - buildStart
+    console.log(`[PERF] [ExportSizes] buildPackage: ${timings.build.toFixed(2)}ms`)
 
     Telemetry.packageExportsSizes(packageString, startTime, true, options)
     return {

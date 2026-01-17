@@ -53,14 +53,20 @@ export default async function getPackageStats(
   options: GetPackageStatsOptions = {},
 ) {
   const startTime = performance.now()
+  const timings: Record<string, number> = {}
 
   const { name: packageName, isLocal } = parsePackageString(packageString)
 
+  const preparePathStart = performance.now()
   const installPath = await InstallationUtils.preparePath(
     packageName,
     options.client,
   )
+  timings.preparePath = performance.now() - preparePathStart
+  console.log(`[PERF] preparePath: ${timings.preparePath.toFixed(2)}ms`)
+
   try {
+    const installStart = performance.now()
     await InstallationUtils.installPackage(packageString, installPath, {
       isLocal,
       client: options.client,
@@ -68,9 +74,15 @@ export default async function getPackageStats(
       networkConcurrency: options.networkConcurrency,
       installTimeout: options.installTimeout,
     })
+    timings.install = performance.now() - installStart
+    console.log(`[PERF] installPackage: ${timings.install.toFixed(2)}ms`)
 
+    const externalsStart = performance.now()
     const externals = getExternals(packageName, installPath)
+    timings.getExternals = performance.now() - externalsStart
+    console.log(`[PERF] getExternals: ${timings.getExternals.toFixed(2)}ms`)
 
+    const parallelStart = performance.now()
     const [pacakgeJSONDetails, builtDetails] = await Promise.all([
       getPackageJSONDetails(packageName, installPath),
       BuildUtils.buildPackageIgnoringMissingDeps({
@@ -85,6 +97,8 @@ export default async function getPackageStats(
         },
       }),
     ])
+    timings.parallelBuild = performance.now() - parallelStart
+    console.log(`[PERF] parallel (packageJSON + build): ${timings.parallelBuild.toFixed(2)}ms`)
 
     const hasCSSAsset = builtDetails.assets.some(asset => asset.type === 'css')
     const mainAsset = builtDetails.assets.find(
