@@ -42,8 +42,8 @@ jobs:
       - name: Build
         run: corepack yarn build
 
-      - name: Run fast tests
-        run: corepack yarn test:fast
+      - name: Run tests
+        run: corepack yarn test
 
       - name: Run tests with coverage
         run: corepack yarn test:coverage
