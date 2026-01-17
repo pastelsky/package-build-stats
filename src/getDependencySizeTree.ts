@@ -1,113 +1,92 @@
-import webpack from 'webpack'
 import path from 'path'
-import Terser from 'terser'
-import * as esbuild from 'esbuild'
+import { minify } from '@swc/core'
 import { MinifyError } from './errors/CustomError'
 import Telemetry from './utils/telemetry.utils'
 import { performance } from 'perf_hooks'
 
-/**
- * A fork of `webpack-bundle-size-analyzer`.
- * https://github.com/robertknight/webpack-bundle-size-analyzer
- */
-
 function modulePath(identifier: string) {
   // the format of module paths is
   //   '(<loader expression>!)?/path/to/module.js'
+  // OR
+  // 'javascript/esm|/some/path'
   let loaderRegex = /.*!/
-  return identifier.replace(loaderRegex, '')
+  const withoutLoader = identifier.replace(loaderRegex, '')
+  if (withoutLoader.includes('|')) return withoutLoader.split('|')[1]
+  return withoutLoader
 }
 
-function getByteLen(normal_val: string) {
-  // Force string type
-  normal_val = String(normal_val)
-
-  let byteLen = 0
-  for (let i = 0; i < normal_val.length; i++) {
-    const c = normal_val.charCodeAt(i)
-    byteLen +=
-      c < 1 << 7
-        ? 1
-        : c < 1 << 11
-        ? 2
-        : c < 1 << 16
-        ? 3
-        : c < 1 << 21
-        ? 4
-        : c < 1 << 26
-        ? 5
-        : c < 1 << 31
-        ? 6
-        : Number.NaN
-  }
-  return byteLen
+function getUtf8Size(value: string) {
+  const size = Buffer.byteLength(value, 'utf8')
+  
+  if (process.env.DEBUG_SIZE && Math.random() < 0.01) { // Only debug 1% to avoid spam  }
+  
+  return size
 }
 
-async function minifyDependencyCode(
-  source: string,
-  minifier: 'terser' | 'esbuild' = 'terser'
-) {
-  if (minifier === 'terser') {
-    return Terser.minify(source, {
-      mangle: false,
-      compress: {
-        arrows: true,
-        booleans: true,
-        collapse_vars: true,
-        comparisons: true,
-        conditionals: true,
-        dead_code: true,
-        drop_console: false,
-        drop_debugger: true,
-        ecma: 5,
-        evaluate: true,
-        expression: false,
-        global_defs: {},
-        hoist_vars: false,
-        ie8: false,
-        if_return: true,
-        inline: true,
-        join_vars: true,
-        keep_fargs: true,
-        keep_fnames: false,
-        keep_infinity: false,
-        loops: true,
-        negate_iife: true,
-        passes: 1,
-        properties: true,
-        pure_getters: 'strict',
-        reduce_vars: true,
-        sequences: true,
-        side_effects: true,
-        switches: true,
-        top_retain: null,
-        toplevel: false,
-        typeofs: true,
-        unsafe: false,
-        unused: true,
-      },
-      output: {
-        comments: false,
-      },
-    })
-  } else {
-    return esbuild.transform(
-      // ESBuild Minifier doesn't auto-remove license comments from code
-      // So, we break ESBuild's heuristic for license comments match. See github.com/privatenumber/esbuild-loader/issues/87
-      source
-        .replace(/@license/g, '@silence')
-        .replace(/\/\/!/g, '//')
-        .replace(/\/\*!/g, '//'),
-      { minify: true }
+/**
+ * Extract all package names from a module path to build a dependency chain.
+ * For example: /node_modules/a/node_modules/b/index.js returns ['a', 'b']
+ * This preserves the old behavior of showing nested dependencies.
+ */
+function extractPackageNamesFromPath(moduleFilePath: string): string[] {
+  // pnpm will serve packages from a global symlink (.pnpm/package@version/node_modules/package)
+  // needs to be stripped off
+  const pnpmPrefix = '.pnpm\\' + path.sep + '.+\\' + path.sep + 'node_modules\\' + path.sep
+  const packages = moduleFilePath.split(
+    new RegExp('\\' + path.sep + 'node_modules\\' + path.sep + `(?:${pnpmPrefix})?`)
+  )
+
+  if (packages.length <= 1) return []
+
+  const lastSegment = packages.pop()
+  if (!lastSegment) return []
+
+  // Extract the package name from the last segment
+  let lastPackageName
+  if (lastSegment[0] === '@') {
+    // package is a scoped package
+    const offset = lastSegment.indexOf(path.sep) + 1
+    lastPackageName = lastSegment.slice(
+      0,
+      offset + lastSegment.slice(offset).indexOf(path.sep)
     )
+  } else {
+    lastPackageName = lastSegment.slice(0, lastSegment.indexOf(path.sep))
+  }
+  
+  packages.push(lastPackageName)
+  packages.shift() // Remove the first empty element
+  
+  return packages
+}
+
+async function minifyDependencyCode(source: string) {
+  if (process.env.DEBUG_SIZE) {  }
+  
+  try {
+    const startTime = Date.now()
+    const result = await minify(source, {
+      compress: true,
+      mangle: true,
+      module: true, // Treat as ES module to support import/export
+    })
+    const minifyTime = Date.now() - startTime
+    
+    if (process.env.DEBUG_SIZE) {    }
+    
+    return { code: result.code }
+  } catch (error) {
+    if (process.env.DEBUG_SIZE) {    }
+    console.error('SWC minify error:', error)
+    throw error
   }
 }
 
-type MakeModule = {
-  path: string
-  sources: string[]
-  source: string
-}
+type RspackStatsCompilation = NonNullable<
+  ReturnType<NonNullable<import('@rspack/core').Stats['toJson']>>
+>
+
+type RspackModule = NonNullable<RspackStatsCompilation['modules']>[0]
 
 type StatsChild = {
   path: string
@@ -122,13 +101,43 @@ type StatsTree = {
   children: StatsChild[]
 }
 
+function normaliseModuleSource(mod: RspackModule) {
+  const identifier = mod.identifier || ''
+  const isJSON = identifier.endsWith('.json')
+  const rawSource = mod.source
+
+  if (process.env.DEBUG_SIZE) {  }
+
+  if (rawSource === undefined || rawSource === null) {
+    if (process.env.DEBUG_SIZE) {    }
+    return null
+  }
+
+  let source: string
+
+  if (typeof rawSource === 'string') {
+    source = rawSource
+    if (process.env.DEBUG_SIZE) {    }
+  } else if (Buffer.isBuffer(rawSource)) {
+    source = rawSource.toString('utf8')
+    if (process.env.DEBUG_SIZE) {    }
+  } else {
+    source = String(rawSource)
+    if (process.env.DEBUG_SIZE) {    }
+  }
+
+  const finalSource = isJSON ? `$a$=${source}` : source
+  if (process.env.DEBUG_SIZE) {  }
+  
+  return finalSource
+}
+
 async function bundleSizeTree(
   packageName: string,
-  stats: webpack.Stats.ToJsonOutput,
-  minifier: 'terser' | 'esbuild'
+  stats: RspackStatsCompilation,
 ) {
-  let startTime = performance.now()
-  let statsTree: StatsTree = {
+  const startTime = performance.now()
+  const statsTree: StatsTree = {
     packageName: '<root>',
     sources: [],
     children: [],
@@ -136,32 +145,43 @@ async function bundleSizeTree(
 
   if (!stats.modules) return []
 
-  // extract source path for each module
-  let modules: MakeModule[] = []
-  const makeModule = (mod: webpack.Stats.FnModules): MakeModule => {
-    // Uglifier cannot minify a json file, hence we need
-    // to make it valid javascript syntax
-    const isJSON = mod.identifier.endsWith('.json')
-    const source = isJSON ? `$a$=${mod.source}` : mod.source
-
+  // Collect modules with their sources
+  const modules: Array<{ path: string; source: string }> = []
+  
+  const makeModule = (mod: RspackModule): { path: string; source: string } | null => {
+    const identifier = mod.identifier || ''
+    const resolvedPath = modulePath(identifier)
+    const source = normaliseModuleSource(mod)
+    
+    if (!source) return null
+    
     return {
-      path: modulePath(mod.identifier),
-      sources: [source || ''],
-      source: source || '',
+      path: resolvedPath,
+      source,
     }
   }
 
-  stats.modules
-    .filter(mod => !mod.name.startsWith('external'))
-    .forEach(mod => {
+  const filteredModules = stats.modules
+    .filter(mod => !(mod.name?.startsWith('external') || mod.moduleType === 'runtime'))
+  
+  if (process.env.DEBUG_SIZE) {
+    console.log(`\n[LOCAL] ==================== ${packageName} ====================`)
+  }
+
+  filteredModules.forEach(mod => {
       if (mod.modules) {
+        if (process.env.DEBUG_SIZE) {        }
         mod.modules.forEach(subMod => {
-          modules.push(makeModule(subMod))
+          const made = makeModule(subMod)
+          if (made) modules.push(made)
         })
       } else {
-        modules.push(makeModule(mod))
+        const made = makeModule(mod)
+        if (made) modules.push(made)
       }
     })
+
+  if (process.env.DEBUG_SIZE) {  }
 
   modules.sort((a, b) => {
     if (a === b) {
@@ -171,74 +191,80 @@ async function bundleSizeTree(
     }
   })
 
-  modules.forEach(mod => {
-    // pnpm will serve packages from a global symlink (.pnpm/package@verison/node_modules/package)
-    // needs to be stripped off
-    const pnpmPrefix =
-      '.pnpm\\' + path.sep + '.+\\' + path.sep + 'node_modules\\' + path.sep
-    let packages = mod.path.split(
-      new RegExp(
-        '\\' + path.sep + 'node_modules\\' + path.sep + `(?:${pnpmPrefix})?`
-      )
-    )
-
-    if (packages.length > 1) {
-      let lastSegment = packages.pop()
-
-      if (!lastSegment) return
-
-      let lastPackageName
-      if (lastSegment[0] === '@') {
-        // package is a scoped package
-        let offset = lastSegment.indexOf(path.sep) + 1
-        lastPackageName = lastSegment.slice(
-          0,
-          offset + lastSegment.slice(offset).indexOf(path.sep)
-        )
-      } else {
-        lastPackageName = lastSegment.slice(0, lastSegment.indexOf(path.sep))
-      }
-      packages.push(lastPackageName)
+  // Build tree structure from module paths
+  modules.forEach((mod, modIndex) => {
+    const packages = extractPackageNamesFromPath(mod.path)
+    
+    if (process.env.DEBUG_SIZE && modIndex < 5) {    }
+    
+    if (packages.length === 0) {
+      if (process.env.DEBUG_SIZE && modIndex < 5) {      }
+      return
     }
-    packages.shift()
 
     let parent = statsTree
-    packages.forEach(pkg => {
-      let existing = parent.children.filter(child => child.packageName === pkg)
+    packages.forEach((pkg, pkgIndex) => {
+      const existing = parent.children.filter(child => child.packageName === pkg)
       if (existing.length > 0) {
         existing[0].sources.push(mod.source)
+        if (process.env.DEBUG_SIZE && modIndex < 5) {        }
         parent = existing[0]
       } else {
-        let newChild = {
+        const newChild: StatsChild = {
           path: mod.path,
           packageName: pkg,
           sources: [mod.source],
           children: [],
         }
         parent.children.push(newChild)
+        if (process.env.DEBUG_SIZE && modIndex < 5) {        }
         parent = newChild
       }
     })
   })
 
-  const resultPromises = statsTree.children
+  // The old webpack implementation returned only the first-level children
+  // We need to preserve that behavior
+  const flattenedItems = statsTree.children
+
+  if (process.env.DEBUG_SIZE) {
+    console.log(`\n[LOCAL] Tree structure built with ${flattenedItems.length} top-level dependencies:`)
+  }
+
+  const resultPromises = flattenedItems
     .map(treeItem => ({
       ...treeItem,
       sources: treeItem.sources.filter(source => !!source),
     }))
     .filter(treeItem => treeItem.sources.length)
-    .map(async treeItem => {
-      const sourceMinifiedPromises = treeItem.sources.map(async code => {
-        const start = Date.now()
-        const minified = await minifyDependencyCode(code, minifier)
+    .map(async (treeItem) => {
+      if (process.env.DEBUG_SIZE) {
+        console.log(`\n[LOCAL] Processing dependency: ${treeItem.packageName}`)
+      }
+
+      const sourceMinifiedPromises = treeItem.sources.map(async (code: string, idx) => {
+        const originalSize = getUtf8Size(code)
+        
+        if (process.env.DEBUG_SIZE) {        }
+        
+        const minified = await minifyDependencyCode(code)
+        const minifiedSize = getUtf8Size(minified.code || '')
+        const minifiedCode = minified.code || ''
+        
+        if (process.env.DEBUG_SIZE) {        }
+        
         return minified
       })
 
       try {
         const sources = await Promise.all(sourceMinifiedPromises)
-        const size = sources.reduce((acc, source) => {
-          return acc + getByteLen(source.code || '')
+        const size = sources.reduce((acc: number, source, idx) => {
+          const sourceSize = getUtf8Size(source.code || '')
+          if (process.env.DEBUG_SIZE) {          }
+          return acc + sourceSize
         }, 0)
+
+        if (process.env.DEBUG_SIZE) {        }
 
         return {
           name: treeItem.packageName,
@@ -255,10 +281,16 @@ async function bundleSizeTree(
 
   try {
     const results = await Promise.all(resultPromises)
-    Telemetry.dependencySizes(packageName, startTime, true, { minifier })
+    Telemetry.dependencySizes(packageName, startTime, true, { minifier: 'swc' })
     return results
   } catch (e) {
-    Telemetry.dependencySizes(packageName, startTime, false, { minifier }, e)
+    Telemetry.dependencySizes(
+      packageName,
+      startTime,
+      false,
+      { minifier: 'swc' },
+      e,
+    )
     throw e
   }
 }

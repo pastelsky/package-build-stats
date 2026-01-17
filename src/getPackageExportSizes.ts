@@ -1,7 +1,10 @@
 import Telemetry from './utils/telemetry.utils'
 import { performance } from 'perf_hooks'
+import path from 'path'
 
-const debug = require('debug')('bp:worker')
+import createDebug from 'debug'
+
+const debug = createDebug('bp:worker')
 
 import { getExternals, parsePackageString } from './utils/common.utils'
 import { getAllExports } from './utils/exports.utils'
@@ -12,7 +15,7 @@ import { GetPackageStatsOptions, InstallPackageOptions } from './common.types'
 async function installPackage(
   packageString: string,
   installPath: string,
-  options: InstallPackageOptions
+  options: InstallPackageOptions,
 ) {
   const { isLocal } = parsePackageString(packageString)
 
@@ -27,7 +30,7 @@ async function installPackage(
 
 export async function getAllPackageExports(
   packageString: string,
-  options: InstallPackageOptions = {}
+  options: InstallPackageOptions = {},
 ) {
   const startTime = performance.now()
   const { name: packageName, normalPath } = parsePackageString(packageString)
@@ -35,10 +38,13 @@ export async function getAllPackageExports(
 
   try {
     await installPackage(packageString, installPath, options)
+    // The package is installed in node_modules subdirectory
+    const packagePath = normalPath || path.join(installPath, 'node_modules', packageName)
     const results = await getAllExports(
       packageString,
-      normalPath || installPath,
-      packageName
+      packagePath,
+      packageName,
+      installPath, // Pass installPath as base for relative path calculation
     )
     Telemetry.packageExports(packageString, startTime, true)
     return results
@@ -52,9 +58,7 @@ export async function getAllPackageExports(
 
 export async function getPackageExportSizes(
   packageString: string,
-  options: GetPackageStatsOptions = {
-    minifier: 'terser',
-  }
+  options: GetPackageStatsOptions = {},
 ) {
   const startTime = performance.now()
   const { name: packageName, normalPath } = parsePackageString(packageString)
@@ -63,10 +67,13 @@ export async function getPackageExportSizes(
   try {
     await installPackage(packageString, installPath, options)
 
+    // The package is installed in node_modules subdirectory
+    const packagePath = normalPath || path.join(installPath, 'node_modules', packageName)
     const exportMap = await getAllExports(
       packageString,
-      normalPath || installPath,
-      packageName
+      packagePath,
+      packageName,
+      installPath, // Pass installPath as base for relative path calculation
     )
 
     const exports = Object.keys(exportMap).filter(exp => !(exp === 'default'))
@@ -82,7 +89,6 @@ export async function getPackageExportSizes(
         customImports: exports,
         splitCustomImports: true,
         includeDependencySizes: false,
-        minifier: options.minifier || 'terser',
       },
     })
 
