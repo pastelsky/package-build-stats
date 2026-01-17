@@ -33,9 +33,10 @@
     "test:watch": "vitest tests/fast",
     "test:coverage": "vitest run --coverage tests/fast",
     "test:ci": "yarn check && yarn test && yarn test:coverage",
-    "compare": "node scripts/compare.js",
-    "compare:list": "node scripts/compare.js list",
-    "compare:top": "node scripts/compare.js top",
+    "compare": "tsx scripts/index.ts",
+    "compare:list": "tsx scripts/index.ts list",
+    "compare:test": "tsx scripts/index.ts test",
+    "compare:top": "tsx scripts/index.ts top",
     "prepublish": "rm -rf build && yarn check && tsc && yarn format"
   },
   "prettier": {
