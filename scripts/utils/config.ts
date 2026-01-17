@@ -17,6 +17,7 @@ export interface ScriptConfig {
   // Execution settings
   concurrency: number
   timeout: number
+  useCache: boolean
 
   // Package manager
   packageManager: 'npm' | 'yarn' | 'pnpm' | 'bun'
@@ -36,6 +37,7 @@ export function getConfig(): ScriptConfig {
     packageListFile: path.join(scriptDir, 'top-packages-list.txt'),
     concurrency: parseInt(process.env.CONCURRENCY || '5', 10),
     timeout: parseInt(process.env.TIMEOUT || '120000', 10),
+    useCache: process.env.USE_CACHE !== 'false',
     packageManager: (process.env.PKG_MANAGER as any) || 'yarn',
   }
 }

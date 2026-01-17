@@ -37,6 +37,7 @@
     "compare:list": "tsx scripts/index.ts list",
     "compare:test": "tsx scripts/index.ts test",
     "compare:top": "tsx scripts/index.ts top",
+    "compare:advanced": "tsx scripts/index.ts compare",
     "prepublish": "rm -rf build && yarn check && tsc && yarn format"
   },
   "prettier": {

@@ -138,6 +138,20 @@ export async function comparePackage(
 }
 
 /**
+ * Run comparison with minification toggle
+ */
+export async function comparePackageWithMinification(
+  packageName: string,
+  minified: boolean,
+): Promise<{ published: PackageStats; local: PackageStats }> {
+  logger.info(`Testing: ${packageName} (minified: ${minified})`)
+
+  // For now, return regular comparison
+  // This can be extended to support minification options
+  return comparePackage(packageName)
+}
+
+/**
  * Run comparisons in parallel with concurrency limit
  */
 export async function comparePackagesParallel(

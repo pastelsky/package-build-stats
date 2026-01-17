@@ -10,6 +10,7 @@ import { logger } from './utils/logger'
 import { listCommand } from './commands/list'
 import { testCommand } from './commands/test'
 import { topCommand } from './commands/top'
+import { compareCommand } from './commands/compare'
 
 async function main() {
   const args = parseArgs(process.argv)
@@ -46,6 +47,10 @@ async function main() {
 
       case 'top':
         await topCommand(args.args, args.options)
+        break
+
+      case 'compare':
+        await compareCommand(args.args, args.options)
         break
 
       default:
