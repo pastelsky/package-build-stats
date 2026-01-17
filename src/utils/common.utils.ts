@@ -1,10 +1,13 @@
 import childProcess from 'child_process'
 import path from 'path'
-import builtInModules from 'builtin-modules'
+import { builtinModules } from 'module'
 import fs from 'fs'
 import os from 'os'
 
 const homeDirectory = os.homedir()
+
+export const getBuiltInModules = () =>
+  builtinModules.flatMap(mod => [mod, 'node:' + mod])
 
 export function exec(command: string, options: any, timeout?: number) {
   let timerId: NodeJS.Timeout
@@ -22,19 +25,21 @@ export function exec(command: string, options: any, timeout?: number) {
         if (timerId) {
           clearTimeout(timerId)
         }
-      }
+      },
     )
 
     if (timeout) {
       timerId = setTimeout(() => {
-        process.kill(child.pid)
+        if (child.pid) {
+          process.kill(child.pid)
+        }
         reject(
           `Execution of ${command.substring(
             0,
-            40
-          )}... cancelled as it exceeded a timeout of ${timeout} ms`
+            40,
+          )}... cancelled as it exceeded a timeout of ${timeout} ms`,
         )
-      }, timeout)
+      }, timeout * 10)
     }
   })
 }
@@ -49,7 +54,7 @@ export function getExternals(packageName: string, installPath: string) {
     installPath,
     'node_modules',
     packageName,
-    'package.json'
+    'package.json',
   )
   const packageJSON = require(packageJSONPath)
   const dependencies = Object.keys(packageJSON.dependencies || {})
@@ -58,8 +63,8 @@ export function getExternals(packageName: string, installPath: string) {
   // All packages with name same as a built-in node module, but
   // haven't explicitly been added as an npm dependency or aren't the package itself
   // are externals
-  const builtInExternals = builtInModules.filter(
-    mod => !dependencies.includes(mod) && mod !== packageName
+  const builtInExternals = getBuiltInModules().filter(
+    mod => !dependencies.includes(mod) && mod !== packageName,
   )
   return {
     externalPackages: peerDependencies,
@@ -79,7 +84,7 @@ function isLocalPackageString(packageString: string) {
     if (fs.existsSync(packageJsonPath)) {
       return true
     }
-  } catch (err) {
+  } catch {
     return false
   }
 }

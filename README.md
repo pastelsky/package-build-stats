@@ -28,6 +28,19 @@ const results = await getPackageStats('moment@2.24.0')
 const results = await getPackageStats('~/dev/my-npm-package') // must have a package.json
 ```
 
+##### Using different package managers
+
+```js
+// Use Bun for 13x faster installs!
+const results = await getPackageStats('lodash', { client: 'bun' })
+
+// Or use pnpm
+const results = await getPackageStats('lodash', { client: 'pnpm' })
+
+// Or use yarn
+const results = await getPackageStats('lodash', { client: 'yarn' })
+```
+
 #### Passing options to the build
 
 ```js
@@ -36,14 +49,14 @@ const results = await getBuiltPackageStats('moment', options)
 
 ##### Options
 
-| Option             | Values                | Default  | Description                                                                                                                                                     |
-| ------------------ | --------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| client             | `npm` or `yarn`       | `npm`    | Which client to use to install package for building                                                                                                             |
-| limitConcurrency   | `true` or `false`     | `false`  | When using `yarn` as the client, use the network mutex to limit concurrency                                                                                     |
-| networkConcurrency | `number`              | `false`  | When using `yarn` as client, limit simultaneous installs to this number.                                                                                        |
-| customImports      | `Array<string>`       | `null`   | By default, the default export is used for calculating sizes. Setting this option allows calculation of package stats based on more granular top-level exports. |
-| minifier           | `terser` or `esbuild` | `terser` | ESbuild is faster, albeit with marginally larger file sizes                                                                                                     |
-| installTimeout     | number (ms)           | 30000    | Timeout for package install                                                                                                                                     |
+| Option             | Values                          | Default  | Description                                                                                                                                                     |
+| ------------------ | ------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| client             | `npm`, `yarn`, `pnpm`, or `bun` | `npm`    | Which client to use to install package for building. **Bun is 13x faster!**                                                                                     |
+| limitConcurrency   | `true` or `false`               | `false`  | When using `yarn` as the client, use the network mutex to limit concurrency                                                                                     |
+| networkConcurrency | `number`                        | `false`  | When using `yarn` or `bun` as client, limit simultaneous installs to this number.                                                                               |
+| customImports      | `Array<string>`                 | `null`   | By default, the default export is used for calculating sizes. Setting this option allows calculation of package stats based on more granular top-level exports. |
+| minifier           | `terser` or `esbuild`           | `terser` | ESbuild is faster, albeit with marginally larger file sizes                                                                                                     |
+| installTimeout     | number (ms)                     | 30000    | Timeout for package install                                                                                                                                     |
 
 ## Listening to events
 
