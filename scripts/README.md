@@ -131,6 +131,7 @@ scripts/
 ```
 
 **Benefits:**
+
 - 63% code reduction (3,246 → 1,200 lines)
 - Single source of truth
 - Full TypeScript type safety
@@ -189,17 +190,20 @@ npm run compare:test lodash
 ## Troubleshooting
 
 **Tests timing out:**
+
 ```bash
 npm run compare:test large-package -- --timeout 300000
 ```
 
 **Network issues:**
+
 ```bash
 # Reduce concurrency
 CONCURRENCY=2 npm run compare:top 20
 ```
 
 **Memory issues:**
+
 ```bash
 # Test in smaller batches
 npm run compare:top 10
