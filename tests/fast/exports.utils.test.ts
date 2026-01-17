@@ -186,7 +186,3 @@ describe('aggregating modules', () => {
     })
   })
 })
-
-// Complex export chain test removed
-// TODO: Enhance getAllExports() to follow export * re-export chains
-// across multiple files and resolve nested dependencies correctly
