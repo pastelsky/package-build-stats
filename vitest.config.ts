@@ -8,6 +8,12 @@ export default defineConfig({
     exclude: ['**/node_modules/**', '**/build/**'],
     setupFiles: ['./tests/helpers/custom-matchers.ts'],
     testTimeout: 90000, // 90 seconds for functional tests with package installations
+    pool: 'forks', // Use forks instead of threads for coverage (fixes ERR_INSPECTOR_NOT_CONNECTED)
+    poolOptions: {
+      forks: {
+        singleFork: true, // Run tests in single fork to avoid concurrency issues with coverage
+      },
+    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'text-summary', 'lcov', 'html', 'json'],
