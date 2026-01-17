@@ -21,9 +21,14 @@ export default defineConfig({
         '**/tests/**',
       ],
     },
-    // Allow ESM modules
+    // Allow ESM modules and handle CJS/ESM interop
     deps: {
       inline: ['oxc-parser', 'oxc-resolver', '@oxc-project/types'],
+    },
+    server: {
+      deps: {
+        inline: true,
+      },
     },
   },
 })
