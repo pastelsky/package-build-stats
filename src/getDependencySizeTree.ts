@@ -18,7 +18,9 @@ function modulePath(identifier: string) {
 function getUtf8Size(value: string) {
   const size = Buffer.byteLength(value, 'utf8')
   
-  if (process.env.DEBUG_SIZE && Math.random() < 0.01) { // Only debug 1% to avoid spam  }
+  if (process.env.DEBUG_SIZE && Math.random() < 0.01) { // Only debug 1% to avoid spam
+    console.log(`Size: ${size} bytes`)
+  }
   
   return size
 }
@@ -61,7 +63,9 @@ function extractPackageNamesFromPath(moduleFilePath: string): string[] {
 }
 
 async function minifyDependencyCode(source: string) {
-  if (process.env.DEBUG_SIZE) {  }
+  if (process.env.DEBUG_SIZE) {
+    console.log('Minifying dependency code...')
+  }
   
   try {
     const startTime = Date.now()
@@ -72,11 +76,15 @@ async function minifyDependencyCode(source: string) {
     })
     const minifyTime = Date.now() - startTime
     
-    if (process.env.DEBUG_SIZE) {    }
+    if (process.env.DEBUG_SIZE) {
+      console.log(`Minify completed in ${minifyTime}ms`)
+    }
     
     return { code: result.code }
   } catch (error) {
-    if (process.env.DEBUG_SIZE) {    }
+    if (process.env.DEBUG_SIZE) {
+      console.log('Minify error occurred')
+    }
     console.error('SWC minify error:', error)
     throw error
   }
@@ -106,10 +114,14 @@ function normaliseModuleSource(mod: RspackModule) {
   const isJSON = identifier.endsWith('.json')
   const rawSource = mod.source
 
-  if (process.env.DEBUG_SIZE) {  }
+  if (process.env.DEBUG_SIZE) {
+    console.log(`Normalising module: ${identifier}`)
+  }
 
   if (rawSource === undefined || rawSource === null) {
-    if (process.env.DEBUG_SIZE) {    }
+    if (process.env.DEBUG_SIZE) {
+      console.log(`No source for module: ${identifier}`)
+    }
     return null
   }
 
@@ -117,17 +129,25 @@ function normaliseModuleSource(mod: RspackModule) {
 
   if (typeof rawSource === 'string') {
     source = rawSource
-    if (process.env.DEBUG_SIZE) {    }
+    if (process.env.DEBUG_SIZE) {
+      console.log(`Source is string`)
+    }
   } else if (Buffer.isBuffer(rawSource)) {
     source = rawSource.toString('utf8')
-    if (process.env.DEBUG_SIZE) {    }
+    if (process.env.DEBUG_SIZE) {
+      console.log(`Source is buffer`)
+    }
   } else {
     source = String(rawSource)
-    if (process.env.DEBUG_SIZE) {    }
+    if (process.env.DEBUG_SIZE) {
+      console.log(`Source is other type`)
+    }
   }
 
   const finalSource = isJSON ? `$a$=${source}` : source
-  if (process.env.DEBUG_SIZE) {  }
+  if (process.env.DEBUG_SIZE) {
+    console.log(`Module source normalised (length: ${finalSource.length})`)
+  }
   
   return finalSource
 }
@@ -170,7 +190,9 @@ async function bundleSizeTree(
 
   filteredModules.forEach(mod => {
       if (mod.modules) {
-        if (process.env.DEBUG_SIZE) {        }
+        if (process.env.DEBUG_SIZE) {
+          console.log(`Module has ${mod.modules.length} sub-modules`)
+        }
         mod.modules.forEach(subMod => {
           const made = makeModule(subMod)
           if (made) modules.push(made)
@@ -181,7 +203,9 @@ async function bundleSizeTree(
       }
     })
 
-  if (process.env.DEBUG_SIZE) {  }
+  if (process.env.DEBUG_SIZE) {
+    console.log(`Collected ${modules.length} total modules`)
+  }
 
   modules.sort((a, b) => {
     if (a === b) {
@@ -195,10 +219,14 @@ async function bundleSizeTree(
   modules.forEach((mod, modIndex) => {
     const packages = extractPackageNamesFromPath(mod.path)
     
-    if (process.env.DEBUG_SIZE && modIndex < 5) {    }
+    if (process.env.DEBUG_SIZE && modIndex < 5) {
+      console.log(`[${modIndex}] Extracted packages: ${packages.join(' > ')}`)
+    }
     
     if (packages.length === 0) {
-      if (process.env.DEBUG_SIZE && modIndex < 5) {      }
+      if (process.env.DEBUG_SIZE && modIndex < 5) {
+        console.log(`[${modIndex}] No packages found in path`)
+      }
       return
     }
 
@@ -207,7 +235,9 @@ async function bundleSizeTree(
       const existing = parent.children.filter(child => child.packageName === pkg)
       if (existing.length > 0) {
         existing[0].sources.push(mod.source)
-        if (process.env.DEBUG_SIZE && modIndex < 5) {        }
+        if (process.env.DEBUG_SIZE && modIndex < 5) {
+          console.log(`[${modIndex}] Added to existing package: ${pkg}`)
+        }
         parent = existing[0]
       } else {
         const newChild: StatsChild = {
@@ -217,7 +247,9 @@ async function bundleSizeTree(
           children: [],
         }
         parent.children.push(newChild)
-        if (process.env.DEBUG_SIZE && modIndex < 5) {        }
+        if (process.env.DEBUG_SIZE && modIndex < 5) {
+          console.log(`[${modIndex}] Created new package: ${pkg}`)
+        }
         parent = newChild
       }
     })
@@ -245,13 +277,17 @@ async function bundleSizeTree(
       const sourceMinifiedPromises = treeItem.sources.map(async (code: string, idx) => {
         const originalSize = getUtf8Size(code)
         
-        if (process.env.DEBUG_SIZE) {        }
+        if (process.env.DEBUG_SIZE) {
+          console.log(`Source ${idx}: ${originalSize} bytes (original)`)
+        }
         
         const minified = await minifyDependencyCode(code)
         const minifiedSize = getUtf8Size(minified.code || '')
         const minifiedCode = minified.code || ''
         
-        if (process.env.DEBUG_SIZE) {        }
+        if (process.env.DEBUG_SIZE) {
+          console.log(`Source ${idx}: ${minifiedSize} bytes (minified)`)
+        }
         
         return minified
       })
@@ -260,11 +296,15 @@ async function bundleSizeTree(
         const sources = await Promise.all(sourceMinifiedPromises)
         const size = sources.reduce((acc: number, source, idx) => {
           const sourceSize = getUtf8Size(source.code || '')
-          if (process.env.DEBUG_SIZE) {          }
+          if (process.env.DEBUG_SIZE) {
+            console.log(`Total accumulation at idx ${idx}: ${acc + sourceSize} bytes`)
+          }
           return acc + sourceSize
         }, 0)
 
-        if (process.env.DEBUG_SIZE) {        }
+        if (process.env.DEBUG_SIZE) {
+          console.log(`Final size for ${treeItem.packageName}: ${size} bytes`)
+        }
 
         return {
           name: treeItem.packageName,
