@@ -1,15 +1,13 @@
 import path from 'path'
-
-const log = require('debug')('bp:worker')
-import webpack, { Entry } from 'webpack'
-import MemoryFS from 'memory-fs'
+import { Entry } from '@rspack/core'
 import isValidNPMName from 'is-valid-npm-name'
 import { gzipSync } from 'zlib'
 import fs from 'fs'
 import getDependencySizes from '../getDependencySizeTree'
-import getParseTime from '../getParseTime'
-import makeWebpackConfig from '../config/makeWebpackConfig'
+import makeRspackConfig from '../config/makeRspackConfig'
 import { performance } from 'perf_hooks'
+import rspack from '@rspack/core'
+import type { Stats } from '@rspack/core'
 
 import {
   BuildError,
@@ -20,7 +18,6 @@ import {
 } from '../errors/CustomError'
 import {
   Externals,
-  WebpackError,
   BuildPackageOptions,
   CreateEntryPointOptions,
 } from '../common.types'
@@ -31,13 +28,12 @@ type CompilePackageArgs = {
   externals: Externals
   entry: Entry
   debug?: boolean
-  minifier: 'terser' | 'esbuild'
+  minify?: boolean
 }
 
 type CompilePackageReturn = {
-  stats: webpack.Stats
-  error: WebpackError
-  memoryFileSystem: MemoryFS
+  stats: Stats
+  error: Error | null
 }
 
 type BuildPackageArgs = {
@@ -47,17 +43,43 @@ type BuildPackageArgs = {
   options: BuildPackageOptions
 }
 
-type WebpackStatsAsset = NonNullable<webpack.Stats.ToJsonOutput['assets']>[0]
+type BuildPackageResult = {
+  assets: Array<{
+    name: string
+    type: string
+    size: number
+    gzip: number
+  }>
+  dependencySizes?: Array<{
+    name: string
+    approximateSize: number
+  }>
+}
+
+type BuildPackageResultWithIgnored = BuildPackageResult & {
+  ignoredMissingDependencies?: Array<string>
+}
+
+type RspackStatsCompilation = ReturnType<Stats['toJson']>
+type RspackStatsAsset = NonNullable<RspackStatsCompilation['assets']>[0]
+
+function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
+  return value !== null && value !== undefined
+}
+
+function getCompilationErrors(stats: Stats) {
+  return [...stats.compilation.errors].filter(notEmpty).flat()
+}
 
 const BuildUtils = {
   createEntryPoint(
     packageName: string,
     installPath: string,
-    options: CreateEntryPointOptions
+    options: CreateEntryPointOptions,
   ) {
     const entryPath = path.join(
       installPath,
-      options.entryFilename || 'index.js'
+      options.entryFilename || 'index.js',
     )
 
     let importStatement: string
@@ -69,13 +91,13 @@ const BuildUtils = {
           console.log(${options.customImports.join(', ')})
      `
       } else {
-        importStatement = `import p from '${packageName}'; console.log(p)`
+        importStatement = `import * as p from '${packageName}'; console.log(p)`
       }
     } else {
       if (options.customImports) {
         importStatement = `
         const { ${options.customImports.join(
-          ', '
+          ', ',
         )} } = require('${packageName}'); 
         console.log(${options.customImports.join(', ')})
         `
@@ -92,74 +114,60 @@ const BuildUtils = {
     }
   },
 
-  compilePackage({
-    name,
-    entry,
-    externals,
-    debug,
-    minifier,
-  }: CompilePackageArgs) {
+  compilePackage({ name, entry, externals, debug, minify }: CompilePackageArgs) {
     const startTime = performance.now()
-    const compiler = webpack(
-      makeWebpackConfig({
-        packageName: name,
-        entry,
-        externals,
-        debug,
-        minifier,
-      })
-    )
-    const memoryFileSystem = new MemoryFS()
-    compiler.outputFileSystem = memoryFileSystem
+
+    const options = makeRspackConfig({
+      packageName: name,
+      entry,
+      externals,
+      debug,
+      minify,
+    })
+
+    const compiler = rspack(options)
 
     return new Promise<CompilePackageReturn>(resolve => {
-      compiler.run((err, stats) => {
-        const error = err as unknown as WebpackError // Webpack types incorrect
-        // stats object can be empty if there are build errors
-        resolve({ stats, error, memoryFileSystem })
+      compiler.run((error, stats) => {
+        if (!stats) {
+          throw new Error('stats is null')
+        }
+        resolve({ stats, error })
 
         if (error) {
           console.error(error)
-          Telemetry.compilePackage(name, false, startTime, { minifier }, error)
+          Telemetry.compilePackage(name, false, startTime, {}, error)
         } else {
-          Telemetry.compilePackage(name, true, startTime, { minifier })
+          Telemetry.compilePackage(name, true, startTime, {})
         }
       })
     })
   },
 
-  _parseMissingModules(errors: Array<WebpackError>) {
-    const missingModuleErrors = errors.filter(
-      error => error.name === 'ModuleNotFoundError'
-    )
-
-    if (!missingModuleErrors.length) {
-      return []
-    }
-
+  _parseMissingModules(errors: ReturnType<typeof getCompilationErrors>) {
     // There's a better way to get the missing module's name, maybe ?
     const missingModuleRegex = /Can't resolve '(.+)' in/
 
-    const missingModules = missingModuleErrors.map(err => {
-      const matches = err.error.toString().match(missingModuleRegex)
+    const missingModules = errors.map(err => {
+      const matches = err.message.match(missingModuleRegex)
 
       if (!matches) {
         throw new UnexpectedBuildError(
-          'Expected to find a file path in the module not found error, but found none. Regex for this might be out of date.'
+          'Expected to find a file path in the module not found error, but found none. Regex for this might be out of date.',
         )
       }
 
       const missingFilePath = matches[1]
       let packageNameMatch
       if (missingFilePath.startsWith('@')) {
-        packageNameMatch = missingFilePath.match(/@[^\/]+\/[^\/]+/) // @babel/runtime/object/create -> @babel/runtime
+        packageNameMatch = missingFilePath.match(/@[^/]+\/[^/]+/) // @babel/runtime/object/create -> @babel/runtime
       } else {
-        packageNameMatch = missingFilePath.match(/[^\/]+/) // babel-runtime/object/create -> babel-runtime
+        packageNameMatch = missingFilePath.match(/[^/]+/) // babel-runtime/object/create -> babel-runtime
       }
 
       if (!packageNameMatch) {
         throw new UnexpectedBuildError(
-          'Failed to resolve the missing package name. Regex for this might be out of date.'
+          'Failed to resolve the missing package name. Regex for this might be out of date.',
         )
       }
 
@@ -168,7 +176,7 @@ const BuildUtils = {
 
     let uniqueMissingModules = Array.from(new Set(missingModules))
     uniqueMissingModules = uniqueMissingModules.filter(
-      mod => !mod.startsWith(`${uniqueMissingModules[0]}/`)
+      mod => !mod.startsWith(`${uniqueMissingModules[0]}/`),
     )
 
     return uniqueMissingModules
@@ -195,74 +203,66 @@ const BuildUtils = {
       })
     } else {
       entry['main'] = BuildUtils.createEntryPoint(name, installPath, {
-        esm: false,
+        esm: true,
         customImports: options.customImports,
       })
     }
 
-    log('build start %s', name)
-    const { stats, error, memoryFileSystem } = await BuildUtils.compilePackage({
+    const { stats, error } = await BuildUtils.compilePackage({
       name,
       entry,
       externals,
       debug: options.debug,
-      minifier: options.minifier,
+      minify: options.minify,
     })
-
-    log('build end %s', name)
 
     const jsonStatsStartTime = performance.now()
     let jsonStats = stats.toJson({
       assets: true,
-      children: false,
+      source: true,
       chunks: false,
       chunkGroups: false,
-      chunkModules: false,
-      chunkOrigins: false,
+      chunkModules: true,
       modules: true,
-      errorDetails: false,
-      entrypoints: false,
-      reasons: false,
-      maxModules: 500,
-      performance: false,
-      source: true,
+      nestedModules: true,
+      reasons: true,
       depth: true,
-      providedExports: true,
+      errors: true,
+      entrypoints: false,
       warnings: false,
-      modulesSort: 'depth',
     })
 
     if (!jsonStats) {
       Telemetry.parseWebpackStats(name, false, jsonStatsStartTime)
       throw new UnexpectedBuildError(
-        'Expected webpack json stats to be non-null, but was null'
+        'Expected webpack json stats to be non-null, but was null',
       )
     } else {
       Telemetry.parseWebpackStats(name, true, jsonStatsStartTime)
     }
 
+
+
+    const compilationErrors = getCompilationErrors(stats)
+
     if (error && !stats) {
       throw new BuildError(error)
-    } else if (stats.compilation.errors && stats.compilation.errors.length) {
-      const missingModules = BuildUtils._parseMissingModules(
-        stats.compilation.errors
-      )
+    } else if (compilationErrors.length) {
+      const missingModules = BuildUtils._parseMissingModules(compilationErrors)
 
       if (missingModules.length) {
         if (missingModules.length === 1 && missingModules[0] === name) {
-          throw new EntryPointError(
-            stats.compilation.errors.map(err => err.toString())
-          )
+          throw new EntryPointError(compilationErrors.map(err => err.message))
         } else {
           throw new MissingDependencyError(
-            stats.compilation.errors.map(err => err.toString()),
-            { missingModules }
+            compilationErrors.map(err => err.toString()),
+            { missingModules },
           )
         }
       } else if (jsonStats.errors && jsonStats.errors.length > 0) {
         if (
           jsonStats.errors.some(error =>
-            error.includes("Unexpected character '#'")
+            error.message.includes("Unexpected character '#'"),
           )
         ) {
           throw new CLIBuildError(jsonStats.errors)
@@ -271,17 +271,13 @@ const BuildUtils = {
         }
       } else {
         throw new UnexpectedBuildError(
-          'The webpack stats object was unexpectedly empty'
+          'The webpack stats object was unexpectedly empty',
         )
       }
     } else {
-      const getAssetStats = (asset: WebpackStatsAsset) => {
+      const getAssetStats = async (asset: RspackStatsAsset) => {
         const bundle = path.join(process.cwd(), 'dist', asset.name)
-        const bundleContents = memoryFileSystem.readFileSync(bundle)
-        let parseTimes = null
-        if (options.calcParse) {
-          parseTimes = getParseTime(bundleContents)
-        }
+        const bundleContents = await fs.promises.readFile(bundle)
 
         const gzip = gzipSync(bundleContents, {}).length
         const matches = asset.name.match(/(.+?)\.bundle\.(.+)$/)
@@ -290,7 +286,7 @@ const BuildUtils = {
           throw new UnexpectedBuildError(
             'Found an asset without the `.bundle` suffix. ' +
               'A loader customization might be needed to recognize this asset type' +
-              asset.name
+              asset.name,
           )
         }
 
@@ -301,28 +297,28 @@ const BuildUtils = {
           type: extension,
           size: asset.size,
           gzip,
-          parse: parseTimes,
         }
       }
 
-      const assetsGzipStartTime = performance.now()
-      const assetStats = jsonStats?.assets
-        ?.filter(asset => !asset.chunkNames.includes('runtime'))
-        .filter(asset => !asset.name.endsWith('LICENSE.txt'))
-        .map(getAssetStats)
-      Telemetry.assetsGZIPParseTime(name, assetsGzipStartTime)
+      const assetStatsPromises =
+        jsonStats?.assets
+          ?.filter(asset => !asset.chunkNames?.includes('runtime'))
+          .filter(asset => !asset.name.endsWith('LICENSE.txt'))
+          .map(getAssetStats) || []
+      const assetStats = await Promise.all(assetStatsPromises)
+      Telemetry.assetsGZIPParseTime(name, performance.now())
 
-      log('build result %O', assetStats)
+      let dependencySizeResults = {}
+      if (options.includeDependencySizes) {
+        const dependencySizes = await getDependencySizes(name, jsonStats)
+        dependencySizeResults = {
+          dependencySizes,
+        }
+      }
 
       return {
         assets: assetStats || [],
-        ...(options.includeDependencySizes && {
-          dependencySizes: await getDependencySizes(
-            name,
-            jsonStats,
-            options.minifier
-          ),
-        }),
+        ...dependencySizeResults,
       }
     }
   },
@@ -331,7 +327,7 @@ const BuildUtils = {
     externals,
     installPath,
     options,
-  }: BuildPackageArgs) {
+  }: BuildPackageArgs): Promise<BuildPackageResultWithIgnored> {
     const buildStartTime = performance.now()
     let buildIteration = 1
 
@@ -359,11 +355,7 @@ const BuildUtils = {
           ...externals,
           externalPackages: externals.externalPackages.concat(missingModules),
         }
-        log(
-          '%s has missing dependencies, rebuilding without %o',
-          name,
-          missingModules
-        )
+
         const rebuiltResult = await BuildUtils.buildPackage({
           name,
           externals: newExternals,
@@ -390,7 +382,7 @@ const BuildUtils = {
             ...options,
             buildIteration,
           },
-          e
+          e,
         )
         throw e
       }
