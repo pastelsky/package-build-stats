@@ -31,3 +31,4 @@ debug-*
 *.tmp
 .DS_Store
 .yarn/install-state.gz
+scripts/package-list.json
