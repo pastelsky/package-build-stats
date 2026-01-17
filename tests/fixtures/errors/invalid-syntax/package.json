@@ -1,0 +1,6 @@
+{
+  "name": "invalid-syntax-fixture",
+  "version": "1.0.0",
+  "description": "Fixture with invalid syntax to trigger build errors",
+  "main": "src/index.js"
+}

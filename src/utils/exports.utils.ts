@@ -1,293 +1,220 @@
-import { parse } from '@babel/parser'
-import traverse from '@babel/traverse'
+/**
+ * Export scanning using oxc-parser and oxc-resolver
+ *
+ * This implementation follows the pattern from oxc-linter's export.rs
+ * using the public npm packages oxc-parser and oxc-resolver.
+ */
+
+import { parseSync, StaticExport, StaticExportEntry } from 'oxc-parser'
+import { ResolverFactory } from 'oxc-resolver'
 import path from 'path'
-import { promises as fs } from 'fs'
-import enhancedResolve from 'enhanced-resolve'
-import makeWebpackConfig from '../config/makeWebpackConfig'
-import {
-  ArrayPattern,
-  AssignmentPattern,
-  ObjectPattern,
-  RestElement,
-} from '@babel/types'
+import fs from 'fs/promises'
 import Telemetry from './telemetry.utils'
 import { performance } from 'perf_hooks'
 
-const assertUnreachable = (x?: never): never => {
-  throw new Error("Didn't expect to get here")
+// Initialize resolver with ESM-first configuration
+// Following oxc-linter's resolver configuration:
+// - main_fields: ["module", "main"] - prioritize ESM entry points
+// - condition_names: ["module", "import"] - standard ESM export conditions
+// - extensions: all common JS/TS extensions
+// - symlinks: false - keep paths as-is without resolving symlinks (matches enhanced-resolve behavior)
+const resolver = new ResolverFactory({
+  extensions: [
+    '.mjs',
+    '.js',
+    '.mts',
+    '.ts',
+    '.jsx',
+    '.tsx',
+    '.cjs',
+    '.cts',
+    '.json',
+  ],
+  mainFields: ['module', 'main'], // ESM-first: prioritize \"module\" field over \"main\"
+  conditionNames: ['import', 'require', 'node', 'default'], // Standard export conditions
+  symlinks: false, // Don't resolve symlinks to match enhanced-resolve behavior
+})
+
+/**
+ * Extract export information from parsed oxc module
+ */
+function getExportsFromStaticExports(staticExports: StaticExport[]): {
+  exports: string[]
+  exportAllLocations: string[]
+} {
+  const exports: string[] = []
+  const exportAllLocations: string[] = []
+
+  staticExports.forEach(staticExport => {
+    staticExport.entries.forEach((entry: StaticExportEntry) => {
+      // Skip type-only exports (TypeScript type exports)
+      if (entry.isType) {
+        return
+      }
+
+      // Handle different export types based on importName kind
+      switch (entry.importName.kind) {
+        case 'AllButDefault': // export * from "mod"
+        case 'All': // export * as ns from "mod"
+          if (entry.moduleRequest) {
+            exportAllLocations.push(entry.moduleRequest.value)
+          }
+          break
+
+        case 'Name': // export { foo } or export { foo } from "mod"
+        case 'None': // export const foo = 1
+          // Get the export name
+          if (entry.exportName.kind === 'Name' && entry.exportName.name) {
+            exports.push(entry.exportName.name)
+          } else if (entry.exportName.kind === 'Default') {
+            exports.push('default')
+          }
+          break
+      }
+    })
+  })
+
+  return { exports, exportAllLocations }
 }
 
 /**
- * Parses code to return all named (and default exports)
- * as well as `export * from` locations
+ * Resolve a module path from a given context
  */
-export function getExportsDetails(code: string) {
-  const ast = parse(code, {
-    sourceType: 'module',
-    allowUndeclaredExports: true,
-    plugins: ['exportDefaultFrom'],
-  })
-
-  const exportAllLocations: string[] = []
-  let exportsList: string[] = []
-
-  const processObjectPattern = (
-    properties: ObjectPattern['properties'],
-    result: string[] = []
-  ) => {
-    properties.forEach(property => {
-      switch (property.type) {
-        case 'RestElement':
-          if (property.argument.type === 'Identifier') {
-            result.push(property.argument.name)
-          }
-          break
-        case 'ObjectProperty':
-          if (property.value.type === 'Identifier') {
-            result.push(property.value.name)
-          }
-          break
-        // default:
-        //   assertUnreachable(property.type)
-      }
-    })
+async function resolveModule(
+  context: string,
+  lookupPath: string,
+): Promise<string> {
+  const result = resolver.sync(context, lookupPath)
+  if (!result.path) {
+    throw new Error(`Cannot resolve module '${lookupPath}' from '${context}'`)
   }
-
-  const processAssignmentPattern = (
-    element: AssignmentPattern,
-    result: string[] = []
-  ) => {
-    switch (element.left.type) {
-      case 'Identifier':
-        result.push(element.left.name)
-        break
-
-      case 'ArrayPattern':
-        processArrayPattern(element.left.elements, result)
-        break
-
-      case 'ObjectPattern':
-        processObjectPattern(element.left.properties, result)
-        break
-
-      case 'MemberExpression':
-        // unhandled
-        break
-      // default:
-      //   assertUnreachable(element.left.type)
-    }
-  }
-
-  const processRestElement = (element: RestElement, result: string[] = []) => {
-    if (element.argument.type === 'Identifier') {
-      result.push(element.argument.name)
-    }
-  }
-
-  const processArrayPattern = (
-    elements: ArrayPattern['elements'],
-    result: string[] = []
-  ) => {
-    elements.forEach(element => {
-      if (element) {
-        switch (element.type) {
-          case 'Identifier':
-            result.push(element.name)
-            break
-          case 'RestElement':
-            processRestElement(element, result)
-            break
-          case 'ArrayPattern':
-            processArrayPattern(element.elements, result)
-            break
-
-          case 'ObjectPattern':
-            processObjectPattern(element.properties, result)
-            break
-
-          case 'AssignmentPattern':
-            processAssignmentPattern(element, result)
-            break
-
-          // default:
-          //   assertUnreachable(element.type)
-        }
-      }
-    })
-  }
-
-  traverse(ast, {
-    ExportNamedDeclaration(path) {
-      const { specifiers, declaration } = path.node
-
-      if (declaration) {
-        switch (declaration.type) {
-          case 'VariableDeclaration':
-            declaration.declarations.forEach(dec => {
-              switch (dec.id.type) {
-                case 'ObjectPattern':
-                  processObjectPattern(dec.id.properties, exportsList)
-                  break
-
-                case 'ArrayPattern':
-                  processArrayPattern(dec.id.elements, exportsList)
-                  break
-                case 'AssignmentPattern':
-                  processAssignmentPattern(dec.id, exportsList)
-                  break
-
-                case 'RestElement':
-                  processRestElement(dec.id, exportsList)
-                  break
-
-                case 'Identifier':
-                  exportsList.push(dec.id.name)
-                  break
-
-                case 'MemberExpression':
-                case 'TSParameterProperty':
-                  // unhandled
-                  break
-                // default:
-                //   assertUnreachable(dec.id.type)
-              }
-            })
-            break
-
-          case 'FunctionDeclaration':
-          case 'ClassDeclaration':
-            if (declaration.id) {
-              exportsList.push(declaration.id.name)
-            }
-            break
-
-          case 'TSModuleDeclaration':
-          case 'TSEnumDeclaration':
-          case 'DeclareModule':
-          case 'DeclareInterface':
-          case 'DeclareModuleExports':
-          case 'DeclareOpaqueType':
-          case 'DeclareVariable':
-          case 'DeclareExportDeclaration':
-          case 'DeclareExportAllDeclaration':
-          case 'DeclareClass':
-          case 'TSTypeAliasDeclaration':
-          case 'OpaqueType':
-          case 'TypeAlias':
-          case 'TSDeclareFunction':
-          case 'TSInterfaceDeclaration':
-          case 'InterfaceDeclaration':
-          case 'DeclareTypeAlias':
-          case 'DeclareFunction':
-          case 'ExportDefaultDeclaration':
-          case 'ExportAllDeclaration':
-          case 'ExportNamedDeclaration':
-          case 'ImportDeclaration':
-            // unhandled
-            break
-
-          // default:
-          //   assertUnreachable(declaration.type)
-        }
-      } else {
-        specifiers.forEach(specifier => {
-          exportsList.push(
-            specifier.exported.type === 'StringLiteral'
-              ? specifier.exported.value
-              : specifier.exported.name
-          )
-        })
-      }
-    },
-
-    ExportDefaultDeclaration() {
-      exportsList.push('default')
-    },
-
-    ExportAllDeclaration(path) {
-      exportAllLocations.push(path.node.source.value)
-    },
-  })
-
-  return {
-    exportAllLocations,
-    exports: exportsList,
-  }
+  return result.path
 }
-
-const webpackConfig = makeWebpackConfig({
-  packageName: '',
-  entry: '',
-  externals: { externalPackages: [], externalBuiltIns: [] },
-  minifier: 'terser',
-})
-
-const resolver = enhancedResolve.create({
-  extensions: webpackConfig?.resolve?.extensions,
-  modules: webpackConfig?.resolve?.modules,
-  // @ts-ignore Error due to unsynced types for enhanced resolve and webpack
-  mainFields: webpackConfig?.resolve?.mainFields,
-})
-
-const resolve = async (context: string, path: string): Promise<string> =>
-  new Promise((resolve, reject) => {
-    resolver(context, path, (err: Error, result: string) => {
-      if (err) {
-        reject(err)
-      } else {
-        resolve(result)
-      }
-    })
-  })
 
 type ResolvedExports = {
   [key: string]: string
 }
 
 /**
- * Recursively get all exports starting
- * from a given path
+ * Recursively walk exports following export * statements
+ *
+ * This mirrors the walk_exported_recursive function in export.rs
+ */
+async function walkExportsRecursive(
+  context: string,
+  lookupPath: string,
+  visited: Set<string>,
+  rootContext?: string,
+  isRootCall: boolean = false,
+): Promise<ResolvedExports> {
+  // Use rootContext for calculating relative paths, context for resolution
+  const root = rootContext || context
+  const resolvedPath = await resolveModule(context, lookupPath)
+
+  // Avoid circular dependencies
+  if (visited.has(resolvedPath)) {
+    return {}
+  }
+  visited.add(resolvedPath)
+
+  // Parse the file to get exports
+  const code = await fs.readFile(resolvedPath, 'utf8')
+  const parseResult = parseSync(resolvedPath, code, {
+    sourceType: 'module',
+  })
+
+  // Check if file has module syntax
+  if (!parseResult.module.hasModuleSyntax) {
+    return {}
+  }
+
+  const { exports, exportAllLocations } = getExportsFromStaticExports(
+    parseResult.module.staticExports,
+  )
+
+  const resolvedExports: ResolvedExports = {}
+
+  // Add direct exports from this module
+  exports.forEach(exp => {
+    // Use path.relative() to calculate the relative path from root to resolvedPath
+    // This works correctly since symlinks are not resolved (symlinks: false in resolver config)
+    const relativePath = root
+      ? path.relative(root, resolvedPath)
+      : path.basename(resolvedPath)
+
+    resolvedExports[exp] = relativePath
+  })
+
+  // Recursively process export * statements
+  const promises = exportAllLocations.map(async location => {
+    const starExports = await walkExportsRecursive(
+      path.dirname(resolvedPath),
+      location,
+      visited,
+      root, // Pass root context through recursion
+    )
+    // Merge star exports into our exports
+    Object.keys(starExports).forEach(expKey => {
+      resolvedExports[expKey] = starExports[expKey]
+    })
+  })
+
+  await Promise.all(promises)
+  return resolvedExports
+}
+
+/**
+ * Get all exports from a package
+ *
+ * This is the main entry point that matches the API of getAllExports in exports.utils.ts
  */
 export async function getAllExports(
   packageString: string,
   context: string,
-  lookupPath: string
+  lookupPath: string,
+  installPath?: string, // Base path for calculating relative paths (optional)
 ) {
   const startTime = performance.now()
-  const getAllExportsRecursive = async (ctx: string, lookPath: string) => {
-    const resolvedPath = await resolve(ctx, lookPath)
-
-    const resolvedExports: ResolvedExports = {}
-    const code = await fs.readFile(resolvedPath, 'utf8')
-    const { exports, exportAllLocations } = getExportsDetails(code)
-
-    exports.forEach(exp => {
-      const relativePath = resolvedPath.substring(
-        resolvedPath.indexOf(context) + context.length + 1
-      )
-      resolvedExports[exp] = relativePath
-    })
-
-    const promises = exportAllLocations.map(async location => {
-      const exports = await getAllExportsRecursive(
-        path.dirname(resolvedPath),
-        location
-      )
-      Object.keys(exports).forEach(expKey => {
-        resolvedExports[expKey] = exports[expKey]
-      })
-    })
-
-    await Promise.all(promises)
-    return resolvedExports
-  }
+  const visited = new Set<string>()
 
   try {
-    const results = await getAllExportsRecursive(context, lookupPath)
+    // Read package.json to get the entry point
+    const packageJsonPath = path.join(context, 'package.json')
+    const packageJson = JSON.parse(await fs.readFile(packageJsonPath, 'utf8'))
+    // Prefer module field for ESM, fallback to main, then default
+    let entryPoint = packageJson.module || packageJson.main || './index.js'
+
+    // Normalize entry point to start with ./
+    if (!entryPoint.startsWith('./') && !entryPoint.startsWith('../')) {
+      entryPoint = './' + entryPoint
+    }
+
+    // Resolve the entry point relative to context
+    // Pass installPath as rootContext for calculating relative paths
+    const results = await walkExportsRecursive(
+      context,
+      entryPoint,
+      visited,
+      installPath,
+      true,
+    )
     Telemetry.walkPackageExportsTree(packageString, startTime, true)
     return results
   } catch (err) {
     Telemetry.walkPackageExportsTree(packageString, startTime, false, err)
     throw err
   }
+}
+
+/**
+ * Get exports details from code (compatibility function)
+ *
+ * This provides the same API as the existing getExportsDetails for backward compatibility
+ */
+export function getExportsDetails(code: string, filename = 'module.js') {
+  const parseResult = parseSync(filename, code, {
+    sourceType: 'module',
+  })
+
+  return getExportsFromStaticExports(parseResult.module.staticExports)
 }

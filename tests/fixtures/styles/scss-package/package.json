@@ -1,0 +1,6 @@
+{
+  "name": "scss-package-fixture",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "description": "Test fixture for SCSS compilation and bundling"
+}

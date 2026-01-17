@@ -1,6 +1,3 @@
-# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
-
 name: CI
 
 on:
@@ -10,21 +7,87 @@ on:
     branches: [master]
 
 jobs:
-  build:
+  test:
+    name: Test (Node ${{ matrix.node-version }})
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [10.x, 12.x]
+        node-version: [20.x, 22.x]
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-      - run: yarn install
-      - run: yarn build
-      - run: yarn test:ci
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: corepack yarn install --immutable
+
+      - name: Type check
+        run: corepack yarn type-check
+
+      - name: Lint
+        run: corepack yarn lint
+
+      - name: Format check
+        run: corepack yarn format:check
+
+      - name: Build
+        run: corepack yarn build
+
+      - name: Run tests
+        run: corepack yarn test
+
+      - name: Run tests with coverage (Node 20 only)
+        if: matrix.node-version == '20.x'
+        run: corepack yarn test:coverage
+        continue-on-error: true
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v4
+        if: matrix.node-version == '20.x'
+        with:
+          files: ./coverage/lcov.info
+          fail_ci_if_error: false
         env:
-          CI: true
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+  build-check:
+    name: Build Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: corepack yarn install --immutable
+
+      - name: Build
+        run: corepack yarn build
+
+      - name: Check build artifacts
+        run: |
+          if [ ! -d "build" ]; then
+            echo "Build directory not found"
+            exit 1
+          fi
+          if [ ! -f "build/index.js" ]; then
+            echo "Build output not found"
+            exit 1
+          fi

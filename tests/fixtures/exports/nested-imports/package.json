@@ -1,0 +1,7 @@
+{
+  "name": "nested-imports-fixture",
+  "version": "1.0.0",
+  "description": "Package with nested imports and complex dependency tree",
+  "main": "src/index.js",
+  "type": "module"
+}

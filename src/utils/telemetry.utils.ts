@@ -2,7 +2,9 @@ import mitt from 'mitt'
 import { parsePackageString } from './common.utils'
 import { performance } from 'perf_hooks'
 import _ from 'lodash'
-const debug = require('debug')('bp-telemetry')
+import createDebug from 'debug'
+
+const debug = createDebug('bp-telemetry')
 
 const emitter = mitt()
 export { emitter }
@@ -34,7 +36,7 @@ export default class Telemetry {
     isSuccessful: boolean,
     startTime: number,
     options: any,
-    error: any = null
+    error: any = null,
   ) {
     emitter.emit('TASK_PACKAGE_INSTALL', {
       package: parsePackageString(packageString),
@@ -49,7 +51,7 @@ export default class Telemetry {
     packageName: string,
     isSuccessful: boolean,
     startTime: number,
-    error: any = null
+    error: any = null,
   ) {
     emitter.emit('TASK_PACKAGE_JSON_DETAILS', {
       package: { name: packageName },
@@ -64,7 +66,7 @@ export default class Telemetry {
     isSuccessful: boolean,
     startTime: number,
     options: any,
-    error: any = null
+    error: any = null,
   ) {
     emitter.emit('TASK_PACKAGE_BUILD', {
       package: { name: packageName },
@@ -80,7 +82,7 @@ export default class Telemetry {
     isSuccessful: boolean,
     startTime: number,
     options: any,
-    error: any = null
+    error: any = null,
   ) {
     emitter.emit('TASK_PACKAGE_COMPILE', {
       packageName,
@@ -96,7 +98,7 @@ export default class Telemetry {
     isSuccessful: boolean,
     startTime: number,
     options: any,
-    error: any = null
+    error: any = null,
   ) {
     emitter.emit('TASK_PACKAGE_STATS', {
       package: parsePackageString(packageString),
@@ -111,7 +113,7 @@ export default class Telemetry {
     packageName: string,
     isSuccessful: boolean,
     startTime: number,
-    error: any = null
+    error: any = null,
   ) {
     emitter.emit('TASK_PACKAGE_PARSE_WEBPACK_STATS', {
       package: { name: packageName },
@@ -126,7 +128,7 @@ export default class Telemetry {
     startTime: number,
     isSuccessful: boolean,
     options: any,
-    error: any = null
+    error: any = null,
   ) {
     emitter.emit('TASK_PACKAGE_DEPENDENCY_SIZES', {
       package: { name: packageName },
@@ -148,7 +150,7 @@ export default class Telemetry {
     packageString: string,
     startTime: number,
     isSuccessful: boolean,
-    error: any = null
+    error: any = null,
   ) {
     emitter.emit('TASK_PACKAGE_EXPORTS_TREEWALK', {
       package: parsePackageString(packageString),
@@ -162,7 +164,7 @@ export default class Telemetry {
     packageString: string,
     startTime: number,
     isSuccessful: boolean,
-    error: any = null
+    error: any = null,
   ) {
     emitter.emit('TASK_PACKAGE_EXPORTS', {
       package: parsePackageString(packageString),
@@ -177,7 +179,7 @@ export default class Telemetry {
     startTime: number,
     isSuccessful: boolean,
     options: any,
-    error: any = null
+    error: any = null,
   ) {
     emitter.emit('TASK_PACKAGE_EXPORTS_SIZES', {
       package: parsePackageString(packageString),

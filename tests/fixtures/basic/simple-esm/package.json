@@ -1,0 +1,7 @@
+{
+  "name": "simple-esm-fixture",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "src/index.js",
+  "description": "Test fixture for basic ESM module bundling"
+}

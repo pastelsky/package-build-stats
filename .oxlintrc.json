@@ -1,0 +1,30 @@
+{
+  "$schema": "https://oxc.rs/schema/oxlintrc.json",
+  "rules": {
+    "typescript": "error",
+    "correctness": "error",
+    "suspicious": "warn",
+    "perf": "warn"
+  },
+  "env": {
+    "node": true,
+    "es2022": true
+  },
+  "globals": {
+    "jest": true,
+    "describe": true,
+    "test": true,
+    "expect": true,
+    "beforeEach": true,
+    "afterEach": true,
+    "beforeAll": true,
+    "afterAll": true
+  },
+  "ignorePatterns": [
+    "src/fixed/**",
+    "build/**",
+    "node_modules/**",
+    "*.min.js",
+    "tests/fixtures/errors/invalid-syntax/**"
+  ]
+}

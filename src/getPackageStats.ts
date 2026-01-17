@@ -3,7 +3,7 @@
  * @see https://github.com/wix/import-cost/blob/master/packages/import-cost/src/webpack.js
  */
 
-import { promises as fs } from 'fs'
+import fs from 'fs/promises'
 import path from 'path'
 import { getExternals, parsePackageString } from './utils/common.utils'
 import InstallationUtils from './utils/installation.utils'
@@ -19,7 +19,7 @@ function getPackageJSONDetails(packageName: string, installPath: string) {
     installPath,
     'node_modules',
     packageName,
-    'package.json'
+    'package.json',
   )
   return fs.readFile(packageJSONPath, 'utf8').then(
     (contents: string) => {
@@ -44,28 +44,22 @@ function getPackageJSONDetails(packageName: string, installPath: string) {
     },
     err => {
       Telemetry.getPackageJSONDetails(packageName, false, startTime, err)
-    }
+    },
   )
 }
 
 export default async function getPackageStats(
   packageString: string,
-  optionsRaw: GetPackageStatsOptions
+  options: GetPackageStatsOptions = {},
 ) {
   const startTime = performance.now()
-  const defaultMinifier: 'terser' = 'terser'
-
-  const options = {
-    minifier: defaultMinifier,
-    ...optionsRaw,
-  }
 
   const { name: packageName, isLocal } = parsePackageString(packageString)
-  const installPath = await InstallationUtils.preparePath(packageName)
 
-  if (options.debug) {
-    console.log('Install path:', installPath)
-  }
+  const installPath = await InstallationUtils.preparePath(
+    packageName,
+    options.client,
+  )
   try {
     await InstallationUtils.installPackage(packageString, installPath, {
       isLocal,
@@ -76,6 +70,7 @@ export default async function getPackageStats(
     })
 
     const externals = getExternals(packageName, installPath)
+
     const [pacakgeJSONDetails, builtDetails] = await Promise.all([
       getPackageJSONDetails(packageName, installPath),
       BuildUtils.buildPackageIgnoringMissingDeps({
@@ -84,8 +79,8 @@ export default async function getPackageStats(
         externals,
         options: {
           debug: options.debug,
+          minify: options.minify !== false,
           customImports: options.customImports,
-          minifier: options.minifier,
           includeDependencySizes: true,
         },
       }),
@@ -94,34 +89,31 @@ export default async function getPackageStats(
     const hasCSSAsset = builtDetails.assets.some(asset => asset.type === 'css')
     const mainAsset = builtDetails.assets.find(
       asset =>
-        asset.name === 'main' && asset.type === (hasCSSAsset ? 'css' : 'js')
+        asset.name === 'main' && asset.type === (hasCSSAsset ? 'css' : 'js'),
     )
 
     if (!mainAsset) {
       throw new UnexpectedBuildError(
-        'Did not find a main asset in the built bundle'
+        'Did not find a main asset in the built bundle',
       )
     }
 
-    Telemetry.packageStats(
-      packageString,
-      true,
-      performance.now() - startTime,
-      options
-    )
+    const totalTime = performance.now() - startTime
+    Telemetry.packageStats(packageString, true, totalTime, options)
+
     return {
       ...pacakgeJSONDetails,
       ...builtDetails,
       size: mainAsset.size,
       gzip: mainAsset.gzip,
-      parse: mainAsset.parse,
+      installPath,
     }
   } catch (e) {
     Telemetry.packageStats(
       packageString,
       false,
       performance.now() - startTime,
-      options
+      options,
     )
     throw e
   } finally {

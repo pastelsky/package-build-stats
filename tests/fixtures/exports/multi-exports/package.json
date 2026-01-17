@@ -1,0 +1,11 @@
+{
+  "name": "multi-exports-fixture",
+  "version": "1.0.0",
+  "description": "Package with multiple named exports for testing export size analysis",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./utils": "./src/utils.js",
+    "./helpers": "./src/helpers.js"
+  }
+}

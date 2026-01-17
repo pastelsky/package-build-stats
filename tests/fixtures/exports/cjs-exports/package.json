@@ -1,0 +1,6 @@
+{
+  "name": "cjs-exports-fixture",
+  "version": "1.0.0",
+  "description": "CommonJS package with multiple exports",
+  "main": "src/index.js"
+}

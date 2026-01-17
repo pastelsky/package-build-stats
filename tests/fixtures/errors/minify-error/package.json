@@ -1,0 +1,7 @@
+{
+  "name": "minify-error-fixture",
+  "version": "1.0.0",
+  "description": "Fixture with code that causes minification errors",
+  "main": "src/index.js",
+  "type": "module"
+}
