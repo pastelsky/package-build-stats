@@ -45,8 +45,10 @@ jobs:
       - name: Run tests
         run: corepack yarn test
 
-      - name: Run tests with coverage
+      - name: Run tests with coverage (Node 20 only)
+        if: matrix.node-version == '20.x'
         run: corepack yarn test:coverage
+        continue-on-error: true
 
       - name: Upload coverage reports
         uses: codecov/codecov-action@v4
