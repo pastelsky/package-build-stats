@@ -10,12 +10,8 @@ import { getPackageStats } from '../../src'
 import {
   UnexpectedBuildError,
   PackageNotFoundError,
-  MinifyError,
-  BuildError,
-  EntryPointError,
-  InstallError,
   CLIBuildError,
-  MissingDependencyError,
+  EntryPointError,
 } from '../../src/errors/CustomError'
 
 describe('Missing Dependencies', () => {
