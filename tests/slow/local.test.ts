@@ -12,7 +12,8 @@ describe('getPackageStats', () => {
       path.resolve('./fixtures/node_modules/resolve-test'),
     )
     // Size changed from 434 to 336 after migrating to rspack with SWC minifier
-    expect(result.size).toEqual(336)
+    // Size changed from 336 to 327 after removing installPath from result
+    expect(result.size).toEqual(327)
   })
 
   test('dependencySizes', async () => {

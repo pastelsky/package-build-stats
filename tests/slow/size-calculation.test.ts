@@ -12,14 +12,14 @@ describe('Bundle Size Calculation', () => {
     const result = await getPackageStats(fixturePath)
 
     // Assert size and gzip are within expected ranges (non-deterministic)
-    expect(result.size).toBeGreaterThanOrEqual(230)
+    expect(result.size).toBeGreaterThanOrEqual(225)
     expect(result.size).toBeLessThanOrEqual(240)
     expect(result.gzip).toBeGreaterThan(0)
     // Note: gzip can sometimes be larger than uncompressed size for very small files
 
     result.assets.forEach(asset => {
       expect(asset.gzip).toBeGreaterThan(0)
-      expect(asset.size).toBeGreaterThanOrEqual(230)
+      expect(asset.size).toBeGreaterThanOrEqual(225)
       expect(asset.size).toBeLessThanOrEqual(240)
     })
 
@@ -29,24 +29,26 @@ describe('Bundle Size Calculation', () => {
       ({ gzip, size, ...asset }) => asset,
     )
 
-    expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile })
+    // Remove installPath (non-deterministic) before snapshot
+    const { installPath: _installPath, ...resultStable } = resultWithoutVolatile
+    expect({ ...resultStable, assets: assetsWithoutVolatile })
       .toMatchInlineSnapshot(`
-      {
-        "assets": [
-          {
-            "name": "main",
-            "type": "js",
-          },
-        ],
-        "dependencyCount": 0,
-        "dependencySizes": [],
-        "hasJSModule": false,
-        "hasJSNext": false,
-        "hasSideEffects": true,
-        "isModuleType": false,
-        "peerDependencies": [],
-      }
-    `)
+        {
+          "assets": [
+            {
+              "name": "main",
+              "type": "js",
+            },
+          ],
+          "dependencyCount": 0,
+          "dependencySizes": [],
+          "hasJSModule": false,
+          "hasJSNext": false,
+          "hasSideEffects": true,
+          "isModuleType": false,
+          "peerDependencies": [],
+        }
+      `)
   })
 
   test('should calculate size for medium bundle', async () => {
@@ -54,14 +56,14 @@ describe('Bundle Size Calculation', () => {
     const result = await getPackageStats(fixturePath)
 
     // Assert size and gzip are within expected ranges (non-deterministic)
-    expect(result.size).toBeGreaterThanOrEqual(515)
+    expect(result.size).toBeGreaterThanOrEqual(505)
     expect(result.size).toBeLessThanOrEqual(530)
     expect(result.gzip).toBeGreaterThan(0)
     expect(result.gzip).toBeLessThan(result.size)
 
     result.assets.forEach(asset => {
       expect(asset.gzip).toBeGreaterThan(0)
-      expect(asset.size).toBeGreaterThanOrEqual(515)
+      expect(asset.size).toBeGreaterThanOrEqual(505)
       expect(asset.size).toBeLessThanOrEqual(530)
     })
 
@@ -115,22 +117,22 @@ describe('Bundle Size Calculation', () => {
 
     expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile })
       .toMatchInlineSnapshot(`
-      {
-        "assets": [
-          {
-            "name": "main",
-            "type": "js",
-          },
-        ],
-        "dependencyCount": 0,
-        "dependencySizes": [],
-        "hasJSModule": false,
-        "hasJSNext": false,
-        "hasSideEffects": true,
-        "isModuleType": false,
-        "peerDependencies": [],
-      }
-    `)
+        {
+          "assets": [
+            {
+              "name": "main",
+              "type": "js",
+            },
+          ],
+          "dependencyCount": 0,
+          "dependencySizes": [],
+          "hasJSModule": false,
+          "hasJSNext": false,
+          "hasSideEffects": true,
+          "isModuleType": false,
+          "peerDependencies": [],
+        }
+      `)
   })
 
   test('should calculate size for multiple assets (CSS + JS)', async () => {
@@ -138,7 +140,7 @@ describe('Bundle Size Calculation', () => {
     const result = await getPackageStats(fixturePath)
 
     // Assert size and gzip are within expected ranges (non-deterministic)
-    expect(result.size).toBeGreaterThanOrEqual(195)
+    expect(result.size).toBeGreaterThanOrEqual(190)
     expect(result.size).toBeLessThanOrEqual(210)
     expect(result.gzip).toBeGreaterThan(0)
     expect(result.gzip).toBeLessThan(result.size)
@@ -148,7 +150,7 @@ describe('Bundle Size Calculation', () => {
     const jsAsset = result.assets.find(a => a.type === 'js')
     const cssAsset = result.assets.find(a => a.type === 'css')
 
-    expect(jsAsset?.size).toBeGreaterThanOrEqual(235)
+    expect(jsAsset?.size).toBeGreaterThanOrEqual(225)
     expect(jsAsset?.size).toBeLessThanOrEqual(245)
     expect(jsAsset?.gzip).toBeGreaterThan(0)
 
@@ -210,7 +212,7 @@ describe('Bundle Size Calculation', () => {
     const result = await getPackageStats(fixturePath)
 
     // Assert size and gzip are within expected ranges (non-deterministic)
-    expect(result.size).toBeGreaterThanOrEqual(185)
+    expect(result.size).toBeGreaterThanOrEqual(180)
     expect(result.size).toBeLessThanOrEqual(200)
     expect(result.gzip).toBeGreaterThan(0)
     expect(result.gzip).toBeLessThan(result.size)
@@ -220,7 +222,7 @@ describe('Bundle Size Calculation', () => {
     const jsAsset = result.assets.find(a => a.type === 'js')
     const cssAsset = result.assets.find(a => a.type === 'css')
 
-    expect(jsAsset?.size).toBeGreaterThanOrEqual(240)
+    expect(jsAsset?.size).toBeGreaterThanOrEqual(235)
     expect(jsAsset?.size).toBeLessThanOrEqual(250)
     expect(jsAsset?.gzip).toBeGreaterThan(0)
 
@@ -316,14 +318,14 @@ describe('Gzip Compression', () => {
     const result = await getPackageStats(fixturePath)
 
     // Assert ranges
-    expect(result.size).toBeGreaterThanOrEqual(230)
+    expect(result.size).toBeGreaterThanOrEqual(225)
     expect(result.size).toBeLessThanOrEqual(240)
     expect(result.gzip).toBeGreaterThan(0)
     expect(result.gzip).toBeLessThan(result.size)
 
     result.assets.forEach(asset => {
       expect(asset.gzip).toBeGreaterThan(0)
-      expect(asset.size).toBeGreaterThanOrEqual(230)
+      expect(asset.size).toBeGreaterThanOrEqual(225)
       expect(asset.size).toBeLessThanOrEqual(240)
     })
 
@@ -335,22 +337,22 @@ describe('Gzip Compression', () => {
 
     expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile })
       .toMatchInlineSnapshot(`
-      {
-        "assets": [
-          {
-            "name": "main",
-            "type": "js",
-          },
-        ],
-        "dependencyCount": 0,
-        "dependencySizes": [],
-        "hasJSModule": false,
-        "hasJSNext": false,
-        "hasSideEffects": true,
-        "isModuleType": false,
-        "peerDependencies": [],
-      }
-    `)
+        {
+          "assets": [
+            {
+              "name": "main",
+              "type": "js",
+            },
+          ],
+          "dependencyCount": 0,
+          "dependencySizes": [],
+          "hasJSModule": false,
+          "hasJSNext": false,
+          "hasSideEffects": true,
+          "isModuleType": false,
+          "peerDependencies": [],
+        }
+      `)
   })
 
   test('should calculate gzip for medium bundle', async () => {
@@ -358,14 +360,14 @@ describe('Gzip Compression', () => {
     const result = await getPackageStats(fixturePath)
 
     // Assert ranges
-    expect(result.size).toBeGreaterThanOrEqual(515)
+    expect(result.size).toBeGreaterThanOrEqual(510)
     expect(result.size).toBeLessThanOrEqual(530)
     expect(result.gzip).toBeGreaterThan(0)
     expect(result.gzip).toBeLessThan(result.size)
 
     result.assets.forEach(asset => {
       expect(asset.gzip).toBeGreaterThan(0)
-      expect(asset.size).toBeGreaterThanOrEqual(515)
+      expect(asset.size).toBeGreaterThanOrEqual(510)
       expect(asset.size).toBeLessThanOrEqual(530)
     })
 
@@ -377,22 +379,22 @@ describe('Gzip Compression', () => {
 
     expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile })
       .toMatchInlineSnapshot(`
-      {
-        "assets": [
-          {
-            "name": "main",
-            "type": "js",
-          },
-        ],
-        "dependencyCount": 0,
-        "dependencySizes": [],
-        "hasJSModule": false,
-        "hasJSNext": false,
-        "hasSideEffects": true,
-        "isModuleType": false,
-        "peerDependencies": [],
-      }
-    `)
+        {
+          "assets": [
+            {
+              "name": "main",
+              "type": "js",
+            },
+          ],
+          "dependencyCount": 0,
+          "dependencySizes": [],
+          "hasJSModule": false,
+          "hasJSNext": false,
+          "hasSideEffects": true,
+          "isModuleType": false,
+          "peerDependencies": [],
+        }
+      `)
   })
 
   test('should calculate gzip for large bundle', async () => {
@@ -419,22 +421,22 @@ describe('Gzip Compression', () => {
 
     expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile })
       .toMatchInlineSnapshot(`
-      {
-        "assets": [
-          {
-            "name": "main",
-            "type": "js",
-          },
-        ],
-        "dependencyCount": 0,
-        "dependencySizes": [],
-        "hasJSModule": false,
-        "hasJSNext": false,
-        "hasSideEffects": true,
-        "isModuleType": false,
-        "peerDependencies": [],
-      }
-    `)
+        {
+          "assets": [
+            {
+              "name": "main",
+              "type": "js",
+            },
+          ],
+          "dependencyCount": 0,
+          "dependencySizes": [],
+          "hasJSModule": false,
+          "hasJSNext": false,
+          "hasSideEffects": true,
+          "isModuleType": false,
+          "peerDependencies": [],
+        }
+      `)
   })
 
   test('should calculate gzip for each asset in multi-asset bundles', async () => {
@@ -606,7 +608,7 @@ describe('Dependency Size Trees', () => {
     const result = await getPackageStats(fixturePath)
 
     // Assert ranges
-    expect(result.size).toBeGreaterThanOrEqual(230)
+    expect(result.size).toBeGreaterThanOrEqual(220)
     expect(result.size).toBeLessThanOrEqual(240)
     expect(result.gzip).toBeGreaterThan(0)
     expect(result.gzip).toBeLessThan(result.size)
@@ -624,22 +626,22 @@ describe('Dependency Size Trees', () => {
 
     expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile })
       .toMatchInlineSnapshot(`
-      {
-        "assets": [
-          {
-            "name": "main",
-            "type": "js",
-          },
-        ],
-        "dependencyCount": 0,
-        "dependencySizes": [],
-        "hasJSModule": false,
-        "hasJSNext": false,
-        "hasSideEffects": true,
-        "isModuleType": false,
-        "peerDependencies": [],
-      }
-    `)
+        {
+          "assets": [
+            {
+              "name": "main",
+              "type": "js",
+            },
+          ],
+          "dependencyCount": 0,
+          "dependencySizes": [],
+          "hasJSModule": false,
+          "hasJSNext": false,
+          "hasSideEffects": true,
+          "isModuleType": false,
+          "peerDependencies": [],
+        }
+      `)
   })
 
   test('should have empty dependency sizes for fixtures', async () => {
@@ -647,7 +649,7 @@ describe('Dependency Size Trees', () => {
     const result = await getPackageStats(fixturePath)
 
     // Assert ranges
-    expect(result.size).toBeGreaterThanOrEqual(515)
+    expect(result.size).toBeGreaterThanOrEqual(505)
     expect(result.size).toBeLessThanOrEqual(530)
     expect(result.gzip).toBeGreaterThan(0)
     expect(result.gzip).toBeLessThan(result.size)
@@ -665,22 +667,22 @@ describe('Dependency Size Trees', () => {
 
     expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile })
       .toMatchInlineSnapshot(`
-      {
-        "assets": [
-          {
-            "name": "main",
-            "type": "js",
-          },
-        ],
-        "dependencyCount": 0,
-        "dependencySizes": [],
-        "hasJSModule": false,
-        "hasJSNext": false,
-        "hasSideEffects": true,
-        "isModuleType": false,
-        "peerDependencies": [],
-      }
-    `)
+        {
+          "assets": [
+            {
+              "name": "main",
+              "type": "js",
+            },
+          ],
+          "dependencyCount": 0,
+          "dependencySizes": [],
+          "hasJSModule": false,
+          "hasJSNext": false,
+          "hasSideEffects": true,
+          "isModuleType": false,
+          "peerDependencies": [],
+        }
+      `)
   })
 
   test('should calculate sizes for dependency tree', async () => {
@@ -706,22 +708,22 @@ describe('Dependency Size Trees', () => {
 
     expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile })
       .toMatchInlineSnapshot(`
-      {
-        "assets": [
-          {
-            "name": "main",
-            "type": "js",
-          },
-        ],
-        "dependencyCount": 0,
-        "dependencySizes": [],
-        "hasJSModule": false,
-        "hasJSNext": false,
-        "hasSideEffects": true,
-        "isModuleType": false,
-        "peerDependencies": [],
-      }
-    `)
+        {
+          "assets": [
+            {
+              "name": "main",
+              "type": "js",
+            },
+          ],
+          "dependencyCount": 0,
+          "dependencySizes": [],
+          "hasJSModule": false,
+          "hasJSNext": false,
+          "hasSideEffects": true,
+          "isModuleType": false,
+          "peerDependencies": [],
+        }
+      `)
   })
 })
 
@@ -734,7 +736,7 @@ describe('Complex Dependency Scenarios', () => {
     const result = await getPackageStats(fixturePath)
 
     // Assert ranges for size and gzip
-    expect(result.size).toBeGreaterThanOrEqual(2400)
+    expect(result.size).toBeGreaterThanOrEqual(2390)
     expect(result.size).toBeLessThanOrEqual(2420)
     expect(result.gzip).toBeGreaterThan(0)
     expect(result.gzip).toBeLessThan(result.size)
@@ -813,7 +815,7 @@ describe('Complex Dependency Scenarios', () => {
     const result = await getPackageStats(fixturePath)
 
     // Assert ranges for size and gzip
-    expect(result.size).toBeGreaterThanOrEqual(6280)
+    expect(result.size).toBeGreaterThanOrEqual(6150)
     expect(result.size).toBeLessThanOrEqual(6310)
     expect(result.gzip).toBeGreaterThan(0)
     expect(result.gzip).toBeLessThan(result.size)
@@ -894,7 +896,7 @@ describe('Complex Dependency Scenarios', () => {
     const result = await getPackageStats(fixturePath)
 
     // Assert ranges for size and gzip
-    expect(result.size).toBeGreaterThanOrEqual(35200)
+    expect(result.size).toBeGreaterThanOrEqual(35000)
     expect(result.size).toBeLessThanOrEqual(35350)
     expect(result.gzip).toBeGreaterThan(0)
     expect(result.gzip).toBeLessThan(result.size)

@@ -106,7 +106,6 @@ export default async function getPackageStats(
       ...builtDetails,
       size: mainAsset.size,
       gzip: mainAsset.gzip,
-      installPath,
     }
   } catch (e) {
     Telemetry.packageStats(
