@@ -1,0 +1,22 @@
+@primary-color: #4CAF50;
+@secondary-color: #FFC107;
+@border-radius: 4px;
+
+.container {
+  background-color: @primary-color;
+  border-radius: @border-radius;
+  
+  .header {
+    color: @secondary-color;
+    padding: 10px;
+    
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}
+
+.button {
+  background: @primary-color;
+  border-radius: @border-radius;
+}

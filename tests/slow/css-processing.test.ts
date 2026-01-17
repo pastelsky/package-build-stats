@@ -131,3 +131,100 @@ describe('SCSS Processing', () => {
     expect(cssAsset!.name).toBe('main')
   })
 })
+
+describe('Less Processing', () => {
+  test('should compile Less to CSS', async () => {
+    const fixturePath = path.resolve(
+      __dirname,
+      '../fixtures/styles/less-package',
+    )
+    const result = await getPackageStats(fixturePath)
+
+    // Should have exactly 2 assets: JS and CSS
+    expect(result.assets).toHaveLength(2)
+
+    const cssAsset = result.assets.find(a => a.type === 'css')
+    expect(cssAsset).toBeDefined()
+    expect(cssAsset!.name).toBe('main')
+    expect(cssAsset!.type).toBe('css')
+  })
+
+  test('should process Less variables', async () => {
+    const fixturePath = path.resolve(
+      __dirname,
+      '../fixtures/styles/less-package',
+    )
+    const result = await getPackageStats(fixturePath)
+
+    const cssAsset = result.assets.find(a => a.type === 'css')
+
+    // Less variables should be compiled to actual values
+    expect(cssAsset).toBeDefined()
+    expect(cssAsset!.size).toBeGreaterThan(0)
+    expect(cssAsset!.gzip).toBeGreaterThan(0)
+  })
+
+  test('should use less-loader for Less compilation', async () => {
+    const fixturePath = path.resolve(
+      __dirname,
+      '../fixtures/styles/less-package',
+    )
+    const result = await getPackageStats(fixturePath)
+
+    // Should successfully compile without errors
+    expect(result.assets).toHaveLength(2)
+    const cssAsset = result.assets.find(a => a.type === 'css')
+    expect(cssAsset).toBeDefined()
+    expect(cssAsset!.name).toBe('main')
+  })
+})
+
+describe('Svelte Processing', () => {
+  test('should compile Svelte component with scoped styles', async () => {
+    const fixturePath = path.resolve(
+      __dirname,
+      '../fixtures/styles/svelte-package',
+    )
+    const result = await getPackageStats(fixturePath)
+
+    // Should have exactly 2 assets: JS and CSS
+    expect(result.assets).toHaveLength(2)
+
+    const jsAsset = result.assets.find(a => a.type === 'js')
+    const cssAsset = result.assets.find(a => a.type === 'css')
+
+    expect(jsAsset).toBeDefined()
+    expect(cssAsset).toBeDefined()
+    expect(cssAsset!.name).toBe('main')
+    expect(cssAsset!.type).toBe('css')
+  })
+
+  test('should extract CSS from Svelte component', async () => {
+    const fixturePath = path.resolve(
+      __dirname,
+      '../fixtures/styles/svelte-package',
+    )
+    const result = await getPackageStats(fixturePath)
+
+    const cssAsset = result.assets.find(a => a.type === 'css')
+
+    // Svelte scoped styles should be extracted
+    expect(cssAsset).toBeDefined()
+    expect(cssAsset!.size).toBeGreaterThan(0)
+    expect(cssAsset!.gzip).toBeGreaterThan(0)
+  })
+
+  test('should use svelte-loader for Svelte compilation', async () => {
+    const fixturePath = path.resolve(
+      __dirname,
+      '../fixtures/styles/svelte-package',
+    )
+    const result = await getPackageStats(fixturePath)
+
+    // Should successfully compile without errors
+    expect(result.assets).toHaveLength(2)
+    const jsAsset = result.assets.find(a => a.type === 'js')
+    expect(jsAsset).toBeDefined()
+    expect(jsAsset!.name).toBe('main')
+  })
+})

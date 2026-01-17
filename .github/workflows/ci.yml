@@ -42,8 +42,11 @@ jobs:
       - name: Build
         run: corepack yarn build
 
-      - name: Run tests
+      - name: Run fast tests
         run: corepack yarn test
+
+      - name: Run all tests (including slow tests)
+        run: corepack yarn test:all
 
       - name: Run tests with coverage (Node 20 only)
         if: matrix.node-version == '20.x'

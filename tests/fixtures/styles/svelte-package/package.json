@@ -1,0 +1,6 @@
+{
+  "name": "svelte-package-fixture",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "description": "Test fixture for Svelte component bundling"
+}
