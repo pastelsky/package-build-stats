@@ -7,7 +7,6 @@ import { createRequire } from 'module'
 
 const require = createRequire(import.meta.url)
 
-
 import { Externals } from '../common.types.js'
 
 type MakeRspackConfigOptions = {
