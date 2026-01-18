@@ -6,11 +6,11 @@ import { randomUUID } from 'crypto'
 import createDebug from 'debug'
 
 const debug = createDebug('bp:worker')
-import { InstallError, PackageNotFoundError } from '../errors/CustomError'
-import { exec } from './common.utils'
-import config from '../config/config'
-import { InstallPackageOptions } from '../common.types'
-import Telemetry from './telemetry.utils'
+import { InstallError, PackageNotFoundError } from '../errors/CustomError.js'
+import { exec } from './common.utils.js'
+import config from '../config/config.js'
+import { InstallPackageOptions } from '../common.types.js'
+import Telemetry from './telemetry.utils.js'
 import { performance } from 'perf_hooks'
 
 // When operating on a local directory, force npm to copy directory structure

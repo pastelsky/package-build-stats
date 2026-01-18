@@ -1,12 +1,11 @@
 import path from 'path'
-import { Entry } from '@rspack/core'
+import { Entry, rspack } from '@rspack/core'
 import isValidNPMName from 'is-valid-npm-name'
 import { gzipSync } from 'zlib'
 import fs from 'fs'
-import getDependencySizes from '../getDependencySizeTree'
-import makeRspackConfig from '../config/makeRspackConfig'
+import getDependencySizes from '../getDependencySizeTree.js'
+import makeRspackConfig from '../config/makeRspackConfig.js'
 import { performance } from 'perf_hooks'
-import rspack from '@rspack/core'
 import type { Stats } from '@rspack/core'
 
 import {
@@ -15,13 +14,13 @@ import {
   EntryPointError,
   MissingDependencyError,
   UnexpectedBuildError,
-} from '../errors/CustomError'
+} from '../errors/CustomError.js'
 import {
   Externals,
   BuildPackageOptions,
   CreateEntryPointOptions,
-} from '../common.types'
-import Telemetry from './telemetry.utils'
+} from '../common.types.js'
+import Telemetry from './telemetry.utils.js'
 
 type CompilePackageArgs = {
   name: string
@@ -289,8 +288,8 @@ const BuildUtils = {
         if (!matches) {
           throw new UnexpectedBuildError(
             'Found an asset without the `.bundle` suffix. ' +
-              'A loader customization might be needed to recognize this asset type' +
-              asset.name,
+            'A loader customization might be needed to recognize this asset type' +
+            asset.name,
           )
         }
 

@@ -5,12 +5,12 @@
 
 import fs from 'fs/promises'
 import path from 'path'
-import { getExternals, parsePackageString } from './utils/common.utils'
-import InstallationUtils from './utils/installation.utils'
-import BuildUtils from './utils/build.utils'
-import { UnexpectedBuildError } from './errors/CustomError'
-import { GetPackageStatsOptions } from './common.types'
-import Telemetry from './utils/telemetry.utils'
+import { getExternals, parsePackageString } from './utils/common.utils.js'
+import InstallationUtils from './utils/installation.utils.js'
+import BuildUtils from './utils/build.utils.js'
+import { UnexpectedBuildError } from './errors/CustomError.js'
+import { GetPackageStatsOptions } from './common.types.js'
+import Telemetry from './utils/telemetry.utils.js'
 import { performance } from 'perf_hooks'
 
 function getPackageJSONDetails(packageName: string, installPath: string) {

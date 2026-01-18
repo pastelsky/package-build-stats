@@ -1,4 +1,4 @@
-import Telemetry from './utils/telemetry.utils'
+import Telemetry from './utils/telemetry.utils.js'
 import { performance } from 'perf_hooks'
 import path from 'path'
 
@@ -6,11 +6,11 @@ import createDebug from 'debug'
 
 const debug = createDebug('bp:worker')
 
-import { getExternals, parsePackageString } from './utils/common.utils'
-import { getAllExports } from './utils/exports.utils'
-import InstallationUtils from './utils/installation.utils'
-import BuildUtils from './utils/build.utils'
-import { GetPackageStatsOptions, InstallPackageOptions } from './common.types'
+import { getExternals, parsePackageString } from './utils/common.utils.js'
+import { getAllExports } from './utils/exports.utils.js'
+import InstallationUtils from './utils/installation.utils.js'
+import BuildUtils from './utils/build.utils.js'
+import { GetPackageStatsOptions, InstallPackageOptions } from './common.types.js'
 
 async function installPackage(
   packageString: string,

@@ -56,7 +56,7 @@ export function getExternals(packageName: string, installPath: string) {
     packageName,
     'package.json',
   )
-  const packageJSON = require(packageJSONPath)
+  const packageJSON = JSON.parse(fs.readFileSync(packageJSONPath, 'utf-8'))
   const dependencies = Object.keys(packageJSON.dependencies || {})
   const peerDependencies = Object.keys(packageJSON.peerDependencies || {})
 
@@ -103,7 +103,7 @@ type ParsePackageResult = {
 
 function parseLocalPackageString(packageString: string): ParsePackageResult {
   const fullPath = path.resolve(packageString, 'package.json')
-  const packageJSON = require(fullPath)
+  const packageJSON = JSON.parse(fs.readFileSync(fullPath, 'utf-8'))
 
   return {
     name: packageJSON.name,

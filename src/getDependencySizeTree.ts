@@ -1,7 +1,7 @@
 import path from 'path'
 import { minify } from '@swc/core'
-import { MinifyError } from './errors/CustomError'
-import Telemetry from './utils/telemetry.utils'
+import { MinifyError } from './errors/CustomError.js'
+import Telemetry from './utils/telemetry.utils.js'
 import { performance } from 'perf_hooks'
 
 function modulePath(identifier: string) {

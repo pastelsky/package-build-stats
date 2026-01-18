@@ -1,15 +1,17 @@
 import mitt from 'mitt'
-import { parsePackageString } from './common.utils'
+import type { Emitter, EventType } from 'mitt'
+import { parsePackageString } from './common.utils.js'
 import { performance } from 'perf_hooks'
 import _ from 'lodash'
 import createDebug from 'debug'
 
 const debug = createDebug('bp-telemetry')
 
-const emitter = mitt()
+type Events = Record<EventType, unknown>
+const emitter: Emitter<Events> = (mitt as unknown as <T extends Record<EventType, unknown>>() => Emitter<T>)<Events>()
 export { emitter }
 
-emitter.on('*', (type, data) => {
+emitter.on('*', (type: EventType, data: unknown) => {
   debug('Telementry Event: %s  %o', type, data)
 })
 

@@ -9,7 +9,7 @@ import { parseSync, StaticExport, StaticExportEntry } from 'oxc-parser'
 import { ResolverFactory } from 'oxc-resolver'
 import path from 'path'
 import fs from 'fs/promises'
-import Telemetry from './telemetry.utils'
+import Telemetry from './telemetry.utils.js'
 import { performance } from 'perf_hooks'
 
 // Initialize resolver with ESM-first configuration
@@ -44,7 +44,7 @@ const resolver = new ResolverFactory({
  */
 type NamedExport = {
   name: string
-  moduleRequest?: string // The source module for re-exports like `export { foo } from './module'`
+  moduleRequest?: string // The source module for re-exports like `export { foo } from './module.js'`
 }
 
 /**
@@ -156,7 +156,7 @@ async function walkExportsRecursive(
   for (const exp of exports) {
     let sourcePath = resolvedPath
 
-    // If this is a re-export (export { foo } from './module'), resolve to the source file
+    // If this is a re-export (export { foo } from './module.js'), resolve to the source file
     if (exp.moduleRequest) {
       try {
         sourcePath = await resolveModule(

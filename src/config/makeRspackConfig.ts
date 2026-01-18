@@ -4,7 +4,7 @@ import escapeRegex from 'escape-string-regexp'
 import type { Entry, Configuration } from '@rspack/core'
 import rspack from '@rspack/core'
 
-import { Externals } from '../common.types'
+import { Externals } from '../common.types.js'
 
 type MakeRspackConfigOptions = {
   packageName: string
