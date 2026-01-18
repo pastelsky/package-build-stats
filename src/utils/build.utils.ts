@@ -306,7 +306,14 @@ const BuildUtils = {
 
       const assetStatsPromises =
         jsonStats?.assets
-          ?.filter(asset => !asset.chunkNames?.some(name => name === 'runtime' || (typeof name === 'string' && name.startsWith('runtime~'))))
+          ?.filter(
+            asset =>
+              !asset.chunkNames?.some(
+                name =>
+                  name === 'runtime' ||
+                  (typeof name === 'string' && name.startsWith('runtime~')),
+              ),
+          )
           .filter(asset => !asset.name.endsWith('LICENSE.txt'))
           .map(getAssetStats) || []
       const assetStats = await Promise.all(assetStatsPromises)

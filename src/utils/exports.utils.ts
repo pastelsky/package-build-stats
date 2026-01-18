@@ -159,7 +159,10 @@ async function walkExportsRecursive(
     // If this is a re-export (export { foo } from './module'), resolve to the source file
     if (exp.moduleRequest) {
       try {
-        sourcePath = await resolveModule(path.dirname(resolvedPath), exp.moduleRequest)
+        sourcePath = await resolveModule(
+          path.dirname(resolvedPath),
+          exp.moduleRequest,
+        )
       } catch {
         // If resolution fails, fall back to current file
         sourcePath = resolvedPath
@@ -248,7 +251,7 @@ export function getExportsDetails(code: string, filename = 'module.js') {
   })
 
   const result = getExportsFromStaticExports(parseResult.module.staticExports)
-  
+
   // Return simple string array for backward compatibility
   return {
     exports: result.exports.map(exp => exp.name),
