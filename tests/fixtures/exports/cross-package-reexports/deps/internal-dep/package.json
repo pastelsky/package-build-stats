@@ -1,0 +1,17 @@
+{
+  "name": "internal-dep",
+  "version": "1.0.0",
+  "description": "Internal dependency with both CJS and ESM exports (simulates @vue/runtime-dom)",
+  "main": "index.js",
+  "module": "lib/index.esm.js",
+  "exports": {
+    ".": {
+      "node": {
+        "default": "./index.js"
+      },
+      "import": "./lib/index.esm.js",
+      "require": "./index.js",
+      "default": "./index.js"
+    }
+  }
+}

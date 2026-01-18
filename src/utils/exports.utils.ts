@@ -13,9 +13,13 @@ import Telemetry from './telemetry.utils'
 import { performance } from 'perf_hooks'
 
 // Initialize resolver with ESM-first configuration
-// Following oxc-linter's resolver configuration:
 // - main_fields: ["module", "main"] - prioritize ESM entry points
-// - condition_names: ["module", "import"] - standard ESM export conditions
+// - condition_names: ["import", "default", "require"] - ESM-first export conditions
+//   NOTE: We intentionally exclude "node" because Node.js conditional exports resolution
+//   uses the PACKAGE's exports field order (not our conditionNames order) to determine
+//   priority. Packages like Vue have "node" before "import" in their exports, so including
+//   "node" would resolve to CJS files instead of ESM. We keep "require" as a fallback for
+//   packages that only export via "require" condition.
 // - extensions: all common JS/TS extensions
 // - symlinks: false - keep paths as-is without resolving symlinks (matches enhanced-resolve behavior)
 const resolver = new ResolverFactory({
@@ -30,8 +34,8 @@ const resolver = new ResolverFactory({
     '.cts',
     '.json',
   ],
-  mainFields: ['module', 'main'], // ESM-first: prioritize \"module\" field over \"main\"
-  conditionNames: ['import', 'require', 'node', 'default'], // Standard export conditions
+  mainFields: ['module', 'main'], // ESM-first: prioritize "module" field over "main"
+  conditionNames: ['import', 'default', 'require'], // ESM-first: exclude "node" which resolves to CJS
   symlinks: false, // Don't resolve symlinks to match enhanced-resolve behavior
 })
 

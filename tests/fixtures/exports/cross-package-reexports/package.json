@@ -1,0 +1,8 @@
+{
+  "name": "cross-package-reexports-fixture",
+  "version": "1.0.0",
+  "description": "Package that re-exports from a dependency with both CJS and ESM exports (simulates Vue pattern)",
+  "main": "src/index.js",
+  "module": "src/index.js",
+  "type": "module"
+}
