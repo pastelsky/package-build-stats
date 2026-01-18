@@ -98,7 +98,9 @@ export default async function getPackageStats(
       }),
     ])
     timings.parallelBuild = performance.now() - parallelStart
-    console.log(`[PERF] parallel (packageJSON + build): ${timings.parallelBuild.toFixed(2)}ms`)
+    console.log(
+      `[PERF] parallel (packageJSON + build): ${timings.parallelBuild.toFixed(2)}ms`,
+    )
 
     const hasCSSAsset = builtDetails.assets.some(asset => asset.type === 'css')
     const mainAsset = builtDetails.assets.find(

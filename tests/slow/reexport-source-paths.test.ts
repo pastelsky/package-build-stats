@@ -2,12 +2,12 @@
  * @jest-environment node
  *
  * Tests that re-exports resolve to their actual source files, not the declaring file.
- * 
+ *
  * For example, lodash-es has:
  *   export { default as add } from './add.js'
- * 
+ *
  * The path for 'add' should be './add.js', not './lodash.js' (the entry file).
- * 
+ *
  * This is important for accurate bundle analysis and understanding where
  * each export actually comes from.
  */

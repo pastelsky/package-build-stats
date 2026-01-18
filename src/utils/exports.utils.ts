@@ -123,7 +123,7 @@ async function walkExportsRecursive(
   lookupPath: string,
   visited: Set<string>,
   rootContext?: string,
-  isRootCall: boolean = false,
+  _isRootCall: boolean = false,
 ): Promise<ResolvedExports> {
   // Use rootContext for calculating relative paths, context for resolution
   const root = rootContext || context

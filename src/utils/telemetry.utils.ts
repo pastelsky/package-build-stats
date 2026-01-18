@@ -8,7 +8,9 @@ import createDebug from 'debug'
 const debug = createDebug('bp-telemetry')
 
 type Events = Record<EventType, unknown>
-const emitter: Emitter<Events> = (mitt as unknown as <T extends Record<EventType, unknown>>() => Emitter<T>)<Events>()
+const emitter: Emitter<Events> = (
+  mitt as unknown as <T extends Record<EventType, unknown>>() => Emitter<T>
+)<Events>()
 export { emitter }
 
 emitter.on('*', (type: EventType, data: unknown) => {

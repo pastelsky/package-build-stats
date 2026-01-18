@@ -240,7 +240,7 @@ async function bundleSizeTree(
     }
 
     let parent = statsTree
-    packages.forEach((pkg, pkgIndex) => {
+    packages.forEach(pkg => {
       const existing = parent.children.filter(
         child => child.packageName === pkg,
       )
@@ -297,7 +297,6 @@ async function bundleSizeTree(
 
           const minified = await minifyDependencyCode(code)
           const minifiedSize = getUtf8Size(minified.code || '')
-          const minifiedCode = minified.code || ''
 
           if (process.env.DEBUG_SIZE) {
             console.log(`Source ${idx}: ${minifiedSize} bytes (minified)`)

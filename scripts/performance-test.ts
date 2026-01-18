@@ -85,8 +85,12 @@ async function performanceTest(): Promise<void> {
 
     logger.blank()
     logger.success('Package Stats Retrieved:')
-    console.log(`  • Size: ${stats.size} bytes (${(stats.size / 1024 / 1024).toFixed(2)} MB)`)
-    console.log(`  • Gzip: ${stats.gzip} bytes (${(stats.gzip / 1024 / 1024).toFixed(2)} MB)`)
+    console.log(
+      `  • Size: ${stats.size} bytes (${(stats.size / 1024 / 1024).toFixed(2)} MB)`,
+    )
+    console.log(
+      `  • Gzip: ${stats.gzip} bytes (${(stats.gzip / 1024 / 1024).toFixed(2)} MB)`,
+    )
     console.log(`  • Dependency Count: ${stats.dependencyCount}`)
     if (stats.assets && Array.isArray(stats.assets)) {
       console.log(`  • Assets Count: ${stats.assets.length}`)
@@ -137,11 +141,10 @@ async function performanceTest(): Promise<void> {
     console.log('  Top 10 Dependencies by Size:')
     stats.dependencySizes
       .slice(0, 10)
-      .forEach(
-        (dep: any, i: number) =>
-          console.log(
-            `    ${i + 1}. ${dep.name}: ${(dep.approximateSize / 1024).toFixed(2)} KB`,
-          ),
+      .forEach((dep: any, i: number) =>
+        console.log(
+          `    ${i + 1}. ${dep.name}: ${(dep.approximateSize / 1024).toFixed(2)} KB`,
+        ),
       )
   }
   logger.blank()
@@ -189,12 +192,16 @@ async function performanceTest(): Promise<void> {
   logger.info('Size Information:')
   console.log(`  • Uncompressed: ${(stats.size / 1024 / 1024).toFixed(2)} MB`)
   console.log(`  • Gzip: ${(stats.gzip / 1024 / 1024).toFixed(2)} MB`)
-  console.log(`  • Compression Ratio: ${((1 - stats.gzip / stats.size) * 100).toFixed(1)}%`)
+  console.log(
+    `  • Compression Ratio: ${((1 - stats.gzip / stats.size) * 100).toFixed(1)}%`,
+  )
   logger.blank()
 
   logger.info('Performance:')
   console.log(`  • Total Execution Time: ${totalDuration.toFixed(2)}ms`)
-  console.log(`  • Slowest Operation: ${sortedTimings[0].operation} (${sortedTimings[0].duration.toFixed(2)}ms)`)
+  console.log(
+    `  • Slowest Operation: ${sortedTimings[0].operation} (${sortedTimings[0].duration.toFixed(2)}ms)`,
+  )
   console.log(`  • Number of Operations: ${timings.length}`)
   logger.blank()
 

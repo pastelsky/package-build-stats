@@ -11,27 +11,28 @@
 ## Execution Breakdown
 
 ### Phase 1: Cache Cleanup
+
 - **Time:** 0.65ms (negligible)
 - **Purpose:** Clear master cache before test
 
 ### Phase 2: getPackageStats() - 2,393.15ms (25.5%)
 
-| Operation | Time (ms) | % of Phase | Notes |
-|-----------|-----------|------------|-------|
-| preparePath | 1.32 | 0.1% | Create temp directory |
-| installPackage | 2,427.66 | 101.4% | **PRIMARY BOTTLENECK** |
-| getExternals | 0.56 | 0.0% | Parse dependencies |
-| parallel (packageJSON + build) | 319.42 | 13.3% | Build main bundle |
+| Operation                      | Time (ms) | % of Phase | Notes                  |
+| ------------------------------ | --------- | ---------- | ---------------------- |
+| preparePath                    | 1.32      | 0.1%       | Create temp directory  |
+| installPackage                 | 2,427.66  | 101.4%     | **PRIMARY BOTTLENECK** |
+| getExternals                   | 0.56      | 0.0%       | Parse dependencies     |
+| parallel (packageJSON + build) | 319.42    | 13.3%      | Build main bundle      |
 
 ### Phase 3: getPackageExportSizes() - 6,531.58ms (69.7%)
 
-| Operation | Time (ms) | % of Phase | Notes |
-|-----------|-----------|------------|-------|
-| preparePath | 0.57 | 0.0% | Create temp directory |
-| installPackage | 1,816.78 | 27.8% | **SECONDARY BOTTLENECK** |
-| getAllExports | 12.01 | 0.2% | Found 436 exports |
-| getExternals | 0.40 | 0.0% | Parse dependencies |
-| buildPackage | 4,574.16 | 70.0% | **PRIMARY BOTTLENECK** |
+| Operation      | Time (ms) | % of Phase | Notes                    |
+| -------------- | --------- | ---------- | ------------------------ |
+| preparePath    | 0.57      | 0.0%       | Create temp directory    |
+| installPackage | 1,816.78  | 27.8%      | **SECONDARY BOTTLENECK** |
+| getAllExports  | 12.01     | 0.2%       | Found 436 exports        |
+| getExternals   | 0.40      | 0.0%       | Parse dependencies       |
+| buildPackage   | 4,574.16  | 70.0%      | **PRIMARY BOTTLENECK**   |
 
 ---
 
@@ -45,6 +46,7 @@
 - Second install (getPackageExportSizes): 1,816.78ms
 
 **Why it's slow:**
+
 - Network I/O to download package from npm
 - File system operations to extract and write files
 - Installing dependencies (if any)
@@ -57,6 +59,7 @@
 - Export bundles build: 4,574.16ms (436 exports!)
 
 **Why it's slow:**
+
 - Rspack needs to bundle 436 separate exports
 - Each export requires parsing, transforming, minifying
 - Three.js is a large library (~680 KB uncompressed)
@@ -81,8 +84,8 @@
 ```typescript
 // Set USE_CACHE=true in environment
 const stats = await getPackageStats('three', {
-  cache: true
-});
+  cache: true,
+})
 ```
 
 **Expected savings:** ~4.2 seconds on cache hit (45% faster)
@@ -94,11 +97,11 @@ const stats = await getPackageStats('three', {
 
 ```typescript
 // Install once, use for both operations
-const installPath = await installOnce('three');
+const installPath = await installOnce('three')
 const [stats, exports] = await Promise.all([
   getPackageStats('three', { installPath }),
-  getPackageExportSizes('three', { installPath })
-]);
+  getPackageExportSizes('three', { installPath }),
+])
 ```
 
 **Expected savings:** ~1.8 seconds (eliminate duplicate install)
@@ -107,6 +110,7 @@ const [stats, exports] = await Promise.all([
 
 **Current:** Builds all 436 exports sequentially  
 **Ideas:**
+
 - Parallel builds (use worker threads)
 - Incremental bundling
 - On-demand export building (only build requested exports)
@@ -117,6 +121,7 @@ const [stats, exports] = await Promise.all([
 ### Medium Impact Optimizations
 
 #### 4. Bundle Size Optimizations
+
 - Current uncompressed: 680 KB
 - Current gzip: 170 KB
 - Compression ratio: 74.8% (already excellent)
@@ -126,6 +131,7 @@ const [stats, exports] = await Promise.all([
 ## Detailed Metrics
 
 ### Package Information
+
 ```
 Package: three
 Version: 0.160.0 (latest)
@@ -159,16 +165,19 @@ Other (2.5%)          ███
 ## Conclusions
 
 ### Primary Bottlenecks
+
 1. **Installation** - 45.3% of total time (I/O bound)
 2. **Export Building** - 48.8% of total time (CPU/I/O bound)
 
 ### Bottleneck Type
+
 - **97.5% I/O bound** (network + disk)
 - **2.5% CPU bound** (parsing, analysis)
 
 ### Quick Wins
+
 1. ✅ Enable caching → saves 45% immediately
-2. ✅ Share installation → saves 19% 
+2. ✅ Share installation → saves 19%
 3. ✅ Parallel export builds → saves 30-40%
 
 **Potential total improvement: 60-70% faster (3-4 seconds)**

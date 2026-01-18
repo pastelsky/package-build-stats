@@ -2,17 +2,17 @@
  * @jest-environment node
  *
  * Tests for cross-package re-exports resolution
- * 
+ *
  * This tests the fix for packages like Vue that use:
  *   export * from '@vue/runtime-dom'
- * 
+ *
  * The dependency (@vue/runtime-dom) has both CJS and ESM exports with a "node" condition
  * that points to CJS. The resolver must correctly pick ESM (via "import" condition)
  * to find the named exports.
- * 
+ *
  * Bug: Prior to the fix, conditionNames included ['import', 'require', 'node', 'default']
  * which caused the resolver to pick CJS files (no ESM exports) via the "node" condition.
- * 
+ *
  * Fix: Changed conditionNames to ['import', 'default'] to prioritize ESM.
  */
 

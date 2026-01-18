@@ -288,8 +288,8 @@ const BuildUtils = {
         if (!matches) {
           throw new UnexpectedBuildError(
             'Found an asset without the `.bundle` suffix. ' +
-            'A loader customization might be needed to recognize this asset type' +
-            asset.name,
+              'A loader customization might be needed to recognize this asset type' +
+              asset.name,
           )
         }
 
