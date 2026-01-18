@@ -2,8 +2,8 @@
 
 import yargs from 'yargs/yargs'
 import { hideBin } from 'yargs/helpers'
-import getPackageStats from '../src/getPackageStats'
-import { GetPackageStatsOptions } from '../src/common.types' // Adjust the import path to where your TypeScript library entry point is
+import getPackageStats from '../src/getPackageStats.js'
+import { GetPackageStatsOptions } from '../src/common.types.js' // Adjust the import path to where your TypeScript library entry point is
 
 enum PackageManager {
   Npm = 'npm',

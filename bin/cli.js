@@ -1,5 +1,8 @@
-require('esbuild-register/dist/node').register({
+#!/usr/bin/env node
+import { register } from 'esbuild-register/dist/node.js'
+
+register({
   target: 'es2020',
 })
 
-require('./cli.ts')
+await import('./cli.ts')

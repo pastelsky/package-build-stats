@@ -1,5 +1,5 @@
-const path = require('path')
-const { getPackageStats, getPackageExportSizes } = require('../build/index')
+import path from 'path'
+import { getPackageStats, getPackageExportSizes } from '../build/index.js'
 
 async function run() {
   const packageString = process.argv[2]

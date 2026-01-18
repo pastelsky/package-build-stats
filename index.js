@@ -1,12 +1,12 @@
-const server = require('server')
+import server from 'server'
 const { get } = server.router
 const { json, status } = server.reply
 
-const {
+import {
   getPackageStats,
   getPackageExportSizes,
   getAllPackageExports,
-} = require('./src')
+} from './src/index.js'
 
 const PORT = 3000
 console.log(`Starting at port ${PORT}`)
