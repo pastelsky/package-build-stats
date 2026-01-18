@@ -40,13 +40,21 @@ const resolver = new ResolverFactory({
 })
 
 /**
+ * Represents a named export with its optional source module
+ */
+type NamedExport = {
+  name: string
+  moduleRequest?: string // The source module for re-exports like `export { foo } from './module'`
+}
+
+/**
  * Extract export information from parsed oxc module
  */
 function getExportsFromStaticExports(staticExports: StaticExport[]): {
-  exports: string[]
+  exports: NamedExport[]
   exportAllLocations: string[]
 } {
-  const exports: string[] = []
+  const exports: NamedExport[] = []
   const exportAllLocations: string[] = []
 
   staticExports.forEach(staticExport => {
@@ -69,9 +77,15 @@ function getExportsFromStaticExports(staticExports: StaticExport[]): {
         case 'None': // export const foo = 1
           // Get the export name
           if (entry.exportName.kind === 'Name' && entry.exportName.name) {
-            exports.push(entry.exportName.name)
+            exports.push({
+              name: entry.exportName.name,
+              moduleRequest: entry.moduleRequest?.value, // Track the source module for re-exports
+            })
           } else if (entry.exportName.kind === 'Default') {
-            exports.push('default')
+            exports.push({
+              name: 'default',
+              moduleRequest: entry.moduleRequest?.value,
+            })
           }
           break
       }
@@ -138,16 +152,28 @@ async function walkExportsRecursive(
 
   const resolvedExports: ResolvedExports = {}
 
-  // Add direct exports from this module
-  exports.forEach(exp => {
-    // Use path.relative() to calculate the relative path from root to resolvedPath
+  // Add direct exports from this module, resolving re-exports to their source files
+  for (const exp of exports) {
+    let sourcePath = resolvedPath
+
+    // If this is a re-export (export { foo } from './module'), resolve to the source file
+    if (exp.moduleRequest) {
+      try {
+        sourcePath = await resolveModule(path.dirname(resolvedPath), exp.moduleRequest)
+      } catch {
+        // If resolution fails, fall back to current file
+        sourcePath = resolvedPath
+      }
+    }
+
+    // Use path.relative() to calculate the relative path from root to sourcePath
     // This works correctly since symlinks are not resolved (symlinks: false in resolver config)
     const relativePath = root
-      ? path.relative(root, resolvedPath)
-      : path.basename(resolvedPath)
+      ? path.relative(root, sourcePath)
+      : path.basename(sourcePath)
 
-    resolvedExports[exp] = relativePath
-  })
+    resolvedExports[exp.name] = relativePath
+  }
 
   // Recursively process export * statements
   const promises = exportAllLocations.map(async location => {
@@ -214,11 +240,18 @@ export async function getAllExports(
  * Get exports details from code (compatibility function)
  *
  * This provides the same API as the existing getExportsDetails for backward compatibility
+ * Returns simple string arrays for exports (without moduleRequest info)
  */
 export function getExportsDetails(code: string, filename = 'module.js') {
   const parseResult = parseSync(filename, code, {
     sourceType: 'module',
   })
 
-  return getExportsFromStaticExports(parseResult.module.staticExports)
+  const result = getExportsFromStaticExports(parseResult.module.staticExports)
+  
+  // Return simple string array for backward compatibility
+  return {
+    exports: result.exports.map(exp => exp.name),
+    exportAllLocations: result.exportAllLocations,
+  }
 }

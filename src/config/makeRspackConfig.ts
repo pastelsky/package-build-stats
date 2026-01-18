@@ -35,9 +35,15 @@ export default function makeRspackConfig({
     mode: 'production',
     devtool: _debug ? 'source-map' : false,
     optimization: {
-      runtimeChunk: { name: 'runtime' },
+      // Use 'multiple' to create a separate runtime chunk per entry point
+      // 'single' or { name: 'runtime' } shares one runtime across all entries,
+      // which breaks tree-shaking when building many exports simultaneously
+      runtimeChunk: 'multiple',
       realContentHash: false,
       minimize: minify,
+      // Enable tree-shaking optimizations
+      usedExports: true, // Mark unused exports for removal
+      sideEffects: true, // Respect package.json sideEffects field
       // Rspack automatically uses its built-in default minifiers:
       // - SwcJsMinimizerRspackPlugin for JS (SWC-based, very fast)
       // - LightningCssMinimizerRspackPlugin for CSS (Lightning CSS-based)

@@ -1,0 +1,8 @@
+{
+  "name": "reexport-source-paths-fixture",
+  "version": "1.0.0",
+  "description": "Package that re-exports from multiple source files (simulates lodash-es pattern)",
+  "main": "src/index.js",
+  "module": "src/index.js",
+  "type": "module"
+}
