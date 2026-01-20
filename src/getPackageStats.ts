@@ -31,9 +31,10 @@ function getPackageJSONDetails(packageName: string, installPath: string) {
           'dependencies' in parsedJSON
             ? Object.keys(parsedJSON.dependencies).length
             : 0,
-        hasJSNext: parsedJSON['jsnext:main'] || false,
-        hasJSModule: parsedJSON['module'] || false,
+        hasJSNext: !!parsedJSON['jsnext:main'],
+        hasJSModule: !!parsedJSON['module'],
         isModuleType: parsedJSON['type'] === 'module',
+        hasExportImport: !!parsedJSON['exports']?.['import']
         hasSideEffects:
           'sideEffects' in parsedJSON ? parsedJSON['sideEffects'] : true,
         peerDependencies:
