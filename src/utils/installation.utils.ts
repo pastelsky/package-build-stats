@@ -214,9 +214,8 @@ const InstallationUtils = {
         'json',
       ]
 
-      command = `npm install ${
-        isLocal ? wrapPackCommand(packageString) : packageString
-      } ${additionalPackages.join(' ')} --${flags.join(' --')}`
+      command = `npm install ${isLocal ? wrapPackCommand(packageString) : packageString
+        } ${additionalPackages.join(' ')} --${flags.join(' --')}`
     } else if (currentClient === 'pnpm') {
       flags = ['no-optional', 'loglevel error', 'ignore-scripts', 'save-exact']
 
@@ -239,7 +238,9 @@ const InstallationUtils = {
 
       command = `bun add ${packageString} ${additionalPackages.join(
         ' ',
-      )} --${flags.join(' --')}`
+      )} --cache-dir=${path.join(config.tmp, 'cache', 'bun')} --${flags.join(
+        ' --',
+      )}`
     } else {
       console.error('No valid client specified')
       process.exit(1)
