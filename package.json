@@ -1,6 +1,6 @@
 {
   "name": "package-build-stats",
-  "version": "8.2.2",
+  "version": "8.2.4",
   "type": "module",
   "author": "Shubham Kanodia <shubham.kanodia10@gmail.com>",
   "repository": "https://github.com/pastelsky/package-build-stats",
@@ -40,7 +40,7 @@
     "compare:top": "tsx scripts/index.ts top",
     "compare:advanced": "tsx scripts/index.ts compare",
     "perf:test": "tsx scripts/performance-test.ts",
-    "prepublish": "rm -rf build && yarn check && tsc && yarn format"
+    "prepack": "rm -rf build && yarn check && tsc && yarn format"
   },
   "prettier": {
     "semi": false,
