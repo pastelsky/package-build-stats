@@ -40,7 +40,7 @@
     "compare:top": "tsx scripts/index.ts top",
     "compare:advanced": "tsx scripts/index.ts compare",
     "perf:test": "tsx scripts/performance-test.ts",
-    "prepack": "rm -rf build && yarn check && tsc && yarn format"
+    "prepack": "rm -rf build && yarn check && yarn build && yarn format"
   },
   "prettier": {
     "semi": false,
