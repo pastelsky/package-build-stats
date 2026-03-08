@@ -35,6 +35,8 @@ type CompilePackageReturn = {
   error: Error | null
 }
 
+type Compiler = NonNullable<ReturnType<typeof rspack>>
+
 type BuildPackageArgs = {
   name: string
   installPath: string
@@ -68,6 +70,18 @@ function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
 
 function getCompilationErrors(stats: Stats) {
   return [...stats.compilation.errors].filter(notEmpty).flat()
+}
+
+function closeCompiler(compiler: Compiler) {
+  return new Promise<void>((resolve, reject) => {
+    compiler.close(error => {
+      if (error) {
+        reject(error)
+      } else {
+        resolve()
+      }
+    })
+  })
 }
 
 const BuildUtils = {
@@ -132,18 +146,25 @@ const BuildUtils = {
 
     const compiler = rspack(options)
 
-    return new Promise<CompilePackageReturn>(resolve => {
-      compiler.run((error, stats) => {
-        if (!stats) {
-          throw new Error('stats is null')
-        }
-        resolve({ stats, error })
+    return new Promise<CompilePackageReturn>((resolve, reject) => {
+      compiler.run(async (error, stats) => {
+        try {
+          if (!stats) {
+            throw new Error('stats is null')
+          }
 
-        if (error) {
-          console.error(error)
-          Telemetry.compilePackage(name, false, startTime, {}, error)
-        } else {
-          Telemetry.compilePackage(name, true, startTime, {})
+          await closeCompiler(compiler)
+
+          if (error) {
+            console.error(error)
+            Telemetry.compilePackage(name, false, startTime, {}, error)
+          } else {
+            Telemetry.compilePackage(name, true, startTime, {})
+          }
+
+          resolve({ stats, error })
+        } catch (closeError) {
+          reject(closeError)
         }
       })
     })
@@ -313,7 +334,11 @@ const BuildUtils = {
                   (typeof name === 'string' && name.startsWith('runtime~')),
               ),
           )
-          .filter(asset => !asset.name.endsWith('LICENSE.txt'))
+          .filter(
+            asset =>
+              typeof asset.name === 'string' &&
+              !asset.name.endsWith('LICENSE.txt'),
+          )
           .map(getAssetStats) || []
       const assetStats = await Promise.all(assetStatsPromises)
       Telemetry.assetsGZIPParseTime(name, performance.now())
