@@ -214,8 +214,9 @@ const InstallationUtils = {
         'json',
       ]
 
-      command = `npm install ${isLocal ? wrapPackCommand(packageString) : packageString
-        } ${additionalPackages.join(' ')} --${flags.join(' --')}`
+      command = `npm install ${
+        isLocal ? wrapPackCommand(packageString) : packageString
+      } ${additionalPackages.join(' ')} --${flags.join(' --')}`
     } else if (currentClient === 'pnpm') {
       flags = ['no-optional', 'loglevel error', 'ignore-scripts', 'save-exact']
 
