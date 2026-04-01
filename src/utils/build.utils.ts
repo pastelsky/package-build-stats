@@ -1,5 +1,5 @@
 import path from 'path'
-import os from 'os'
+import config from '../config/config.js'
 import { Entry, rspack } from '@rspack/core'
 import isValidNPMName from 'is-valid-npm-name'
 import { gzipSync } from 'zlib'
@@ -218,7 +218,7 @@ const BuildUtils = {
     externals,
     options,
   }: BuildPackageArgs) {
-    const outputPath = fs.mkdtempSync(path.join(os.tmpdir(), 'pkg-build-'))
+    const outputPath = fs.mkdtempSync(path.join(config.tmp, 'pkg-build-'))
     let entry: any = {}
 
     if (options.splitCustomImports) {
