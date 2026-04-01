@@ -1,4 +1,5 @@
 import path from 'path'
+import { randomUUID } from 'crypto'
 import config from '../config/config.js'
 import { Entry, rspack } from '@rspack/core'
 import isValidNPMName from 'is-valid-npm-name'
@@ -218,11 +219,14 @@ const BuildUtils = {
     externals,
     options,
   }: BuildPackageArgs) {
-    const outputPath = config.tmp
+    const id = randomUUID().slice(0, 8)
+    const outputPath = path.join(config.tmp, 'dist', `build-${name}-${id}`)
+    fs.mkdirSync(outputPath, { recursive: true })
     let entry: any = {}
 
     if (options.splitCustomImports) {
       if (!options.customImports || !options.customImports.length) {
+        fs.rmSync(outputPath, { recursive: true, force: true })
         return { assets: [] }
       }
       options.customImports.forEach(importt => {
@@ -248,6 +252,7 @@ const BuildUtils = {
       outputPath,
     })
 
+    try {
     const jsonStatsStartTime = performance.now()
     let jsonStats = stats.toJson({
       assets: true,
@@ -361,6 +366,9 @@ const BuildUtils = {
         assets: assetStats || [],
         ...dependencySizeResults,
       }
+    }
+    } finally {
+      fs.rmSync(outputPath, { recursive: true, force: true })
     }
   },
   async buildPackageIgnoringMissingDeps({
