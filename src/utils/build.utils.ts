@@ -1,4 +1,5 @@
 import path from 'path'
+import config from '../config/config.js'
 import { Entry, rspack } from '@rspack/core'
 import isValidNPMName from 'is-valid-npm-name'
 import { gzipSync } from 'zlib'
@@ -28,6 +29,7 @@ type CompilePackageArgs = {
   entry: Entry
   debug?: boolean
   minify?: boolean
+  outputPath: string
 }
 
 type CompilePackageReturn = {
@@ -133,6 +135,7 @@ const BuildUtils = {
     externals,
     debug,
     minify,
+    outputPath,
   }: CompilePackageArgs) {
     const startTime = performance.now()
 
@@ -142,6 +145,7 @@ const BuildUtils = {
       externals,
       debug,
       minify,
+      outputPath,
     })
 
     const compiler = rspack(options)
@@ -214,6 +218,7 @@ const BuildUtils = {
     externals,
     options,
   }: BuildPackageArgs) {
+    const outputPath = config.tmp
     let entry: any = {}
 
     if (options.splitCustomImports) {
@@ -240,6 +245,7 @@ const BuildUtils = {
       externals,
       debug: options.debug,
       minify: options.minify,
+      outputPath,
     })
 
     const jsonStatsStartTime = performance.now()
@@ -300,7 +306,7 @@ const BuildUtils = {
       }
     } else {
       const getAssetStats = async (asset: RspackStatsAsset) => {
-        const bundle = path.join(process.cwd(), 'dist', asset.name)
+        const bundle = path.join(outputPath, asset.name)
         const bundleContents = await fs.promises.readFile(bundle)
 
         const gzip = gzipSync(bundleContents, {}).length
