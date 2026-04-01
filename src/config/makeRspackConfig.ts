@@ -15,6 +15,7 @@ type MakeRspackConfigOptions = {
   debug?: boolean
   minify?: boolean
   entry: Entry
+  outputPath: string
 }
 
 export default function makeRspackConfig({
@@ -23,6 +24,7 @@ export default function makeRspackConfig({
   externals,
   debug: _debug,
   minify = true,
+  outputPath,
 }: MakeRspackConfigOptions): Configuration {
   const externalsRegex = makeExternalsRegex(externals.externalPackages)
   const isExternalRequest = (request: string) => {
@@ -176,6 +178,7 @@ export default function makeRspackConfig({
     },
     output: {
       filename: '[name].bundle.js',
+      path: outputPath,
     },
     externals: ({ request }, callback) =>
       isExternalRequest(request || '')

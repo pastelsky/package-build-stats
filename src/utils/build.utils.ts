@@ -1,4 +1,5 @@
 import path from 'path'
+import os from 'os'
 import { Entry, rspack } from '@rspack/core'
 import isValidNPMName from 'is-valid-npm-name'
 import { gzipSync } from 'zlib'
@@ -28,6 +29,7 @@ type CompilePackageArgs = {
   entry: Entry
   debug?: boolean
   minify?: boolean
+  outputPath: string
 }
 
 type CompilePackageReturn = {
@@ -133,6 +135,7 @@ const BuildUtils = {
     externals,
     debug,
     minify,
+    outputPath,
   }: CompilePackageArgs) {
     const startTime = performance.now()
 
@@ -142,6 +145,7 @@ const BuildUtils = {
       externals,
       debug,
       minify,
+      outputPath,
     })
 
     const compiler = rspack(options)
@@ -214,10 +218,12 @@ const BuildUtils = {
     externals,
     options,
   }: BuildPackageArgs) {
+    const outputPath = fs.mkdtempSync(path.join(os.tmpdir(), 'pkg-build-'))
     let entry: any = {}
 
     if (options.splitCustomImports) {
       if (!options.customImports || !options.customImports.length) {
+        fs.rmSync(outputPath, { recursive: true, force: true })
         return { assets: [] }
       }
       options.customImports.forEach(importt => {
@@ -240,8 +246,10 @@ const BuildUtils = {
       externals,
       debug: options.debug,
       minify: options.minify,
+      outputPath,
     })
 
+    try {
     const jsonStatsStartTime = performance.now()
     let jsonStats = stats.toJson({
       assets: true,
@@ -300,7 +308,7 @@ const BuildUtils = {
       }
     } else {
       const getAssetStats = async (asset: RspackStatsAsset) => {
-        const bundle = path.join(process.cwd(), 'dist', asset.name)
+        const bundle = path.join(outputPath, asset.name)
         const bundleContents = await fs.promises.readFile(bundle)
 
         const gzip = gzipSync(bundleContents, {}).length
@@ -355,6 +363,9 @@ const BuildUtils = {
         assets: assetStats || [],
         ...dependencySizeResults,
       }
+    }
+    } finally {
+      fs.rmSync(outputPath, { recursive: true, force: true })
     }
   },
   async buildPackageIgnoringMissingDeps({
