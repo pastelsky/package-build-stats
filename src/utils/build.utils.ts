@@ -253,120 +253,121 @@ const BuildUtils = {
     })
 
     try {
-    const jsonStatsStartTime = performance.now()
-    let jsonStats = stats.toJson({
-      assets: true,
-      source: true,
-      chunks: false,
-      chunkGroups: false,
-      chunkModules: true,
-      modules: true,
-      nestedModules: true,
-      reasons: true,
-      depth: true,
-      errors: true,
-      entrypoints: false,
-      warnings: false,
-    })
+      const jsonStatsStartTime = performance.now()
+      let jsonStats = stats.toJson({
+        assets: true,
+        source: true,
+        chunks: false,
+        chunkGroups: false,
+        chunkModules: true,
+        modules: true,
+        nestedModules: true,
+        reasons: true,
+        depth: true,
+        errors: true,
+        entrypoints: false,
+        warnings: false,
+      })
 
-    if (!jsonStats) {
-      Telemetry.parseWebpackStats(name, false, jsonStatsStartTime)
-      throw new UnexpectedBuildError(
-        'Expected webpack json stats to be non-null, but was null',
-      )
-    } else {
-      Telemetry.parseWebpackStats(name, true, jsonStatsStartTime)
-    }
+      if (!jsonStats) {
+        Telemetry.parseWebpackStats(name, false, jsonStatsStartTime)
+        throw new UnexpectedBuildError(
+          'Expected webpack json stats to be non-null, but was null',
+        )
+      } else {
+        Telemetry.parseWebpackStats(name, true, jsonStatsStartTime)
+      }
 
-    const compilationErrors = getCompilationErrors(stats)
+      const compilationErrors = getCompilationErrors(stats)
 
-    if (error && !stats) {
-      throw new BuildError(error)
-    } else if (compilationErrors.length) {
-      const missingModules = BuildUtils._parseMissingModules(compilationErrors)
+      if (error && !stats) {
+        throw new BuildError(error)
+      } else if (compilationErrors.length) {
+        const missingModules =
+          BuildUtils._parseMissingModules(compilationErrors)
 
-      if (missingModules.length) {
-        if (missingModules.length === 1 && missingModules[0] === name) {
-          throw new EntryPointError(compilationErrors.map(err => err.message))
+        if (missingModules.length) {
+          if (missingModules.length === 1 && missingModules[0] === name) {
+            throw new EntryPointError(compilationErrors.map(err => err.message))
+          } else {
+            throw new MissingDependencyError(
+              compilationErrors.map(err => err.toString()),
+              { missingModules },
+            )
+          }
+        } else if (jsonStats.errors && jsonStats.errors.length > 0) {
+          if (
+            jsonStats.errors.some(error =>
+              error.message.includes("Unexpected character '#'"),
+            )
+          ) {
+            throw new CLIBuildError(jsonStats.errors)
+          } else {
+            throw new BuildError(jsonStats.errors)
+          }
         } else {
-          throw new MissingDependencyError(
-            compilationErrors.map(err => err.toString()),
-            { missingModules },
+          throw new UnexpectedBuildError(
+            'The webpack stats object was unexpectedly empty',
           )
-        }
-      } else if (jsonStats.errors && jsonStats.errors.length > 0) {
-        if (
-          jsonStats.errors.some(error =>
-            error.message.includes("Unexpected character '#'"),
-          )
-        ) {
-          throw new CLIBuildError(jsonStats.errors)
-        } else {
-          throw new BuildError(jsonStats.errors)
         }
       } else {
-        throw new UnexpectedBuildError(
-          'The webpack stats object was unexpectedly empty',
-        )
-      }
-    } else {
-      const getAssetStats = async (asset: RspackStatsAsset) => {
-        const bundle = path.join(outputPath, asset.name)
-        const bundleContents = await fs.promises.readFile(bundle)
+        const getAssetStats = async (asset: RspackStatsAsset) => {
+          const bundle = path.join(outputPath, asset.name)
+          const bundleContents = await fs.promises.readFile(bundle)
 
-        const gzip = gzipSync(bundleContents, {}).length
-        const matches = asset.name.match(/(.+?)\.bundle\.(.+)$/)
+          const gzip = gzipSync(bundleContents, {}).length
+          const matches = asset.name.match(/(.+?)\.bundle\.(.+)$/)
 
-        if (!matches) {
-          throw new UnexpectedBuildError(
-            'Found an asset without the `.bundle` suffix. ' +
-              'A loader customization might be needed to recognize this asset type' +
-              asset.name,
-          )
+          if (!matches) {
+            throw new UnexpectedBuildError(
+              'Found an asset without the `.bundle` suffix. ' +
+                'A loader customization might be needed to recognize this asset type' +
+                asset.name,
+            )
+          }
+
+          const [, entryName, extension] = matches
+
+          return {
+            name: entryName,
+            type: extension,
+            size: asset.size,
+            gzip,
+          }
         }
 
-        const [, entryName, extension] = matches
+        const assetStatsPromises =
+          jsonStats?.assets
+            ?.filter(
+              asset =>
+                !asset.chunkNames?.some(
+                  name =>
+                    name === 'runtime' ||
+                    (typeof name === 'string' && name.startsWith('runtime~')),
+                ),
+            )
+            .filter(
+              asset =>
+                typeof asset.name === 'string' &&
+                !asset.name.endsWith('LICENSE.txt'),
+            )
+            .map(getAssetStats) || []
+        const assetStats = await Promise.all(assetStatsPromises)
+        Telemetry.assetsGZIPParseTime(name, performance.now())
+
+        let dependencySizeResults = {}
+        if (options.includeDependencySizes) {
+          const dependencySizes = await getDependencySizes(name, jsonStats)
+          dependencySizeResults = {
+            dependencySizes,
+          }
+        }
 
         return {
-          name: entryName,
-          type: extension,
-          size: asset.size,
-          gzip,
+          assets: assetStats || [],
+          ...dependencySizeResults,
         }
       }
-
-      const assetStatsPromises =
-        jsonStats?.assets
-          ?.filter(
-            asset =>
-              !asset.chunkNames?.some(
-                name =>
-                  name === 'runtime' ||
-                  (typeof name === 'string' && name.startsWith('runtime~')),
-              ),
-          )
-          .filter(
-            asset =>
-              typeof asset.name === 'string' &&
-              !asset.name.endsWith('LICENSE.txt'),
-          )
-          .map(getAssetStats) || []
-      const assetStats = await Promise.all(assetStatsPromises)
-      Telemetry.assetsGZIPParseTime(name, performance.now())
-
-      let dependencySizeResults = {}
-      if (options.includeDependencySizes) {
-        const dependencySizes = await getDependencySizes(name, jsonStats)
-        dependencySizeResults = {
-          dependencySizes,
-        }
-      }
-
-      return {
-        assets: assetStats || [],
-        ...dependencySizeResults,
-      }
-    }
     } finally {
       fs.rmSync(outputPath, { recursive: true, force: true })
     }
