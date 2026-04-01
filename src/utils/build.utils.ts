@@ -218,12 +218,11 @@ const BuildUtils = {
     externals,
     options,
   }: BuildPackageArgs) {
-    const outputPath = fs.mkdtempSync(path.join(config.tmp, 'pkg-build-'))
+    const outputPath = config.tmp
     let entry: any = {}
 
     if (options.splitCustomImports) {
       if (!options.customImports || !options.customImports.length) {
-        fs.rmSync(outputPath, { recursive: true, force: true })
         return { assets: [] }
       }
       options.customImports.forEach(importt => {
@@ -249,7 +248,6 @@ const BuildUtils = {
       outputPath,
     })
 
-    try {
     const jsonStatsStartTime = performance.now()
     let jsonStats = stats.toJson({
       assets: true,
@@ -363,9 +361,6 @@ const BuildUtils = {
         assets: assetStats || [],
         ...dependencySizeResults,
       }
-    }
-    } finally {
-      fs.rmSync(outputPath, { recursive: true, force: true })
     }
   },
   async buildPackageIgnoringMissingDeps({
