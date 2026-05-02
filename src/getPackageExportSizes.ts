@@ -7,7 +7,7 @@ import createDebug from 'debug'
 const debug = createDebug('bp:worker')
 
 import { getExternals, parsePackageString } from './utils/common.utils.js'
-import { getAllExports } from './utils/exports.utils.js'
+import { getAllExports, getExportsMetadata } from './utils/exports.utils.js'
 import InstallationUtils from './utils/installation.utils.js'
 import BuildUtils from './utils/build.utils.js'
 import {
@@ -89,12 +89,13 @@ export async function getPackageExportSizes(
       normalPath || path.join(installPath, 'node_modules', packageName)
 
     const getAllExportsStart = performance.now()
-    const exportMap = await getAllExports(
+    const exportsMetadata = await getExportsMetadata(
       packageString,
       packagePath,
       packageName,
       installPath, // Pass installPath as base for relative path calculation
     )
+    const exportMap = exportsMetadata.exports
     timings.getAllExports = performance.now() - getAllExportsStart
     console.log(
       `[PERF] [ExportSizes] getAllExports: ${timings.getAllExports.toFixed(2)}ms`,
@@ -127,6 +128,26 @@ export async function getPackageExportSizes(
       `[PERF] [ExportSizes] buildPackage: ${timings.build.toFixed(2)}ms`,
     )
 
+    const combinedEntrypointsStart = performance.now()
+    const combinedEntrypointsBuild =
+      await BuildUtils.buildPackageIgnoringMissingDeps({
+        name: packageName,
+        installPath,
+        externals,
+        options: {
+          customImportPaths: exportsMetadata.entrypoints.map(
+            entrypoint => entrypoint.specifier,
+          ),
+          includeDependencySizes: false,
+        },
+      })
+    timings.combinedEntrypointsBuild =
+      performance.now() - combinedEntrypointsStart
+
+    const combinedEntrypointsAsset = combinedEntrypointsBuild.assets.find(
+      asset => asset.name === 'main' && asset.type === 'js',
+    )
+
     Telemetry.packageExportsSizes(packageString, startTime, true, options)
     return {
       ...builtDetails,
@@ -134,6 +155,17 @@ export async function getPackageExportSizes(
         ...asset,
         path: exportMap[asset.name],
       })),
+      exports: exportMap,
+      entrypoints: exportsMetadata.entrypoints,
+      combinedEntrypoints: combinedEntrypointsAsset
+        ? {
+            size: combinedEntrypointsAsset.size,
+            gzip: combinedEntrypointsAsset.gzip,
+            imports: exportsMetadata.entrypoints.map(
+              entrypoint => entrypoint.specifier,
+            ),
+          }
+        : null,
     }
   } catch (err) {
     Telemetry.packageExportsSizes(packageString, startTime, false, options, err)

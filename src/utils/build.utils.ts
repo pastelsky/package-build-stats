@@ -100,7 +100,20 @@ const BuildUtils = {
     let importStatement: string
 
     if (options.esm) {
-      if (options.customImports) {
+      if (options.customImportPaths) {
+        const importLines = options.customImportPaths.map(
+          (importPath, index) =>
+            `import * as __bp_path_import_${index} from '${importPath}'`,
+        )
+        const aliasRefs = options.customImportPaths.map(
+          (_path, index) => `__bp_path_import_${index}`,
+        )
+
+        importStatement = `
+          ${importLines.join('\n')}
+          console.log(${aliasRefs.join(', ')})
+        `
+      } else if (options.customImports) {
         const aliasedImports = options.customImports.map((importName, index) => {
           const importAlias = `__bp_import_${index}`
           const quotedImportName = JSON.stringify(importName)
@@ -118,7 +131,19 @@ const BuildUtils = {
         importStatement = `import * as p from '${packageName}'; console.log(p)`
       }
     } else {
-      if (options.customImports) {
+      if (options.customImportPaths) {
+        const cjsLookups = options.customImportPaths.map(
+          (importPath, index) =>
+            `const __bp_path_import_${index} = require('${importPath}')`,
+        )
+
+        importStatement = `
+        ${cjsLookups.join('\n')}
+        console.log(${options.customImportPaths
+          .map((_path, index) => `__bp_path_import_${index}`)
+          .join(', ')})
+        `
+      } else if (options.customImports) {
         const cjsLookups = options.customImports.map((importName, index) => {
           const importAlias = `__bp_import_${index}`
           const quotedImportName = JSON.stringify(importName)
