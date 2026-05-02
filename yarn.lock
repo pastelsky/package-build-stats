@@ -238,7 +238,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@emnapi/core@npm:^1.5.0, @emnapi/core@npm:^1.7.1":
+"@emnapi/core@npm:1.10.0":
+  version: 1.10.0
+  resolution: "@emnapi/core@npm:1.10.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40emnapi%2Fcore%2F-%2Fcore-1.10.0.tgz"
+  dependencies:
+    "@emnapi/wasi-threads": "npm:1.2.1"
+    tslib: "npm:^2.4.0"
+  checksum: 10c0/f51d08227857b60632de7714d708124f0e100a1462dde6df8221760939aa3204a73193830371830fac0716f3ccd2129f2cac1b17cd7d7958bc4da9018a296edb
+  languageName: node
+  linkType: hard
+
+"@emnapi/core@npm:^1.7.1":
   version: 1.8.1
   resolution: "@emnapi/core@npm:1.8.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40emnapi%2Fcore%2F-%2Fcore-1.8.1.tgz"
   dependencies:
@@ -248,7 +258,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@emnapi/runtime@npm:^1.5.0, @emnapi/runtime@npm:^1.7.1":
+"@emnapi/runtime@npm:1.10.0":
+  version: 1.10.0
+  resolution: "@emnapi/runtime@npm:1.10.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40emnapi%2Fruntime%2F-%2Fruntime-1.10.0.tgz"
+  dependencies:
+    tslib: "npm:^2.4.0"
+  checksum: 10c0/953f14991d1aefb92ee6f8eb27dea725e484791a53a0cb5f47d9e0087b9a2c929ff2e92adf95af15d6ad456db6300c6b761ebf72b50a875b874a83520b3ba093
+  languageName: node
+  linkType: hard
+
+"@emnapi/runtime@npm:^1.7.1":
   version: 1.8.1
   resolution: "@emnapi/runtime@npm:1.8.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40emnapi%2Fruntime%2F-%2Fruntime-1.8.1.tgz"
   dependencies:
@@ -263,6 +282,15 @@ __metadata:
   dependencies:
     tslib: "npm:^2.4.0"
   checksum: 10c0/e6d54bf2b1e64cdd83d2916411e44e579b6ae35d5def0dea61a3c452d9921373044dff32a8b8473ae60c80692bdc39323e98b96a3f3d87ba6886b24dd0ef7ca1
+  languageName: node
+  linkType: hard
+
+"@emnapi/wasi-threads@npm:1.2.1":
+  version: 1.2.1
+  resolution: "@emnapi/wasi-threads@npm:1.2.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40emnapi%2Fwasi-threads%2F-%2Fwasi-threads-1.2.1.tgz"
+  dependencies:
+    tslib: "npm:^2.4.0"
+  checksum: 10c0/32fcfa81ab396533b2ec1f4082b1ff779a05d9c836bbbd3f4398405b0e6814c0d9503b7993130e37bc6941dbc1ded49f55e9700ae9ca4e803bab2b5bc5deb331
   languageName: node
   linkType: hard
 
@@ -1173,73 +1201,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@module-federation/error-codes@npm:0.22.0":
-  version: 0.22.0
-  resolution: "@module-federation/error-codes@npm:0.22.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40module-federation%2Ferror-codes%2F-%2Ferror-codes-0.22.0.tgz"
-  checksum: 10c0/a9b25e8c930971e146e6352f482f915f1b54965ce54706984e834a87be714d30caebbd3946f9eb408e7821b2cc326b90787eeb2f8306edf1d322d9931543a139
-  languageName: node
-  linkType: hard
-
-"@module-federation/runtime-core@npm:0.22.0":
-  version: 0.22.0
-  resolution: "@module-federation/runtime-core@npm:0.22.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40module-federation%2Fruntime-core%2F-%2Fruntime-core-0.22.0.tgz"
+"@napi-rs/wasm-runtime@npm:1.1.4, @napi-rs/wasm-runtime@npm:^1.1.4":
+  version: 1.1.4
+  resolution: "@napi-rs/wasm-runtime@npm:1.1.4::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40napi-rs%2Fwasm-runtime%2F-%2Fwasm-runtime-1.1.4.tgz"
   dependencies:
-    "@module-federation/error-codes": "npm:0.22.0"
-    "@module-federation/sdk": "npm:0.22.0"
-  checksum: 10c0/0406c26b119065dca23a8fb65872b8ab5794984d5d82984ed625c433658693050a8a800cde8c97cc1572b0bc154a7824fa9db5bb05106b7250643e799ba7091d
-  languageName: node
-  linkType: hard
-
-"@module-federation/runtime-tools@npm:0.22.0":
-  version: 0.22.0
-  resolution: "@module-federation/runtime-tools@npm:0.22.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40module-federation%2Fruntime-tools%2F-%2Fruntime-tools-0.22.0.tgz"
-  dependencies:
-    "@module-federation/runtime": "npm:0.22.0"
-    "@module-federation/webpack-bundler-runtime": "npm:0.22.0"
-  checksum: 10c0/fbe76616fb176ce03550e3ce2bb43fa5d44c12d7d0939593f29dab5658accfb559b857df4180f7f681dc601aab928658cd9b49a78daad866089390b820854fbd
-  languageName: node
-  linkType: hard
-
-"@module-federation/runtime@npm:0.22.0":
-  version: 0.22.0
-  resolution: "@module-federation/runtime@npm:0.22.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40module-federation%2Fruntime%2F-%2Fruntime-0.22.0.tgz"
-  dependencies:
-    "@module-federation/error-codes": "npm:0.22.0"
-    "@module-federation/runtime-core": "npm:0.22.0"
-    "@module-federation/sdk": "npm:0.22.0"
-  checksum: 10c0/f9cfaf7f8599a215195cb612a5d4532d4399cc8eb5a928ced60c4bdf0e7e2028849cdc384fa3f1506f9e7e0e112f74f6c30a5a76136dc56e155012d111ea075b
-  languageName: node
-  linkType: hard
-
-"@module-federation/sdk@npm:0.22.0":
-  version: 0.22.0
-  resolution: "@module-federation/sdk@npm:0.22.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40module-federation%2Fsdk%2F-%2Fsdk-0.22.0.tgz"
-  checksum: 10c0/c09ba0147368151b67ba33b9174ef451a028e1709d2208aa811cacc1ae4efcae0f1987f02119f9b54754ee6430af3610e357c9b744147f112a25d8f7564f8041
-  languageName: node
-  linkType: hard
-
-"@module-federation/webpack-bundler-runtime@npm:0.22.0":
-  version: 0.22.0
-  resolution: "@module-federation/webpack-bundler-runtime@npm:0.22.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40module-federation%2Fwebpack-bundler-runtime%2F-%2Fwebpack-bundler-runtime-0.22.0.tgz"
-  dependencies:
-    "@module-federation/runtime": "npm:0.22.0"
-    "@module-federation/sdk": "npm:0.22.0"
-  checksum: 10c0/4c1354b881ffc0c1521f1d676c9301db0b0d59186c386dde4dbb6d33f00fdb16bf118e85cfc38e2ffb36084fa87df8390d415a41c0c93b33bd0e5460a9a934f5
-  languageName: node
-  linkType: hard
-
-"@napi-rs/wasm-runtime@npm:1.0.7":
-  version: 1.0.7
-  resolution: "@napi-rs/wasm-runtime@npm:1.0.7::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40napi-rs%2Fwasm-runtime%2F-%2Fwasm-runtime-1.0.7.tgz"
-  dependencies:
-    "@emnapi/core": "npm:^1.5.0"
-    "@emnapi/runtime": "npm:^1.5.0"
     "@tybys/wasm-util": "npm:^0.10.1"
-  checksum: 10c0/2d8635498136abb49d6dbf7395b78c63422292240963bf055f307b77aeafbde57ae2c0ceaaef215601531b36d6eb92a2cdd6f5ba90ed2aa8127c27aff9c4ae55
+  peerDependencies:
+    "@emnapi/core": ^1.7.1
+    "@emnapi/runtime": ^1.7.1
+  checksum: 10c0/2e88e1955258949ccf2d18c79975821ad38071b465ef126a5e14110977b97868867b016c1ad046e963cccc42c0bd9db6c8ff5fd1ebb61b87bb3487f339041658
   languageName: node
   linkType: hard
 
-"@napi-rs/wasm-runtime@npm:^1.0.7, @napi-rs/wasm-runtime@npm:^1.1.1":
+"@napi-rs/wasm-runtime@npm:^1.1.1":
   version: 1.1.1
   resolution: "@napi-rs/wasm-runtime@npm:1.1.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40napi-rs%2Fwasm-runtime%2F-%2Fwasm-runtime-1.1.1.tgz"
   dependencies:
@@ -1313,258 +1287,295 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@oxc-parser/binding-android-arm64@npm:0.96.0":
-  version: 0.96.0
-  resolution: "@oxc-parser/binding-android-arm64@npm:0.96.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-android-arm64%2F-%2Fbinding-android-arm64-0.96.0.tgz"
-  conditions: os=android & cpu=arm64
-  languageName: node
-  linkType: hard
-
-"@oxc-parser/binding-darwin-arm64@npm:0.96.0":
-  version: 0.96.0
-  resolution: "@oxc-parser/binding-darwin-arm64@npm:0.96.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-darwin-arm64%2F-%2Fbinding-darwin-arm64-0.96.0.tgz"
-  conditions: os=darwin & cpu=arm64
-  languageName: node
-  linkType: hard
-
-"@oxc-parser/binding-darwin-x64@npm:0.96.0":
-  version: 0.96.0
-  resolution: "@oxc-parser/binding-darwin-x64@npm:0.96.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-darwin-x64%2F-%2Fbinding-darwin-x64-0.96.0.tgz"
-  conditions: os=darwin & cpu=x64
-  languageName: node
-  linkType: hard
-
-"@oxc-parser/binding-freebsd-x64@npm:0.96.0":
-  version: 0.96.0
-  resolution: "@oxc-parser/binding-freebsd-x64@npm:0.96.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-freebsd-x64%2F-%2Fbinding-freebsd-x64-0.96.0.tgz"
-  conditions: os=freebsd & cpu=x64
-  languageName: node
-  linkType: hard
-
-"@oxc-parser/binding-linux-arm-gnueabihf@npm:0.96.0":
-  version: 0.96.0
-  resolution: "@oxc-parser/binding-linux-arm-gnueabihf@npm:0.96.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-linux-arm-gnueabihf%2F-%2Fbinding-linux-arm-gnueabihf-0.96.0.tgz"
-  conditions: os=linux & cpu=arm
-  languageName: node
-  linkType: hard
-
-"@oxc-parser/binding-linux-arm-musleabihf@npm:0.96.0":
-  version: 0.96.0
-  resolution: "@oxc-parser/binding-linux-arm-musleabihf@npm:0.96.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-linux-arm-musleabihf%2F-%2Fbinding-linux-arm-musleabihf-0.96.0.tgz"
-  conditions: os=linux & cpu=arm
-  languageName: node
-  linkType: hard
-
-"@oxc-parser/binding-linux-arm64-gnu@npm:0.96.0":
-  version: 0.96.0
-  resolution: "@oxc-parser/binding-linux-arm64-gnu@npm:0.96.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-linux-arm64-gnu%2F-%2Fbinding-linux-arm64-gnu-0.96.0.tgz"
-  conditions: os=linux & cpu=arm64 & libc=glibc
-  languageName: node
-  linkType: hard
-
-"@oxc-parser/binding-linux-arm64-musl@npm:0.96.0":
-  version: 0.96.0
-  resolution: "@oxc-parser/binding-linux-arm64-musl@npm:0.96.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-linux-arm64-musl%2F-%2Fbinding-linux-arm64-musl-0.96.0.tgz"
-  conditions: os=linux & cpu=arm64 & libc=musl
-  languageName: node
-  linkType: hard
-
-"@oxc-parser/binding-linux-riscv64-gnu@npm:0.96.0":
-  version: 0.96.0
-  resolution: "@oxc-parser/binding-linux-riscv64-gnu@npm:0.96.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-linux-riscv64-gnu%2F-%2Fbinding-linux-riscv64-gnu-0.96.0.tgz"
-  conditions: os=linux & cpu=riscv64 & libc=glibc
-  languageName: node
-  linkType: hard
-
-"@oxc-parser/binding-linux-s390x-gnu@npm:0.96.0":
-  version: 0.96.0
-  resolution: "@oxc-parser/binding-linux-s390x-gnu@npm:0.96.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-linux-s390x-gnu%2F-%2Fbinding-linux-s390x-gnu-0.96.0.tgz"
-  conditions: os=linux & cpu=s390x & libc=glibc
-  languageName: node
-  linkType: hard
-
-"@oxc-parser/binding-linux-x64-gnu@npm:0.96.0":
-  version: 0.96.0
-  resolution: "@oxc-parser/binding-linux-x64-gnu@npm:0.96.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-linux-x64-gnu%2F-%2Fbinding-linux-x64-gnu-0.96.0.tgz"
-  conditions: os=linux & cpu=x64 & libc=glibc
-  languageName: node
-  linkType: hard
-
-"@oxc-parser/binding-linux-x64-musl@npm:0.96.0":
-  version: 0.96.0
-  resolution: "@oxc-parser/binding-linux-x64-musl@npm:0.96.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-linux-x64-musl%2F-%2Fbinding-linux-x64-musl-0.96.0.tgz"
-  conditions: os=linux & cpu=x64 & libc=musl
-  languageName: node
-  linkType: hard
-
-"@oxc-parser/binding-wasm32-wasi@npm:0.96.0":
-  version: 0.96.0
-  resolution: "@oxc-parser/binding-wasm32-wasi@npm:0.96.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-wasm32-wasi%2F-%2Fbinding-wasm32-wasi-0.96.0.tgz"
-  dependencies:
-    "@napi-rs/wasm-runtime": "npm:^1.0.7"
-  conditions: cpu=wasm32
-  languageName: node
-  linkType: hard
-
-"@oxc-parser/binding-win32-arm64-msvc@npm:0.96.0":
-  version: 0.96.0
-  resolution: "@oxc-parser/binding-win32-arm64-msvc@npm:0.96.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-win32-arm64-msvc%2F-%2Fbinding-win32-arm64-msvc-0.96.0.tgz"
-  conditions: os=win32 & cpu=arm64
-  languageName: node
-  linkType: hard
-
-"@oxc-parser/binding-win32-x64-msvc@npm:0.96.0":
-  version: 0.96.0
-  resolution: "@oxc-parser/binding-win32-x64-msvc@npm:0.96.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-win32-x64-msvc%2F-%2Fbinding-win32-x64-msvc-0.96.0.tgz"
-  conditions: os=win32 & cpu=x64
-  languageName: node
-  linkType: hard
-
-"@oxc-project/types@npm:^0.96.0":
-  version: 0.96.0
-  resolution: "@oxc-project/types@npm:0.96.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-project%2Ftypes%2F-%2Ftypes-0.96.0.tgz"
-  checksum: 10c0/8d2770c551e0cb2efc77fb7d0711a2e19080dd9cd1e221ff95b3fae6d29c7f38165b1443eafc712956a215d607a4c8d4c1aad6bf26cb7069a391b27290aa6e8e
-  languageName: node
-  linkType: hard
-
-"@oxc-resolver/binding-android-arm-eabi@npm:11.16.3":
-  version: 11.16.3
-  resolution: "@oxc-resolver/binding-android-arm-eabi@npm:11.16.3::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-android-arm-eabi%2F-%2Fbinding-android-arm-eabi-11.16.3.tgz"
+"@oxc-parser/binding-android-arm-eabi@npm:0.128.0":
+  version: 0.128.0
+  resolution: "@oxc-parser/binding-android-arm-eabi@npm:0.128.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-android-arm-eabi%2F-%2Fbinding-android-arm-eabi-0.128.0.tgz"
   conditions: os=android & cpu=arm
   languageName: node
   linkType: hard
 
-"@oxc-resolver/binding-android-arm64@npm:11.16.3":
-  version: 11.16.3
-  resolution: "@oxc-resolver/binding-android-arm64@npm:11.16.3::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-android-arm64%2F-%2Fbinding-android-arm64-11.16.3.tgz"
+"@oxc-parser/binding-android-arm64@npm:0.128.0":
+  version: 0.128.0
+  resolution: "@oxc-parser/binding-android-arm64@npm:0.128.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-android-arm64%2F-%2Fbinding-android-arm64-0.128.0.tgz"
   conditions: os=android & cpu=arm64
   languageName: node
   linkType: hard
 
-"@oxc-resolver/binding-darwin-arm64@npm:11.16.3":
-  version: 11.16.3
-  resolution: "@oxc-resolver/binding-darwin-arm64@npm:11.16.3::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-darwin-arm64%2F-%2Fbinding-darwin-arm64-11.16.3.tgz"
+"@oxc-parser/binding-darwin-arm64@npm:0.128.0":
+  version: 0.128.0
+  resolution: "@oxc-parser/binding-darwin-arm64@npm:0.128.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-darwin-arm64%2F-%2Fbinding-darwin-arm64-0.128.0.tgz"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@oxc-resolver/binding-darwin-x64@npm:11.16.3":
-  version: 11.16.3
-  resolution: "@oxc-resolver/binding-darwin-x64@npm:11.16.3::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-darwin-x64%2F-%2Fbinding-darwin-x64-11.16.3.tgz"
+"@oxc-parser/binding-darwin-x64@npm:0.128.0":
+  version: 0.128.0
+  resolution: "@oxc-parser/binding-darwin-x64@npm:0.128.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-darwin-x64%2F-%2Fbinding-darwin-x64-0.128.0.tgz"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@oxc-resolver/binding-freebsd-x64@npm:11.16.3":
-  version: 11.16.3
-  resolution: "@oxc-resolver/binding-freebsd-x64@npm:11.16.3::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-freebsd-x64%2F-%2Fbinding-freebsd-x64-11.16.3.tgz"
+"@oxc-parser/binding-freebsd-x64@npm:0.128.0":
+  version: 0.128.0
+  resolution: "@oxc-parser/binding-freebsd-x64@npm:0.128.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-freebsd-x64%2F-%2Fbinding-freebsd-x64-0.128.0.tgz"
   conditions: os=freebsd & cpu=x64
   languageName: node
   linkType: hard
 
-"@oxc-resolver/binding-linux-arm-gnueabihf@npm:11.16.3":
-  version: 11.16.3
-  resolution: "@oxc-resolver/binding-linux-arm-gnueabihf@npm:11.16.3::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-linux-arm-gnueabihf%2F-%2Fbinding-linux-arm-gnueabihf-11.16.3.tgz"
+"@oxc-parser/binding-linux-arm-gnueabihf@npm:0.128.0":
+  version: 0.128.0
+  resolution: "@oxc-parser/binding-linux-arm-gnueabihf@npm:0.128.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-linux-arm-gnueabihf%2F-%2Fbinding-linux-arm-gnueabihf-0.128.0.tgz"
   conditions: os=linux & cpu=arm
   languageName: node
   linkType: hard
 
-"@oxc-resolver/binding-linux-arm-musleabihf@npm:11.16.3":
-  version: 11.16.3
-  resolution: "@oxc-resolver/binding-linux-arm-musleabihf@npm:11.16.3::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-linux-arm-musleabihf%2F-%2Fbinding-linux-arm-musleabihf-11.16.3.tgz"
+"@oxc-parser/binding-linux-arm-musleabihf@npm:0.128.0":
+  version: 0.128.0
+  resolution: "@oxc-parser/binding-linux-arm-musleabihf@npm:0.128.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-linux-arm-musleabihf%2F-%2Fbinding-linux-arm-musleabihf-0.128.0.tgz"
   conditions: os=linux & cpu=arm
   languageName: node
   linkType: hard
 
-"@oxc-resolver/binding-linux-arm64-gnu@npm:11.16.3":
-  version: 11.16.3
-  resolution: "@oxc-resolver/binding-linux-arm64-gnu@npm:11.16.3::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-linux-arm64-gnu%2F-%2Fbinding-linux-arm64-gnu-11.16.3.tgz"
+"@oxc-parser/binding-linux-arm64-gnu@npm:0.128.0":
+  version: 0.128.0
+  resolution: "@oxc-parser/binding-linux-arm64-gnu@npm:0.128.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-linux-arm64-gnu%2F-%2Fbinding-linux-arm64-gnu-0.128.0.tgz"
   conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@oxc-resolver/binding-linux-arm64-musl@npm:11.16.3":
-  version: 11.16.3
-  resolution: "@oxc-resolver/binding-linux-arm64-musl@npm:11.16.3::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-linux-arm64-musl%2F-%2Fbinding-linux-arm64-musl-11.16.3.tgz"
+"@oxc-parser/binding-linux-arm64-musl@npm:0.128.0":
+  version: 0.128.0
+  resolution: "@oxc-parser/binding-linux-arm64-musl@npm:0.128.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-linux-arm64-musl%2F-%2Fbinding-linux-arm64-musl-0.128.0.tgz"
   conditions: os=linux & cpu=arm64 & libc=musl
   languageName: node
   linkType: hard
 
-"@oxc-resolver/binding-linux-ppc64-gnu@npm:11.16.3":
-  version: 11.16.3
-  resolution: "@oxc-resolver/binding-linux-ppc64-gnu@npm:11.16.3::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-linux-ppc64-gnu%2F-%2Fbinding-linux-ppc64-gnu-11.16.3.tgz"
+"@oxc-parser/binding-linux-ppc64-gnu@npm:0.128.0":
+  version: 0.128.0
+  resolution: "@oxc-parser/binding-linux-ppc64-gnu@npm:0.128.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-linux-ppc64-gnu%2F-%2Fbinding-linux-ppc64-gnu-0.128.0.tgz"
   conditions: os=linux & cpu=ppc64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@oxc-resolver/binding-linux-riscv64-gnu@npm:11.16.3":
-  version: 11.16.3
-  resolution: "@oxc-resolver/binding-linux-riscv64-gnu@npm:11.16.3::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-linux-riscv64-gnu%2F-%2Fbinding-linux-riscv64-gnu-11.16.3.tgz"
+"@oxc-parser/binding-linux-riscv64-gnu@npm:0.128.0":
+  version: 0.128.0
+  resolution: "@oxc-parser/binding-linux-riscv64-gnu@npm:0.128.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-linux-riscv64-gnu%2F-%2Fbinding-linux-riscv64-gnu-0.128.0.tgz"
   conditions: os=linux & cpu=riscv64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@oxc-resolver/binding-linux-riscv64-musl@npm:11.16.3":
-  version: 11.16.3
-  resolution: "@oxc-resolver/binding-linux-riscv64-musl@npm:11.16.3::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-linux-riscv64-musl%2F-%2Fbinding-linux-riscv64-musl-11.16.3.tgz"
+"@oxc-parser/binding-linux-riscv64-musl@npm:0.128.0":
+  version: 0.128.0
+  resolution: "@oxc-parser/binding-linux-riscv64-musl@npm:0.128.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-linux-riscv64-musl%2F-%2Fbinding-linux-riscv64-musl-0.128.0.tgz"
   conditions: os=linux & cpu=riscv64 & libc=musl
   languageName: node
   linkType: hard
 
-"@oxc-resolver/binding-linux-s390x-gnu@npm:11.16.3":
-  version: 11.16.3
-  resolution: "@oxc-resolver/binding-linux-s390x-gnu@npm:11.16.3::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-linux-s390x-gnu%2F-%2Fbinding-linux-s390x-gnu-11.16.3.tgz"
+"@oxc-parser/binding-linux-s390x-gnu@npm:0.128.0":
+  version: 0.128.0
+  resolution: "@oxc-parser/binding-linux-s390x-gnu@npm:0.128.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-linux-s390x-gnu%2F-%2Fbinding-linux-s390x-gnu-0.128.0.tgz"
   conditions: os=linux & cpu=s390x & libc=glibc
   languageName: node
   linkType: hard
 
-"@oxc-resolver/binding-linux-x64-gnu@npm:11.16.3":
-  version: 11.16.3
-  resolution: "@oxc-resolver/binding-linux-x64-gnu@npm:11.16.3::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-linux-x64-gnu%2F-%2Fbinding-linux-x64-gnu-11.16.3.tgz"
+"@oxc-parser/binding-linux-x64-gnu@npm:0.128.0":
+  version: 0.128.0
+  resolution: "@oxc-parser/binding-linux-x64-gnu@npm:0.128.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-linux-x64-gnu%2F-%2Fbinding-linux-x64-gnu-0.128.0.tgz"
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@oxc-resolver/binding-linux-x64-musl@npm:11.16.3":
-  version: 11.16.3
-  resolution: "@oxc-resolver/binding-linux-x64-musl@npm:11.16.3::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-linux-x64-musl%2F-%2Fbinding-linux-x64-musl-11.16.3.tgz"
+"@oxc-parser/binding-linux-x64-musl@npm:0.128.0":
+  version: 0.128.0
+  resolution: "@oxc-parser/binding-linux-x64-musl@npm:0.128.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-linux-x64-musl%2F-%2Fbinding-linux-x64-musl-0.128.0.tgz"
   conditions: os=linux & cpu=x64 & libc=musl
   languageName: node
   linkType: hard
 
-"@oxc-resolver/binding-openharmony-arm64@npm:11.16.3":
-  version: 11.16.3
-  resolution: "@oxc-resolver/binding-openharmony-arm64@npm:11.16.3::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-openharmony-arm64%2F-%2Fbinding-openharmony-arm64-11.16.3.tgz"
+"@oxc-parser/binding-openharmony-arm64@npm:0.128.0":
+  version: 0.128.0
+  resolution: "@oxc-parser/binding-openharmony-arm64@npm:0.128.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-openharmony-arm64%2F-%2Fbinding-openharmony-arm64-0.128.0.tgz"
   conditions: os=openharmony & cpu=arm64
   languageName: node
   linkType: hard
 
-"@oxc-resolver/binding-wasm32-wasi@npm:11.16.3":
-  version: 11.16.3
-  resolution: "@oxc-resolver/binding-wasm32-wasi@npm:11.16.3::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-wasm32-wasi%2F-%2Fbinding-wasm32-wasi-11.16.3.tgz"
+"@oxc-parser/binding-wasm32-wasi@npm:0.128.0":
+  version: 0.128.0
+  resolution: "@oxc-parser/binding-wasm32-wasi@npm:0.128.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-wasm32-wasi%2F-%2Fbinding-wasm32-wasi-0.128.0.tgz"
+  dependencies:
+    "@emnapi/core": "npm:1.10.0"
+    "@emnapi/runtime": "npm:1.10.0"
+    "@napi-rs/wasm-runtime": "npm:^1.1.4"
+  conditions: cpu=wasm32
+  languageName: node
+  linkType: hard
+
+"@oxc-parser/binding-win32-arm64-msvc@npm:0.128.0":
+  version: 0.128.0
+  resolution: "@oxc-parser/binding-win32-arm64-msvc@npm:0.128.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-win32-arm64-msvc%2F-%2Fbinding-win32-arm64-msvc-0.128.0.tgz"
+  conditions: os=win32 & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@oxc-parser/binding-win32-ia32-msvc@npm:0.128.0":
+  version: 0.128.0
+  resolution: "@oxc-parser/binding-win32-ia32-msvc@npm:0.128.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-win32-ia32-msvc%2F-%2Fbinding-win32-ia32-msvc-0.128.0.tgz"
+  conditions: os=win32 & cpu=ia32
+  languageName: node
+  linkType: hard
+
+"@oxc-parser/binding-win32-x64-msvc@npm:0.128.0":
+  version: 0.128.0
+  resolution: "@oxc-parser/binding-win32-x64-msvc@npm:0.128.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-parser%2Fbinding-win32-x64-msvc%2F-%2Fbinding-win32-x64-msvc-0.128.0.tgz"
+  conditions: os=win32 & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@oxc-project/types@npm:^0.128.0":
+  version: 0.128.0
+  resolution: "@oxc-project/types@npm:0.128.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-project%2Ftypes%2F-%2Ftypes-0.128.0.tgz"
+  checksum: 10c0/b6999b1b6b012d979364231a2c0c9204bca814a73f8417234edd39bf352a081779dad72aaf18ac60a676fb904c1408b63553e4e1230d7408a4f885002d66c809
+  languageName: node
+  linkType: hard
+
+"@oxc-resolver/binding-android-arm-eabi@npm:11.19.1":
+  version: 11.19.1
+  resolution: "@oxc-resolver/binding-android-arm-eabi@npm:11.19.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-android-arm-eabi%2F-%2Fbinding-android-arm-eabi-11.19.1.tgz"
+  conditions: os=android & cpu=arm
+  languageName: node
+  linkType: hard
+
+"@oxc-resolver/binding-android-arm64@npm:11.19.1":
+  version: 11.19.1
+  resolution: "@oxc-resolver/binding-android-arm64@npm:11.19.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-android-arm64%2F-%2Fbinding-android-arm64-11.19.1.tgz"
+  conditions: os=android & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@oxc-resolver/binding-darwin-arm64@npm:11.19.1":
+  version: 11.19.1
+  resolution: "@oxc-resolver/binding-darwin-arm64@npm:11.19.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-darwin-arm64%2F-%2Fbinding-darwin-arm64-11.19.1.tgz"
+  conditions: os=darwin & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@oxc-resolver/binding-darwin-x64@npm:11.19.1":
+  version: 11.19.1
+  resolution: "@oxc-resolver/binding-darwin-x64@npm:11.19.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-darwin-x64%2F-%2Fbinding-darwin-x64-11.19.1.tgz"
+  conditions: os=darwin & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@oxc-resolver/binding-freebsd-x64@npm:11.19.1":
+  version: 11.19.1
+  resolution: "@oxc-resolver/binding-freebsd-x64@npm:11.19.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-freebsd-x64%2F-%2Fbinding-freebsd-x64-11.19.1.tgz"
+  conditions: os=freebsd & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@oxc-resolver/binding-linux-arm-gnueabihf@npm:11.19.1":
+  version: 11.19.1
+  resolution: "@oxc-resolver/binding-linux-arm-gnueabihf@npm:11.19.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-linux-arm-gnueabihf%2F-%2Fbinding-linux-arm-gnueabihf-11.19.1.tgz"
+  conditions: os=linux & cpu=arm
+  languageName: node
+  linkType: hard
+
+"@oxc-resolver/binding-linux-arm-musleabihf@npm:11.19.1":
+  version: 11.19.1
+  resolution: "@oxc-resolver/binding-linux-arm-musleabihf@npm:11.19.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-linux-arm-musleabihf%2F-%2Fbinding-linux-arm-musleabihf-11.19.1.tgz"
+  conditions: os=linux & cpu=arm
+  languageName: node
+  linkType: hard
+
+"@oxc-resolver/binding-linux-arm64-gnu@npm:11.19.1":
+  version: 11.19.1
+  resolution: "@oxc-resolver/binding-linux-arm64-gnu@npm:11.19.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-linux-arm64-gnu%2F-%2Fbinding-linux-arm64-gnu-11.19.1.tgz"
+  conditions: os=linux & cpu=arm64 & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@oxc-resolver/binding-linux-arm64-musl@npm:11.19.1":
+  version: 11.19.1
+  resolution: "@oxc-resolver/binding-linux-arm64-musl@npm:11.19.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-linux-arm64-musl%2F-%2Fbinding-linux-arm64-musl-11.19.1.tgz"
+  conditions: os=linux & cpu=arm64 & libc=musl
+  languageName: node
+  linkType: hard
+
+"@oxc-resolver/binding-linux-ppc64-gnu@npm:11.19.1":
+  version: 11.19.1
+  resolution: "@oxc-resolver/binding-linux-ppc64-gnu@npm:11.19.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-linux-ppc64-gnu%2F-%2Fbinding-linux-ppc64-gnu-11.19.1.tgz"
+  conditions: os=linux & cpu=ppc64 & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@oxc-resolver/binding-linux-riscv64-gnu@npm:11.19.1":
+  version: 11.19.1
+  resolution: "@oxc-resolver/binding-linux-riscv64-gnu@npm:11.19.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-linux-riscv64-gnu%2F-%2Fbinding-linux-riscv64-gnu-11.19.1.tgz"
+  conditions: os=linux & cpu=riscv64 & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@oxc-resolver/binding-linux-riscv64-musl@npm:11.19.1":
+  version: 11.19.1
+  resolution: "@oxc-resolver/binding-linux-riscv64-musl@npm:11.19.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-linux-riscv64-musl%2F-%2Fbinding-linux-riscv64-musl-11.19.1.tgz"
+  conditions: os=linux & cpu=riscv64 & libc=musl
+  languageName: node
+  linkType: hard
+
+"@oxc-resolver/binding-linux-s390x-gnu@npm:11.19.1":
+  version: 11.19.1
+  resolution: "@oxc-resolver/binding-linux-s390x-gnu@npm:11.19.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-linux-s390x-gnu%2F-%2Fbinding-linux-s390x-gnu-11.19.1.tgz"
+  conditions: os=linux & cpu=s390x & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@oxc-resolver/binding-linux-x64-gnu@npm:11.19.1":
+  version: 11.19.1
+  resolution: "@oxc-resolver/binding-linux-x64-gnu@npm:11.19.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-linux-x64-gnu%2F-%2Fbinding-linux-x64-gnu-11.19.1.tgz"
+  conditions: os=linux & cpu=x64 & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@oxc-resolver/binding-linux-x64-musl@npm:11.19.1":
+  version: 11.19.1
+  resolution: "@oxc-resolver/binding-linux-x64-musl@npm:11.19.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-linux-x64-musl%2F-%2Fbinding-linux-x64-musl-11.19.1.tgz"
+  conditions: os=linux & cpu=x64 & libc=musl
+  languageName: node
+  linkType: hard
+
+"@oxc-resolver/binding-openharmony-arm64@npm:11.19.1":
+  version: 11.19.1
+  resolution: "@oxc-resolver/binding-openharmony-arm64@npm:11.19.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-openharmony-arm64%2F-%2Fbinding-openharmony-arm64-11.19.1.tgz"
+  conditions: os=openharmony & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@oxc-resolver/binding-wasm32-wasi@npm:11.19.1":
+  version: 11.19.1
+  resolution: "@oxc-resolver/binding-wasm32-wasi@npm:11.19.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-wasm32-wasi%2F-%2Fbinding-wasm32-wasi-11.19.1.tgz"
   dependencies:
     "@napi-rs/wasm-runtime": "npm:^1.1.1"
   conditions: cpu=wasm32
   languageName: node
   linkType: hard
 
-"@oxc-resolver/binding-win32-arm64-msvc@npm:11.16.3":
-  version: 11.16.3
-  resolution: "@oxc-resolver/binding-win32-arm64-msvc@npm:11.16.3::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-win32-arm64-msvc%2F-%2Fbinding-win32-arm64-msvc-11.16.3.tgz"
+"@oxc-resolver/binding-win32-arm64-msvc@npm:11.19.1":
+  version: 11.19.1
+  resolution: "@oxc-resolver/binding-win32-arm64-msvc@npm:11.19.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-win32-arm64-msvc%2F-%2Fbinding-win32-arm64-msvc-11.19.1.tgz"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"@oxc-resolver/binding-win32-ia32-msvc@npm:11.16.3":
-  version: 11.16.3
-  resolution: "@oxc-resolver/binding-win32-ia32-msvc@npm:11.16.3::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-win32-ia32-msvc%2F-%2Fbinding-win32-ia32-msvc-11.16.3.tgz"
+"@oxc-resolver/binding-win32-ia32-msvc@npm:11.19.1":
+  version: 11.19.1
+  resolution: "@oxc-resolver/binding-win32-ia32-msvc@npm:11.19.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-win32-ia32-msvc%2F-%2Fbinding-win32-ia32-msvc-11.19.1.tgz"
   conditions: os=win32 & cpu=ia32
   languageName: node
   linkType: hard
 
-"@oxc-resolver/binding-win32-x64-msvc@npm:11.16.3":
-  version: 11.16.3
-  resolution: "@oxc-resolver/binding-win32-x64-msvc@npm:11.16.3::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-win32-x64-msvc%2F-%2Fbinding-win32-x64-msvc-11.16.3.tgz"
+"@oxc-resolver/binding-win32-x64-msvc@npm:11.19.1":
+  version: 11.19.1
+  resolution: "@oxc-resolver/binding-win32-x64-msvc@npm:11.19.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40oxc-resolver%2Fbinding-win32-x64-msvc%2F-%2Fbinding-win32-x64-msvc-11.19.1.tgz"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
@@ -2067,9 +2078,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rsbuild/plugin-check-syntax@npm:1.6.0":
-  version: 1.6.0
-  resolution: "@rsbuild/plugin-check-syntax@npm:1.6.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rsbuild%2Fplugin-check-syntax%2F-%2Fplugin-check-syntax-1.6.0.tgz"
+"@rsbuild/plugin-check-syntax@npm:1.6.1":
+  version: 1.6.1
+  resolution: "@rsbuild/plugin-check-syntax@npm:1.6.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rsbuild%2Fplugin-check-syntax%2F-%2Fplugin-check-syntax-1.6.1.tgz"
   dependencies:
     acorn: "npm:^8.15.0"
     browserslist-to-es-version: "npm:^1.2.0"
@@ -2077,94 +2088,95 @@ __metadata:
     picocolors: "npm:^1.1.1"
     source-map: "npm:^0.7.6"
   peerDependencies:
-    "@rsbuild/core": 1.x
+    "@rsbuild/core": ^1.0.0 || ^2.0.0-0
   peerDependenciesMeta:
     "@rsbuild/core":
       optional: true
-  checksum: 10c0/adcdcc95a17de8d9eba7a78ca43aec5dffde7af540da4cc6e34e2607af05cdd1d9eebed35f89842f9748b7b19bfe9c9eb495dc259784034e6c3bd9ea0facf278
+  checksum: 10c0/8602a653494c37f90387da868134edcf011915b6117fade214d5bf739c8f3b69e078b4d5372cfd7c0e1114647a76e81824524a3d0936b972505c2d63b97d2fb7
   languageName: node
   linkType: hard
 
-"@rsdoctor/client@npm:1.5.0":
-  version: 1.5.0
-  resolution: "@rsdoctor/client@npm:1.5.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rsdoctor%2Fclient%2F-%2Fclient-1.5.0.tgz"
-  checksum: 10c0/4d4a254185acffec07ce6e0ee72dee57f6e680321fca3bcc8920903804e4e408a02b52b74b58be9720a42229b02d947e0e709cb7258970ac4fdc653acf31a801
+"@rsdoctor/client@npm:1.5.9":
+  version: 1.5.9
+  resolution: "@rsdoctor/client@npm:1.5.9::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rsdoctor%2Fclient%2F-%2Fclient-1.5.9.tgz"
+  checksum: 10c0/ea626b817c96480dadc28686cc26b4464e1851b501f9d2b0d1f7e14be11155444a653120e2fb0d55f8150193f770ffb24ddf8f9ff7c24c44c896bdbfbf1ca86b
   languageName: node
   linkType: hard
 
-"@rsdoctor/core@npm:1.5.0":
-  version: 1.5.0
-  resolution: "@rsdoctor/core@npm:1.5.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rsdoctor%2Fcore%2F-%2Fcore-1.5.0.tgz"
+"@rsdoctor/core@npm:1.5.9":
+  version: 1.5.9
+  resolution: "@rsdoctor/core@npm:1.5.9::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rsdoctor%2Fcore%2F-%2Fcore-1.5.9.tgz"
   dependencies:
-    "@rsbuild/plugin-check-syntax": "npm:1.6.0"
-    "@rsdoctor/graph": "npm:1.5.0"
-    "@rsdoctor/sdk": "npm:1.5.0"
-    "@rsdoctor/types": "npm:1.5.0"
-    "@rsdoctor/utils": "npm:1.5.0"
+    "@rsbuild/plugin-check-syntax": "npm:1.6.1"
+    "@rsdoctor/graph": "npm:1.5.9"
+    "@rsdoctor/sdk": "npm:1.5.9"
+    "@rsdoctor/types": "npm:1.5.9"
+    "@rsdoctor/utils": "npm:1.5.9"
+    "@rspack/resolver": "npm:0.2.8"
     browserslist-load-config: "npm:^1.0.1"
-    enhanced-resolve: "npm:5.12.0"
-    es-toolkit: "npm:^1.43.0"
+    es-toolkit: "npm:^1.45.1"
     filesize: "npm:^10.1.6"
     fs-extra: "npm:^11.1.1"
-    semver: "npm:^7.7.3"
+    semver: "npm:^7.7.4"
     source-map: "npm:^0.7.6"
-  checksum: 10c0/a84d327b9b189a8980ea01dbb5f6719ca63785adede96df9c059f964051484f864382d852262b31552fd641655745c6d6bb9212604dfbe292bf6a123783c07ff
+  checksum: 10c0/6670d665cb02dc595b5d99f67306f1949be39d7118257815bf6e7d414886d144ed26b09b2830a31fa2477ce83069c51bb42b79500ba0bdb9e1c8eaac351c91cd
   languageName: node
   linkType: hard
 
-"@rsdoctor/graph@npm:1.5.0":
-  version: 1.5.0
-  resolution: "@rsdoctor/graph@npm:1.5.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rsdoctor%2Fgraph%2F-%2Fgraph-1.5.0.tgz"
+"@rsdoctor/graph@npm:1.5.9":
+  version: 1.5.9
+  resolution: "@rsdoctor/graph@npm:1.5.9::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rsdoctor%2Fgraph%2F-%2Fgraph-1.5.9.tgz"
   dependencies:
-    "@rsdoctor/types": "npm:1.5.0"
-    "@rsdoctor/utils": "npm:1.5.0"
-    es-toolkit: "npm:^1.43.0"
+    "@rsdoctor/types": "npm:1.5.9"
+    "@rsdoctor/utils": "npm:1.5.9"
+    es-toolkit: "npm:^1.45.1"
     path-browserify: "npm:1.0.1"
     source-map: "npm:^0.7.6"
-  checksum: 10c0/da6d26136e66712809b3ec99d1b722a42393d8a99df4f8ed573cb0bb32838e3f88db3d0a30772722ee3f845a9b8894b86a30215e74472392624195ba9b7046de
+  checksum: 10c0/ac90e8cc552b4eaf6dfa68b088f3dcd5310fd0e89154d585afa94917adc34de5c1c9f687008b9a12167802173b2cb781c7ba5d180104bb4e90cb91ed66e19b8f
   languageName: node
   linkType: hard
 
-"@rsdoctor/rspack-plugin@npm:^1.3.8":
-  version: 1.5.0
-  resolution: "@rsdoctor/rspack-plugin@npm:1.5.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rsdoctor%2Frspack-plugin%2F-%2Frspack-plugin-1.5.0.tgz"
+"@rsdoctor/rspack-plugin@npm:^1.5.9":
+  version: 1.5.9
+  resolution: "@rsdoctor/rspack-plugin@npm:1.5.9::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rsdoctor%2Frspack-plugin%2F-%2Frspack-plugin-1.5.9.tgz"
   dependencies:
-    "@rsdoctor/core": "npm:1.5.0"
-    "@rsdoctor/graph": "npm:1.5.0"
-    "@rsdoctor/sdk": "npm:1.5.0"
-    "@rsdoctor/types": "npm:1.5.0"
-    "@rsdoctor/utils": "npm:1.5.0"
+    "@rsdoctor/core": "npm:1.5.9"
+    "@rsdoctor/graph": "npm:1.5.9"
+    "@rsdoctor/sdk": "npm:1.5.9"
+    "@rsdoctor/types": "npm:1.5.9"
+    "@rsdoctor/utils": "npm:1.5.9"
   peerDependencies:
     "@rspack/core": "*"
   peerDependenciesMeta:
     "@rspack/core":
       optional: true
-  checksum: 10c0/02d1277c4182b904b6397ff5d6fe3ff8e3935b01701f7086b8cbd839a02d494d8600746a1480a64711412070475d595e34bfa96ded0b24ef7891e819cb87511f
+  checksum: 10c0/4b4905e8f1b2d35f2e57fbf8ab90b0a363c7ad49cccae5075fe86d066a7b21e9cf258185b44e816646a7abc13c127c3a55f46195c0c778ce53365a29553b3bb0
   languageName: node
   linkType: hard
 
-"@rsdoctor/sdk@npm:1.5.0":
-  version: 1.5.0
-  resolution: "@rsdoctor/sdk@npm:1.5.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rsdoctor%2Fsdk%2F-%2Fsdk-1.5.0.tgz"
+"@rsdoctor/sdk@npm:1.5.9":
+  version: 1.5.9
+  resolution: "@rsdoctor/sdk@npm:1.5.9::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rsdoctor%2Fsdk%2F-%2Fsdk-1.5.9.tgz"
   dependencies:
-    "@rsdoctor/client": "npm:1.5.0"
-    "@rsdoctor/graph": "npm:1.5.0"
-    "@rsdoctor/types": "npm:1.5.0"
-    "@rsdoctor/utils": "npm:1.5.0"
+    "@rsdoctor/client": "npm:1.5.9"
+    "@rsdoctor/graph": "npm:1.5.9"
+    "@rsdoctor/types": "npm:1.5.9"
+    "@rsdoctor/utils": "npm:1.5.9"
+    launch-editor: "npm:^2.13.2"
     safer-buffer: "npm:2.1.2"
     socket.io: "npm:4.8.1"
-    tapable: "npm:2.2.3"
-  checksum: 10c0/42849a9430d59d9cbc8f3b2e2c64aa3cd02d196b3dba4b23dd009545098f5d8b33b1abe6946d28e40a01fc69543a0e11c87e6b16a18a11099464c02a55259d51
+    tapable: "npm:2.3.2"
+  checksum: 10c0/e39989eb41aeaa2e127d1aeb97ed2efdeb70f388645d06c019e03f6cc9d83f2f36ede97ff082b61bc6cc1e416d04190e676bc7874e45b58d450795cfcc11a5a1
   languageName: node
   linkType: hard
 
-"@rsdoctor/types@npm:1.5.0":
-  version: 1.5.0
-  resolution: "@rsdoctor/types@npm:1.5.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rsdoctor%2Ftypes%2F-%2Ftypes-1.5.0.tgz"
+"@rsdoctor/types@npm:1.5.9":
+  version: 1.5.9
+  resolution: "@rsdoctor/types@npm:1.5.9::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rsdoctor%2Ftypes%2F-%2Ftypes-1.5.9.tgz"
   dependencies:
     "@types/connect": "npm:3.4.38"
     "@types/estree": "npm:1.0.5"
-    "@types/tapable": "npm:2.2.7"
+    "@types/tapable": "npm:2.3.0"
     source-map: "npm:^0.7.6"
   peerDependencies:
     "@rspack/core": "*"
@@ -2174,20 +2186,20 @@ __metadata:
       optional: true
     webpack:
       optional: true
-  checksum: 10c0/eb0ef5ad886f10f65a56444153743a237f9eda854841a90401064e1c67e5e1faac4e9239d9c0381602dd887f276a192516cf5ae86835104d621ffb3642fbc610
+  checksum: 10c0/2915a4a94acde1aa279446f63f4f98b112696ec555f52e902809a26d3450959ce6b743f48daf9cd4a28489903dc17d9d2244c42ba57ea238fb7f451104df1dfd
   languageName: node
   linkType: hard
 
-"@rsdoctor/utils@npm:1.5.0":
-  version: 1.5.0
-  resolution: "@rsdoctor/utils@npm:1.5.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rsdoctor%2Futils%2F-%2Futils-1.5.0.tgz"
+"@rsdoctor/utils@npm:1.5.9":
+  version: 1.5.9
+  resolution: "@rsdoctor/utils@npm:1.5.9::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rsdoctor%2Futils%2F-%2Futils-1.5.9.tgz"
   dependencies:
     "@babel/code-frame": "npm:7.26.2"
-    "@rsdoctor/types": "npm:1.5.0"
+    "@rsdoctor/types": "npm:1.5.9"
     "@types/estree": "npm:1.0.5"
     acorn: "npm:^8.10.0"
     acorn-import-attributes: "npm:^1.9.5"
-    acorn-walk: "npm:8.3.4"
+    acorn-walk: "npm:8.3.5"
     deep-eql: "npm:4.1.4"
     envinfo: "npm:7.21.0"
     fs-extra: "npm:^11.1.1"
@@ -2195,98 +2207,100 @@ __metadata:
     json-stream-stringify: "npm:3.0.1"
     lines-and-columns: "npm:2.0.4"
     picocolors: "npm:^1.1.1"
-    rslog: "npm:^1.2.11"
+    rslog: "npm:^1.3.2"
     strip-ansi: "npm:^6.0.1"
-  checksum: 10c0/057bac2f58dade26b3e2f08fd1dcd3075d2f4e438ed40e3c71cc31ce98871a3464eebe1654edf80116f46a4bc2d7e04c93357dbc4b1912e333e6f4b586000047
+  checksum: 10c0/ef9c64c5fd5bfc59933f0291c8a888cc084861c61d3c6dacc9775aeb0b47a279e31849afe61b844a5276fba007649c36d51d0ec2b26250819f8d68929bfbaae2
   languageName: node
   linkType: hard
 
-"@rspack/binding-darwin-arm64@npm:1.7.2":
-  version: 1.7.2
-  resolution: "@rspack/binding-darwin-arm64@npm:1.7.2::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fbinding-darwin-arm64%2F-%2Fbinding-darwin-arm64-1.7.2.tgz"
+"@rspack/binding-darwin-arm64@npm:2.0.1":
+  version: 2.0.1
+  resolution: "@rspack/binding-darwin-arm64@npm:2.0.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fbinding-darwin-arm64%2F-%2Fbinding-darwin-arm64-2.0.1.tgz"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@rspack/binding-darwin-x64@npm:1.7.2":
-  version: 1.7.2
-  resolution: "@rspack/binding-darwin-x64@npm:1.7.2::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fbinding-darwin-x64%2F-%2Fbinding-darwin-x64-1.7.2.tgz"
+"@rspack/binding-darwin-x64@npm:2.0.1":
+  version: 2.0.1
+  resolution: "@rspack/binding-darwin-x64@npm:2.0.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fbinding-darwin-x64%2F-%2Fbinding-darwin-x64-2.0.1.tgz"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@rspack/binding-linux-arm64-gnu@npm:1.7.2":
-  version: 1.7.2
-  resolution: "@rspack/binding-linux-arm64-gnu@npm:1.7.2::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fbinding-linux-arm64-gnu%2F-%2Fbinding-linux-arm64-gnu-1.7.2.tgz"
+"@rspack/binding-linux-arm64-gnu@npm:2.0.1":
+  version: 2.0.1
+  resolution: "@rspack/binding-linux-arm64-gnu@npm:2.0.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fbinding-linux-arm64-gnu%2F-%2Fbinding-linux-arm64-gnu-2.0.1.tgz"
   conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@rspack/binding-linux-arm64-musl@npm:1.7.2":
-  version: 1.7.2
-  resolution: "@rspack/binding-linux-arm64-musl@npm:1.7.2::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fbinding-linux-arm64-musl%2F-%2Fbinding-linux-arm64-musl-1.7.2.tgz"
+"@rspack/binding-linux-arm64-musl@npm:2.0.1":
+  version: 2.0.1
+  resolution: "@rspack/binding-linux-arm64-musl@npm:2.0.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fbinding-linux-arm64-musl%2F-%2Fbinding-linux-arm64-musl-2.0.1.tgz"
   conditions: os=linux & cpu=arm64 & libc=musl
   languageName: node
   linkType: hard
 
-"@rspack/binding-linux-x64-gnu@npm:1.7.2":
-  version: 1.7.2
-  resolution: "@rspack/binding-linux-x64-gnu@npm:1.7.2::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fbinding-linux-x64-gnu%2F-%2Fbinding-linux-x64-gnu-1.7.2.tgz"
+"@rspack/binding-linux-x64-gnu@npm:2.0.1":
+  version: 2.0.1
+  resolution: "@rspack/binding-linux-x64-gnu@npm:2.0.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fbinding-linux-x64-gnu%2F-%2Fbinding-linux-x64-gnu-2.0.1.tgz"
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@rspack/binding-linux-x64-musl@npm:1.7.2":
-  version: 1.7.2
-  resolution: "@rspack/binding-linux-x64-musl@npm:1.7.2::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fbinding-linux-x64-musl%2F-%2Fbinding-linux-x64-musl-1.7.2.tgz"
+"@rspack/binding-linux-x64-musl@npm:2.0.1":
+  version: 2.0.1
+  resolution: "@rspack/binding-linux-x64-musl@npm:2.0.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fbinding-linux-x64-musl%2F-%2Fbinding-linux-x64-musl-2.0.1.tgz"
   conditions: os=linux & cpu=x64 & libc=musl
   languageName: node
   linkType: hard
 
-"@rspack/binding-wasm32-wasi@npm:1.7.2":
-  version: 1.7.2
-  resolution: "@rspack/binding-wasm32-wasi@npm:1.7.2::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fbinding-wasm32-wasi%2F-%2Fbinding-wasm32-wasi-1.7.2.tgz"
+"@rspack/binding-wasm32-wasi@npm:2.0.1":
+  version: 2.0.1
+  resolution: "@rspack/binding-wasm32-wasi@npm:2.0.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fbinding-wasm32-wasi%2F-%2Fbinding-wasm32-wasi-2.0.1.tgz"
   dependencies:
-    "@napi-rs/wasm-runtime": "npm:1.0.7"
+    "@emnapi/core": "npm:1.10.0"
+    "@emnapi/runtime": "npm:1.10.0"
+    "@napi-rs/wasm-runtime": "npm:1.1.4"
   conditions: cpu=wasm32
   languageName: node
   linkType: hard
 
-"@rspack/binding-win32-arm64-msvc@npm:1.7.2":
-  version: 1.7.2
-  resolution: "@rspack/binding-win32-arm64-msvc@npm:1.7.2::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fbinding-win32-arm64-msvc%2F-%2Fbinding-win32-arm64-msvc-1.7.2.tgz"
+"@rspack/binding-win32-arm64-msvc@npm:2.0.1":
+  version: 2.0.1
+  resolution: "@rspack/binding-win32-arm64-msvc@npm:2.0.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fbinding-win32-arm64-msvc%2F-%2Fbinding-win32-arm64-msvc-2.0.1.tgz"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"@rspack/binding-win32-ia32-msvc@npm:1.7.2":
-  version: 1.7.2
-  resolution: "@rspack/binding-win32-ia32-msvc@npm:1.7.2::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fbinding-win32-ia32-msvc%2F-%2Fbinding-win32-ia32-msvc-1.7.2.tgz"
+"@rspack/binding-win32-ia32-msvc@npm:2.0.1":
+  version: 2.0.1
+  resolution: "@rspack/binding-win32-ia32-msvc@npm:2.0.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fbinding-win32-ia32-msvc%2F-%2Fbinding-win32-ia32-msvc-2.0.1.tgz"
   conditions: os=win32 & cpu=ia32
   languageName: node
   linkType: hard
 
-"@rspack/binding-win32-x64-msvc@npm:1.7.2":
-  version: 1.7.2
-  resolution: "@rspack/binding-win32-x64-msvc@npm:1.7.2::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fbinding-win32-x64-msvc%2F-%2Fbinding-win32-x64-msvc-1.7.2.tgz"
+"@rspack/binding-win32-x64-msvc@npm:2.0.1":
+  version: 2.0.1
+  resolution: "@rspack/binding-win32-x64-msvc@npm:2.0.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fbinding-win32-x64-msvc%2F-%2Fbinding-win32-x64-msvc-2.0.1.tgz"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
-"@rspack/binding@npm:1.7.2":
-  version: 1.7.2
-  resolution: "@rspack/binding@npm:1.7.2::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fbinding%2F-%2Fbinding-1.7.2.tgz"
+"@rspack/binding@npm:2.0.1":
+  version: 2.0.1
+  resolution: "@rspack/binding@npm:2.0.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fbinding%2F-%2Fbinding-2.0.1.tgz"
   dependencies:
-    "@rspack/binding-darwin-arm64": "npm:1.7.2"
-    "@rspack/binding-darwin-x64": "npm:1.7.2"
-    "@rspack/binding-linux-arm64-gnu": "npm:1.7.2"
-    "@rspack/binding-linux-arm64-musl": "npm:1.7.2"
-    "@rspack/binding-linux-x64-gnu": "npm:1.7.2"
-    "@rspack/binding-linux-x64-musl": "npm:1.7.2"
-    "@rspack/binding-wasm32-wasi": "npm:1.7.2"
-    "@rspack/binding-win32-arm64-msvc": "npm:1.7.2"
-    "@rspack/binding-win32-ia32-msvc": "npm:1.7.2"
-    "@rspack/binding-win32-x64-msvc": "npm:1.7.2"
+    "@rspack/binding-darwin-arm64": "npm:2.0.1"
+    "@rspack/binding-darwin-x64": "npm:2.0.1"
+    "@rspack/binding-linux-arm64-gnu": "npm:2.0.1"
+    "@rspack/binding-linux-arm64-musl": "npm:2.0.1"
+    "@rspack/binding-linux-x64-gnu": "npm:2.0.1"
+    "@rspack/binding-linux-x64-musl": "npm:2.0.1"
+    "@rspack/binding-wasm32-wasi": "npm:2.0.1"
+    "@rspack/binding-win32-arm64-msvc": "npm:2.0.1"
+    "@rspack/binding-win32-ia32-msvc": "npm:2.0.1"
+    "@rspack/binding-win32-x64-msvc": "npm:2.0.1"
   dependenciesMeta:
     "@rspack/binding-darwin-arm64":
       optional: true
@@ -2308,30 +2322,135 @@ __metadata:
       optional: true
     "@rspack/binding-win32-x64-msvc":
       optional: true
-  checksum: 10c0/5751de5921bee6f52f3892d45ebd62c89ac0722b29de30dce531b6744aa3b02ba15ea99e91cd90508539c7de981c6639ad5598e996986bc770781d555fd3cc11
+  checksum: 10c0/f31f9662a70852db3934836decf83bc4088ab6f46db41d8e927f1c23fd5a356fedb0535a1880ace464b9a304478df8d7901e6a6675e1c9eff962eb7988f83e9b
   languageName: node
   linkType: hard
 
-"@rspack/core@npm:^1.6.0":
-  version: 1.7.2
-  resolution: "@rspack/core@npm:1.7.2::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fcore%2F-%2Fcore-1.7.2.tgz"
+"@rspack/core@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "@rspack/core@npm:2.0.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fcore%2F-%2Fcore-2.0.1.tgz"
   dependencies:
-    "@module-federation/runtime-tools": "npm:0.22.0"
-    "@rspack/binding": "npm:1.7.2"
-    "@rspack/lite-tapable": "npm:1.1.0"
+    "@rspack/binding": "npm:2.0.1"
   peerDependencies:
+    "@module-federation/runtime-tools": ^0.24.1 || ^2.0.0
     "@swc/helpers": ">=0.5.1"
   peerDependenciesMeta:
+    "@module-federation/runtime-tools":
+      optional: true
     "@swc/helpers":
       optional: true
-  checksum: 10c0/6cf7a96a71cd60faae26065204fa9754d5c54489319aeea6acc18300a43e7fdc2b53e682bbc56f2fe7789e900d44057af568aa7b9ee40479fe0d38e9873cab3d
+  checksum: 10c0/c6346659645a58d81309adbb2981a56f3b010fedee95ce07bfcb658a09a927fda0b6f269b00fe165a87b7c93b06103e710bf5f435d24f512869f17bc91f23d8b
   languageName: node
   linkType: hard
 
-"@rspack/lite-tapable@npm:1.1.0":
-  version: 1.1.0
-  resolution: "@rspack/lite-tapable@npm:1.1.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Flite-tapable%2F-%2Flite-tapable-1.1.0.tgz"
-  checksum: 10c0/15059d1da73192b150339ceba3142a2d0073fa298dad9a497cc8c6037c597c3a982ed4c88dc50afa7b70d0757df1b47af7ae407cfe8acd31d333d524b84a7a4b
+"@rspack/resolver-binding-darwin-arm64@npm:0.2.8":
+  version: 0.2.8
+  resolution: "@rspack/resolver-binding-darwin-arm64@npm:0.2.8::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fresolver-binding-darwin-arm64%2F-%2Fresolver-binding-darwin-arm64-0.2.8.tgz"
+  conditions: os=darwin & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@rspack/resolver-binding-darwin-x64@npm:0.2.8":
+  version: 0.2.8
+  resolution: "@rspack/resolver-binding-darwin-x64@npm:0.2.8::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fresolver-binding-darwin-x64%2F-%2Fresolver-binding-darwin-x64-0.2.8.tgz"
+  conditions: os=darwin & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@rspack/resolver-binding-linux-arm64-gnu@npm:0.2.8":
+  version: 0.2.8
+  resolution: "@rspack/resolver-binding-linux-arm64-gnu@npm:0.2.8::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fresolver-binding-linux-arm64-gnu%2F-%2Fresolver-binding-linux-arm64-gnu-0.2.8.tgz"
+  conditions: os=linux & cpu=arm64 & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@rspack/resolver-binding-linux-arm64-musl@npm:0.2.8":
+  version: 0.2.8
+  resolution: "@rspack/resolver-binding-linux-arm64-musl@npm:0.2.8::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fresolver-binding-linux-arm64-musl%2F-%2Fresolver-binding-linux-arm64-musl-0.2.8.tgz"
+  conditions: os=linux & cpu=arm64 & libc=musl
+  languageName: node
+  linkType: hard
+
+"@rspack/resolver-binding-linux-x64-gnu@npm:0.2.8":
+  version: 0.2.8
+  resolution: "@rspack/resolver-binding-linux-x64-gnu@npm:0.2.8::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fresolver-binding-linux-x64-gnu%2F-%2Fresolver-binding-linux-x64-gnu-0.2.8.tgz"
+  conditions: os=linux & cpu=x64 & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@rspack/resolver-binding-linux-x64-musl@npm:0.2.8":
+  version: 0.2.8
+  resolution: "@rspack/resolver-binding-linux-x64-musl@npm:0.2.8::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fresolver-binding-linux-x64-musl%2F-%2Fresolver-binding-linux-x64-musl-0.2.8.tgz"
+  conditions: os=linux & cpu=x64 & libc=musl
+  languageName: node
+  linkType: hard
+
+"@rspack/resolver-binding-wasm32-wasi@npm:0.2.8":
+  version: 0.2.8
+  resolution: "@rspack/resolver-binding-wasm32-wasi@npm:0.2.8::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fresolver-binding-wasm32-wasi%2F-%2Fresolver-binding-wasm32-wasi-0.2.8.tgz"
+  dependencies:
+    "@napi-rs/wasm-runtime": "npm:^1.1.1"
+  conditions: cpu=wasm32
+  languageName: node
+  linkType: hard
+
+"@rspack/resolver-binding-win32-arm64-msvc@npm:0.2.8":
+  version: 0.2.8
+  resolution: "@rspack/resolver-binding-win32-arm64-msvc@npm:0.2.8::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fresolver-binding-win32-arm64-msvc%2F-%2Fresolver-binding-win32-arm64-msvc-0.2.8.tgz"
+  conditions: os=win32 & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@rspack/resolver-binding-win32-ia32-msvc@npm:0.2.8":
+  version: 0.2.8
+  resolution: "@rspack/resolver-binding-win32-ia32-msvc@npm:0.2.8::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fresolver-binding-win32-ia32-msvc%2F-%2Fresolver-binding-win32-ia32-msvc-0.2.8.tgz"
+  conditions: os=win32 & cpu=ia32
+  languageName: node
+  linkType: hard
+
+"@rspack/resolver-binding-win32-x64-msvc@npm:0.2.8":
+  version: 0.2.8
+  resolution: "@rspack/resolver-binding-win32-x64-msvc@npm:0.2.8::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fresolver-binding-win32-x64-msvc%2F-%2Fresolver-binding-win32-x64-msvc-0.2.8.tgz"
+  conditions: os=win32 & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@rspack/resolver@npm:0.2.8":
+  version: 0.2.8
+  resolution: "@rspack/resolver@npm:0.2.8::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40rspack%2Fresolver%2F-%2Fresolver-0.2.8.tgz"
+  dependencies:
+    "@rspack/resolver-binding-darwin-arm64": "npm:0.2.8"
+    "@rspack/resolver-binding-darwin-x64": "npm:0.2.8"
+    "@rspack/resolver-binding-linux-arm64-gnu": "npm:0.2.8"
+    "@rspack/resolver-binding-linux-arm64-musl": "npm:0.2.8"
+    "@rspack/resolver-binding-linux-x64-gnu": "npm:0.2.8"
+    "@rspack/resolver-binding-linux-x64-musl": "npm:0.2.8"
+    "@rspack/resolver-binding-wasm32-wasi": "npm:0.2.8"
+    "@rspack/resolver-binding-win32-arm64-msvc": "npm:0.2.8"
+    "@rspack/resolver-binding-win32-ia32-msvc": "npm:0.2.8"
+    "@rspack/resolver-binding-win32-x64-msvc": "npm:0.2.8"
+  dependenciesMeta:
+    "@rspack/resolver-binding-darwin-arm64":
+      optional: true
+    "@rspack/resolver-binding-darwin-x64":
+      optional: true
+    "@rspack/resolver-binding-linux-arm64-gnu":
+      optional: true
+    "@rspack/resolver-binding-linux-arm64-musl":
+      optional: true
+    "@rspack/resolver-binding-linux-x64-gnu":
+      optional: true
+    "@rspack/resolver-binding-linux-x64-musl":
+      optional: true
+    "@rspack/resolver-binding-wasm32-wasi":
+      optional: true
+    "@rspack/resolver-binding-win32-arm64-msvc":
+      optional: true
+    "@rspack/resolver-binding-win32-ia32-msvc":
+      optional: true
+    "@rspack/resolver-binding-win32-x64-msvc":
+      optional: true
+  checksum: 10c0/6e683f8cb74ba01baf27002b6787f68ebbc51fe989fe40286e5876cef504210c16ca8e31729203a4cf03ea6ba62c198fc3cf7543b933ee2936abe4c02be258d4
   languageName: node
   linkType: hard
 
@@ -2892,12 +3011,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/tapable@npm:2.2.7":
-  version: 2.2.7
-  resolution: "@types/tapable@npm:2.2.7::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40types%2Ftapable%2F-%2Ftapable-2.2.7.tgz"
+"@types/tapable@npm:2.3.0":
+  version: 2.3.0
+  resolution: "@types/tapable@npm:2.3.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2F%40types%2Ftapable%2F-%2Ftapable-2.3.0.tgz"
   dependencies:
-    tapable: "npm:^2.2.0"
-  checksum: 10c0/112e4e94588edfcb597c8161185c6b7cae1ea780c7bf3e8fe41d5c88a283447518939a890df139e6a46d9abddce670cad40cf07145ea9b792bad8a3f17cfb5f2
+    tapable: "npm:^2.3.0"
+  checksum: 10c0/d1b9809f2cc7c9029c1b8037502e0a5675d4edde30163f87bb018882517688e6c98cd632764869d6c5922f6c02f05c639811cc50cb0ef4d436fd1f1b2e333b31
   languageName: node
   linkType: hard
 
@@ -3099,7 +3218,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"acorn-walk@npm:8.3.4, acorn-walk@npm:^8.1.1":
+"acorn-walk@npm:8.3.5":
+  version: 8.3.5
+  resolution: "acorn-walk@npm:8.3.5::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2Facorn-walk%2F-%2Facorn-walk-8.3.5.tgz"
+  dependencies:
+    acorn: "npm:^8.11.0"
+  checksum: 10c0/e31bf5b5423ed1349437029d66d708b9fbd1b77a644b031501e2c753b028d13b56348210ed901d5b1d0d86eb3381c0a0fc0d0998511a9d546d1194936266a332
+  languageName: node
+  linkType: hard
+
+"acorn-walk@npm:^8.1.1":
   version: 8.3.4
   resolution: "acorn-walk@npm:8.3.4::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2Facorn-walk%2F-%2Facorn-walk-8.3.4.tgz"
   dependencies:
@@ -4595,16 +4723,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"enhanced-resolve@npm:5.12.0":
-  version: 5.12.0
-  resolution: "enhanced-resolve@npm:5.12.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2Fenhanced-resolve%2F-%2Fenhanced-resolve-5.12.0.tgz"
-  dependencies:
-    graceful-fs: "npm:^4.2.4"
-    tapable: "npm:^2.2.0"
-  checksum: 10c0/5738924cfe3641d04b89c2856fee3d109d7bd71bbe234fb7f54843dda65f293e5f3eee6d5970ced70dbb09016085b961e60d1eb26cac72a21044479954b6cdfd
-  languageName: node
-  linkType: hard
-
 "entities@npm:^4.2.0":
   version: 4.5.0
   resolution: "entities@npm:4.5.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2Fentities%2F-%2Fentities-4.5.0.tgz"
@@ -4704,15 +4822,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"es-toolkit@npm:^1.43.0":
-  version: 1.44.0
-  resolution: "es-toolkit@npm:1.44.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2Fes-toolkit%2F-%2Fes-toolkit-1.44.0.tgz"
+"es-toolkit@npm:^1.45.1":
+  version: 1.46.1
+  resolution: "es-toolkit@npm:1.46.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2Fes-toolkit%2F-%2Fes-toolkit-1.46.1.tgz"
   dependenciesMeta:
     "@trivago/prettier-plugin-sort-imports@4.3.0":
       unplugged: true
     prettier-plugin-sort-re-exports@0.0.1:
       unplugged: true
-  checksum: 10c0/b80ff52ddc85ba26914cda57c9d4e46379ccc38c60dc097ef0d065cc0b20f95a16cf8d537969eea600b51c6687b5900a6cce67489db16d5ccc14d47597a29c34
+  checksum: 10c0/6a4c3dd0ddc2138fa13d983d93ebaf8061759c52c2cf7c3101315139fc1fca826d253daa67fe85ad880c03cc4c092bd53a83a7cbf58b4721c251479122ba5303
   languageName: node
   linkType: hard
 
@@ -5604,7 +5722,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graceful-fs@npm:^4.1.2, graceful-fs@npm:^4.1.6, graceful-fs@npm:^4.2.0, graceful-fs@npm:^4.2.11, graceful-fs@npm:^4.2.4, graceful-fs@npm:^4.2.6":
+"graceful-fs@npm:^4.1.2, graceful-fs@npm:^4.1.6, graceful-fs@npm:^4.2.0, graceful-fs@npm:^4.2.11, graceful-fs@npm:^4.2.6":
   version: 4.2.11
   resolution: "graceful-fs@npm:4.2.11::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2Fgraceful-fs%2F-%2Fgraceful-fs-4.2.11.tgz"
   checksum: 10c0/386d011a553e02bc594ac2ca0bd6d9e4c22d7fa8cfbfc448a6d148c59ea881b092db9dbe3547ae4b88e55f1b01f7c4a2ecc53b310c042793e63aa44cf6c257f2
@@ -6608,6 +6726,16 @@ __metadata:
   dependencies:
     package-json: "npm:^10.0.0"
   checksum: 10c0/643cfda3a58dfb3af221a2950e433393d28a5adbe225d1cbbb358dbcbb04e9f8dce15b892f8ae3e3156f50693428dbd7ca13a69edfbdfcd94e62519480d7041e
+  languageName: node
+  linkType: hard
+
+"launch-editor@npm:^2.13.2":
+  version: 2.13.2
+  resolution: "launch-editor@npm:2.13.2::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2Flaunch-editor%2F-%2Flaunch-editor-2.13.2.tgz"
+  dependencies:
+    picocolors: "npm:^1.1.1"
+    shell-quote: "npm:^1.8.3"
+  checksum: 10c0/5057fc8d3d0b0a92055b09b99192ffb5860b3e8a3f8ba56ef9b7f252fd78650d6b4182b725f4a1dcb8b04e350fa053874d819bb84362f2cfd6c3e84f556066dd
   languageName: node
   linkType: hard
 
@@ -7744,27 +7872,34 @@ __metadata:
   languageName: node
   linkType: hard
 
-"oxc-parser@npm:^0.96.0":
-  version: 0.96.0
-  resolution: "oxc-parser@npm:0.96.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2Foxc-parser%2F-%2Foxc-parser-0.96.0.tgz"
+"oxc-parser@npm:^0.128.0":
+  version: 0.128.0
+  resolution: "oxc-parser@npm:0.128.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2Foxc-parser%2F-%2Foxc-parser-0.128.0.tgz"
   dependencies:
-    "@oxc-parser/binding-android-arm64": "npm:0.96.0"
-    "@oxc-parser/binding-darwin-arm64": "npm:0.96.0"
-    "@oxc-parser/binding-darwin-x64": "npm:0.96.0"
-    "@oxc-parser/binding-freebsd-x64": "npm:0.96.0"
-    "@oxc-parser/binding-linux-arm-gnueabihf": "npm:0.96.0"
-    "@oxc-parser/binding-linux-arm-musleabihf": "npm:0.96.0"
-    "@oxc-parser/binding-linux-arm64-gnu": "npm:0.96.0"
-    "@oxc-parser/binding-linux-arm64-musl": "npm:0.96.0"
-    "@oxc-parser/binding-linux-riscv64-gnu": "npm:0.96.0"
-    "@oxc-parser/binding-linux-s390x-gnu": "npm:0.96.0"
-    "@oxc-parser/binding-linux-x64-gnu": "npm:0.96.0"
-    "@oxc-parser/binding-linux-x64-musl": "npm:0.96.0"
-    "@oxc-parser/binding-wasm32-wasi": "npm:0.96.0"
-    "@oxc-parser/binding-win32-arm64-msvc": "npm:0.96.0"
-    "@oxc-parser/binding-win32-x64-msvc": "npm:0.96.0"
-    "@oxc-project/types": "npm:^0.96.0"
+    "@oxc-parser/binding-android-arm-eabi": "npm:0.128.0"
+    "@oxc-parser/binding-android-arm64": "npm:0.128.0"
+    "@oxc-parser/binding-darwin-arm64": "npm:0.128.0"
+    "@oxc-parser/binding-darwin-x64": "npm:0.128.0"
+    "@oxc-parser/binding-freebsd-x64": "npm:0.128.0"
+    "@oxc-parser/binding-linux-arm-gnueabihf": "npm:0.128.0"
+    "@oxc-parser/binding-linux-arm-musleabihf": "npm:0.128.0"
+    "@oxc-parser/binding-linux-arm64-gnu": "npm:0.128.0"
+    "@oxc-parser/binding-linux-arm64-musl": "npm:0.128.0"
+    "@oxc-parser/binding-linux-ppc64-gnu": "npm:0.128.0"
+    "@oxc-parser/binding-linux-riscv64-gnu": "npm:0.128.0"
+    "@oxc-parser/binding-linux-riscv64-musl": "npm:0.128.0"
+    "@oxc-parser/binding-linux-s390x-gnu": "npm:0.128.0"
+    "@oxc-parser/binding-linux-x64-gnu": "npm:0.128.0"
+    "@oxc-parser/binding-linux-x64-musl": "npm:0.128.0"
+    "@oxc-parser/binding-openharmony-arm64": "npm:0.128.0"
+    "@oxc-parser/binding-wasm32-wasi": "npm:0.128.0"
+    "@oxc-parser/binding-win32-arm64-msvc": "npm:0.128.0"
+    "@oxc-parser/binding-win32-ia32-msvc": "npm:0.128.0"
+    "@oxc-parser/binding-win32-x64-msvc": "npm:0.128.0"
+    "@oxc-project/types": "npm:^0.128.0"
   dependenciesMeta:
+    "@oxc-parser/binding-android-arm-eabi":
+      optional: true
     "@oxc-parser/binding-android-arm64":
       optional: true
     "@oxc-parser/binding-darwin-arm64":
@@ -7781,7 +7916,11 @@ __metadata:
       optional: true
     "@oxc-parser/binding-linux-arm64-musl":
       optional: true
+    "@oxc-parser/binding-linux-ppc64-gnu":
+      optional: true
     "@oxc-parser/binding-linux-riscv64-gnu":
+      optional: true
+    "@oxc-parser/binding-linux-riscv64-musl":
       optional: true
     "@oxc-parser/binding-linux-s390x-gnu":
       optional: true
@@ -7789,40 +7928,44 @@ __metadata:
       optional: true
     "@oxc-parser/binding-linux-x64-musl":
       optional: true
+    "@oxc-parser/binding-openharmony-arm64":
+      optional: true
     "@oxc-parser/binding-wasm32-wasi":
       optional: true
     "@oxc-parser/binding-win32-arm64-msvc":
       optional: true
+    "@oxc-parser/binding-win32-ia32-msvc":
+      optional: true
     "@oxc-parser/binding-win32-x64-msvc":
       optional: true
-  checksum: 10c0/0b896e08630509d55f379f9eb7b7918c5f83efadb76a03fd37652c634a9594a51d0bf269886b8d565cb7a3d7d23cea86a2174c6574de404292313214f3a8a567
+  checksum: 10c0/c750d5d205353efd67276019d50a315cab1fe68f10067a892154e9fa81ba62844760aa8536ae0008580e421e10fb8d2d419455744de862eb0037499b4760c1c9
   languageName: node
   linkType: hard
 
-"oxc-resolver@npm:^11.13.0":
-  version: 11.16.3
-  resolution: "oxc-resolver@npm:11.16.3::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2Foxc-resolver%2F-%2Foxc-resolver-11.16.3.tgz"
+"oxc-resolver@npm:^11.19.1":
+  version: 11.19.1
+  resolution: "oxc-resolver@npm:11.19.1::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2Foxc-resolver%2F-%2Foxc-resolver-11.19.1.tgz"
   dependencies:
-    "@oxc-resolver/binding-android-arm-eabi": "npm:11.16.3"
-    "@oxc-resolver/binding-android-arm64": "npm:11.16.3"
-    "@oxc-resolver/binding-darwin-arm64": "npm:11.16.3"
-    "@oxc-resolver/binding-darwin-x64": "npm:11.16.3"
-    "@oxc-resolver/binding-freebsd-x64": "npm:11.16.3"
-    "@oxc-resolver/binding-linux-arm-gnueabihf": "npm:11.16.3"
-    "@oxc-resolver/binding-linux-arm-musleabihf": "npm:11.16.3"
-    "@oxc-resolver/binding-linux-arm64-gnu": "npm:11.16.3"
-    "@oxc-resolver/binding-linux-arm64-musl": "npm:11.16.3"
-    "@oxc-resolver/binding-linux-ppc64-gnu": "npm:11.16.3"
-    "@oxc-resolver/binding-linux-riscv64-gnu": "npm:11.16.3"
-    "@oxc-resolver/binding-linux-riscv64-musl": "npm:11.16.3"
-    "@oxc-resolver/binding-linux-s390x-gnu": "npm:11.16.3"
-    "@oxc-resolver/binding-linux-x64-gnu": "npm:11.16.3"
-    "@oxc-resolver/binding-linux-x64-musl": "npm:11.16.3"
-    "@oxc-resolver/binding-openharmony-arm64": "npm:11.16.3"
-    "@oxc-resolver/binding-wasm32-wasi": "npm:11.16.3"
-    "@oxc-resolver/binding-win32-arm64-msvc": "npm:11.16.3"
-    "@oxc-resolver/binding-win32-ia32-msvc": "npm:11.16.3"
-    "@oxc-resolver/binding-win32-x64-msvc": "npm:11.16.3"
+    "@oxc-resolver/binding-android-arm-eabi": "npm:11.19.1"
+    "@oxc-resolver/binding-android-arm64": "npm:11.19.1"
+    "@oxc-resolver/binding-darwin-arm64": "npm:11.19.1"
+    "@oxc-resolver/binding-darwin-x64": "npm:11.19.1"
+    "@oxc-resolver/binding-freebsd-x64": "npm:11.19.1"
+    "@oxc-resolver/binding-linux-arm-gnueabihf": "npm:11.19.1"
+    "@oxc-resolver/binding-linux-arm-musleabihf": "npm:11.19.1"
+    "@oxc-resolver/binding-linux-arm64-gnu": "npm:11.19.1"
+    "@oxc-resolver/binding-linux-arm64-musl": "npm:11.19.1"
+    "@oxc-resolver/binding-linux-ppc64-gnu": "npm:11.19.1"
+    "@oxc-resolver/binding-linux-riscv64-gnu": "npm:11.19.1"
+    "@oxc-resolver/binding-linux-riscv64-musl": "npm:11.19.1"
+    "@oxc-resolver/binding-linux-s390x-gnu": "npm:11.19.1"
+    "@oxc-resolver/binding-linux-x64-gnu": "npm:11.19.1"
+    "@oxc-resolver/binding-linux-x64-musl": "npm:11.19.1"
+    "@oxc-resolver/binding-openharmony-arm64": "npm:11.19.1"
+    "@oxc-resolver/binding-wasm32-wasi": "npm:11.19.1"
+    "@oxc-resolver/binding-win32-arm64-msvc": "npm:11.19.1"
+    "@oxc-resolver/binding-win32-ia32-msvc": "npm:11.19.1"
+    "@oxc-resolver/binding-win32-x64-msvc": "npm:11.19.1"
   dependenciesMeta:
     "@oxc-resolver/binding-android-arm-eabi":
       optional: true
@@ -7864,18 +8007,18 @@ __metadata:
       optional: true
     "@oxc-resolver/binding-win32-x64-msvc":
       optional: true
-  checksum: 10c0/b64f306dc38d8fd973af077dcaf836b6dc9e8e5b9dbec22819fda5b7f3a2e602ce0159206e59c4a74a7206b5711af77cedef88d8489e6710291e971f63f063db
+  checksum: 10c0/8ac4eaffa9c0bcbb9f4f4a2b43786457ec5a68684d8776cb78b5a15ce3d1a79d3e67262aa3c635f98a0c1cd6cd56a31fcb05bffb9a286100056e4ab06b928833
   languageName: node
   linkType: hard
 
-"oxc-walker@npm:^0.5.2":
-  version: 0.5.2
-  resolution: "oxc-walker@npm:0.5.2::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2Foxc-walker%2F-%2Foxc-walker-0.5.2.tgz"
+"oxc-walker@npm:^0.7.0":
+  version: 0.7.0
+  resolution: "oxc-walker@npm:0.7.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2Foxc-walker%2F-%2Foxc-walker-0.7.0.tgz"
   dependencies:
     magic-regexp: "npm:^0.10.0"
   peerDependencies:
-    oxc-parser: ">=0.72.0"
-  checksum: 10c0/1ef0f943f2ef55919b4090c8f41f716db5fe11e910e312ae086128104fc9b7f3ff65cb9d9986e5d33f2e8e3bb5f5d71e96c8fd5bdb7ca4cc9cd35c4bd8584ff0
+    oxc-parser: ">=0.98.0"
+  checksum: 10c0/4238233aaec526a1937b5d173202fbeaa22ff3047fcb5734516d595cf415b0d2b78f9e042aa090d6579574a654224d1d31c2fe6d31ff086c1dd525bbfa9cb354
   languageName: node
   linkType: hard
 
@@ -8006,8 +8149,8 @@ __metadata:
   resolution: "package-build-stats@workspace:."
   dependencies:
     "@babel/core": "npm:^7.28.5"
-    "@rsdoctor/rspack-plugin": "npm:^1.3.8"
-    "@rspack/core": "npm:^1.6.0"
+    "@rsdoctor/rspack-plugin": "npm:^1.5.9"
+    "@rspack/core": "npm:^2.0.1"
     "@swc/core": "npm:^1.14.0"
     "@types/autoprefixer": "npm:^9.7.2"
     "@types/debug": "npm:^4.1.12"
@@ -8039,9 +8182,9 @@ __metadata:
     mitt: "npm:^3.0.1"
     node-fetch: "npm:^2.7.0"
     np: "npm:^10.0.5"
-    oxc-parser: "npm:^0.96.0"
-    oxc-resolver: "npm:^11.13.0"
-    oxc-walker: "npm:^0.5.2"
+    oxc-parser: "npm:^0.128.0"
+    oxc-resolver: "npm:^11.19.1"
+    oxc-walker: "npm:^0.7.0"
     oxlint: "npm:^1.25.0"
     p-series: "npm:^2.1.0"
     pify: "npm:^6.1.0"
@@ -9058,7 +9201,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rslog@npm:^1.2.11":
+"rslog@npm:^1.3.2":
   version: 1.3.2
   resolution: "rslog@npm:1.3.2::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2Frslog%2F-%2Frslog-1.3.2.tgz"
   checksum: 10c0/18b168525f0d88f8f7d94fb143da4172c759ca3762cbe46abab39e24677901578b30a4f891fb513474903d20d3075eaedb90c4f522693e8d1f8d0f1b06355478
@@ -9328,6 +9471,13 @@ __metadata:
   version: 3.0.0
   resolution: "shebang-regex@npm:3.0.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2Fshebang-regex%2F-%2Fshebang-regex-3.0.0.tgz"
   checksum: 10c0/1dbed0726dd0e1152a92696c76c7f06084eb32a90f0528d11acd764043aacf76994b2fb30aa1291a21bd019d6699164d048286309a278855ee7bec06cf6fb690
+  languageName: node
+  linkType: hard
+
+"shell-quote@npm:^1.8.3":
+  version: 1.8.3
+  resolution: "shell-quote@npm:1.8.3::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2Fshell-quote%2F-%2Fshell-quote-1.8.3.tgz"
+  checksum: 10c0/bee87c34e1e986cfb4c30846b8e6327d18874f10b535699866f368ade11ea4ee45433d97bf5eada22c4320c27df79c3a6a7eb1bf3ecfc47f2c997d9e5e2672fd
   languageName: node
   linkType: hard
 
@@ -9890,17 +10040,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tapable@npm:2.2.3":
-  version: 2.2.3
-  resolution: "tapable@npm:2.2.3::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2Ftapable%2F-%2Ftapable-2.2.3.tgz"
-  checksum: 10c0/e57fd8e2d756c317f8726a1bec8f2c904bc42e37fcbd4a78211daeab89f42c734b6a20e61774321f47be9a421da628a0c78b62d36c5ed186f4d5232d09ae15f2
+"tapable@npm:2.3.2":
+  version: 2.3.2
+  resolution: "tapable@npm:2.3.2::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2Ftapable%2F-%2Ftapable-2.3.2.tgz"
+  checksum: 10c0/45ec8bd8963907f35bba875f9b3e9a5afa5ba11a9a4e4a2d7b2313d983cb2741386fd7dd3e54b13055b2be942971aac369d197e02263ec9216c59c0a8069ed7f
   languageName: node
   linkType: hard
 
-"tapable@npm:^2.2.0":
-  version: 2.3.0
-  resolution: "tapable@npm:2.3.0::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2Ftapable%2F-%2Ftapable-2.3.0.tgz"
-  checksum: 10c0/cb9d67cc2c6a74dedc812ef3085d9d681edd2c1fa18e4aef57a3c0605fdbe44e6b8ea00bd9ef21bc74dd45314e39d31227aa031ebf2f5e38164df514136f2681
+"tapable@npm:^2.3.0":
+  version: 2.3.3
+  resolution: "tapable@npm:2.3.3::__archiveUrl=https%3A%2F%2Fpackages.atlassian.com%2Fapi%2Fnpm%2Fnpm-remote%2Ftapable%2F-%2Ftapable-2.3.3.tgz"
+  checksum: 10c0/47992e861053f861154e92fb4a98ac4ab47b6463717e60792dd1e8c755da0c4964cd8bb68c308a9066d6da89000b6310457b4d5d985c30de4ccc29066068cc17
   languageName: node
   linkType: hard
 
