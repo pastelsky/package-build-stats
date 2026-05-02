@@ -113,6 +113,92 @@ type ResolvedExports = {
   [key: string]: string
 }
 
+type PackageJSON = {
+  exports?: unknown
+  module?: string
+  main?: string
+}
+
+const CONDITION_PRIORITY = ['import', 'default', 'require', 'node']
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
+}
+
+function normalizeEntryPoint(entryPoint: string): string {
+  if (entryPoint.startsWith('./') || entryPoint.startsWith('../')) {
+    return entryPoint
+  }
+  return `./${entryPoint}`
+}
+
+function resolveExportTarget(value: unknown): string | undefined {
+  if (typeof value === 'string') {
+    return value
+  }
+
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const resolved = resolveExportTarget(item)
+      if (resolved) {
+        return resolved
+      }
+    }
+    return undefined
+  }
+
+  if (!isRecord(value)) {
+    return undefined
+  }
+
+  // If the object uses subpath keys, only "." is the package root target.
+  const keys = Object.keys(value)
+  const hasSubpathKeys = keys.some(key => key.startsWith('.'))
+  if (hasSubpathKeys) {
+    if (Object.prototype.hasOwnProperty.call(value, '.')) {
+      return resolveExportTarget(value['.'])
+    }
+    return undefined
+  }
+
+  // Conditional exports object; prefer ESM-ish conditions first.
+  for (const condition of CONDITION_PRIORITY) {
+    if (Object.prototype.hasOwnProperty.call(value, condition)) {
+      const resolved = resolveExportTarget(value[condition])
+      if (resolved) {
+        return resolved
+      }
+    }
+  }
+
+  // Fall back to declaration order for unknown conditions.
+  for (const key of keys) {
+    const resolved = resolveExportTarget(value[key])
+    if (resolved) {
+      return resolved
+    }
+  }
+
+  return undefined
+}
+
+function resolvePackageEntryPoint(packageJson: PackageJSON): string {
+  const fromExports = resolveExportTarget(packageJson.exports)
+  if (fromExports) {
+    return normalizeEntryPoint(fromExports)
+  }
+
+  if (packageJson.module) {
+    return normalizeEntryPoint(packageJson.module)
+  }
+
+  if (packageJson.main) {
+    return normalizeEntryPoint(packageJson.main)
+  }
+
+  return './index.js'
+}
+
 /**
  * Recursively walk exports following export * statements
  *
@@ -213,14 +299,10 @@ export async function getAllExports(
   try {
     // Read package.json to get the entry point
     const packageJsonPath = path.join(context, 'package.json')
-    const packageJson = JSON.parse(await fs.readFile(packageJsonPath, 'utf8'))
-    // Prefer module field for ESM, fallback to main, then default
-    let entryPoint = packageJson.module || packageJson.main || './index.js'
-
-    // Normalize entry point to start with ./
-    if (!entryPoint.startsWith('./') && !entryPoint.startsWith('../')) {
-      entryPoint = './' + entryPoint
-    }
+    const packageJson = JSON.parse(
+      await fs.readFile(packageJsonPath, 'utf8'),
+    ) as PackageJSON
+    const entryPoint = resolvePackageEntryPoint(packageJson)
 
     // Resolve the entry point relative to context
     // Pass installPath as rootContext for calculating relative paths

@@ -65,6 +65,34 @@ describe('getAllPackageExports', () => {
     expect(Object.keys(exports).length).toBeGreaterThan(0)
   })
 
+  test('should resolve entry point from exports field when main is missing', async () => {
+    const fixturePath = path.resolve(
+      __dirname,
+      '../fixtures/exports/exports-only',
+    )
+
+    const exports = await getAllPackageExports(fixturePath)
+
+    expect(exports).toBeDefined()
+    expect(exports).toHaveProperty('default')
+    expect(exports).toHaveProperty('add')
+    expect(exports).toHaveProperty('subtract')
+  })
+
+  test('should resolve conditional exports for package root', async () => {
+    const fixturePath = path.resolve(
+      __dirname,
+      '../fixtures/exports/exports-conditional',
+    )
+
+    const exports = await getAllPackageExports(fixturePath)
+
+    expect(exports).toBeDefined()
+    expect(exports).toHaveProperty('default')
+    expect(exports).toHaveProperty('multiply')
+    expect(exports).toHaveProperty('divide')
+  })
+
   test('should throw error for non-existent package', async () => {
     const nonExistentPackage =
       'definitely-does-not-exist-' + Date.now() + '-' + Math.random()
@@ -152,6 +180,21 @@ describe('getPackageExportSizes', () => {
     expect(result).toBeDefined()
     expect(result.assets).toBeDefined()
     expect(Array.isArray(result.assets)).toBe(true)
+  })
+
+  test('should calculate sizes when package only defines exports root', async () => {
+    const fixturePath = path.resolve(
+      __dirname,
+      '../fixtures/exports/exports-only',
+    )
+
+    const result = await getPackageExportSizes(fixturePath)
+    const assetNames = result.assets.map(asset => asset.name)
+
+    expect(result).toBeDefined()
+    expect(result.assets.length).toBeGreaterThan(0)
+    expect(assetNames).toContain('add')
+    expect(assetNames).toContain('subtract')
   })
 
   test('should throw error for non-existent package', async () => {
