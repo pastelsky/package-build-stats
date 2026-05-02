@@ -1,4 +1,7 @@
 import { afterEach, describe, expect, test, vi } from 'vitest'
+import fs from 'node:fs'
+import os from 'node:os'
+import path from 'node:path'
 
 const mockRspack = vi.fn()
 const mockCompilePackage = vi.fn()
@@ -75,5 +78,32 @@ describe('BuildUtils.compilePackage', () => {
         },
       }),
     ).rejects.toThrow('close failed')
+  })
+})
+
+describe('BuildUtils.createEntryPoint', () => {
+  test('aliases reserved export names in ESM import statements', () => {
+    const installPath = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'pbs-entrypoint-test-'),
+    )
+
+    try {
+      const entryPath = BuildUtils.createEntryPoint('zod', installPath, {
+        esm: true,
+        customImports: ['enum', 'void', 'function'],
+        entryFilename: 'reserved.js',
+      })
+
+      const contents = fs.readFileSync(entryPath, 'utf8')
+
+      expect(contents).toContain(
+        'import { "enum" as __bp_import_0, "void" as __bp_import_1, "function" as __bp_import_2 } from \'zod\';',
+      )
+      expect(contents).toContain(
+        'console.log(__bp_import_0, __bp_import_1, __bp_import_2)',
+      )
+    } finally {
+      fs.rmSync(installPath, { recursive: true, force: true })
+    }
   })
 })

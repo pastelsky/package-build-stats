@@ -101,20 +101,35 @@ const BuildUtils = {
 
     if (options.esm) {
       if (options.customImports) {
+        const aliasedImports = options.customImports.map((importName, index) => {
+          const importAlias = `__bp_import_${index}`
+          const quotedImportName = JSON.stringify(importName)
+          return {
+            specifier: `${quotedImportName} as ${importAlias}`,
+            alias: importAlias,
+          }
+        })
+
         importStatement = `
-          import { ${options.customImports.join(', ')} } from '${packageName}'; 
-          console.log(${options.customImports.join(', ')})
+          import { ${aliasedImports.map(item => item.specifier).join(', ')} } from '${packageName}';
+          console.log(${aliasedImports.map(item => item.alias).join(', ')})
      `
       } else {
         importStatement = `import * as p from '${packageName}'; console.log(p)`
       }
     } else {
       if (options.customImports) {
+        const cjsLookups = options.customImports.map((importName, index) => {
+          const importAlias = `__bp_import_${index}`
+          const quotedImportName = JSON.stringify(importName)
+          return `const ${importAlias} = require('${packageName}')[${quotedImportName}]`
+        })
+
         importStatement = `
-        const { ${options.customImports.join(
-          ', ',
-        )} } = require('${packageName}'); 
-        console.log(${options.customImports.join(', ')})
+        ${cjsLookups.join('\n')}
+        console.log(${options.customImports
+          .map((_importName, index) => `__bp_import_${index}`)
+          .join(', ')})
         `
       } else {
         importStatement = `const p = require('${packageName}'); console.log(p)`
