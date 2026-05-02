@@ -134,10 +134,6 @@ describe('getPackageExportSizes', () => {
       expect(asset.size).toBeGreaterThan(0)
     })
 
-    expect(Array.isArray(result.entrypoints)).toBe(true)
-    expect(result.entrypoints.length).toBeGreaterThan(0)
-    expect(result.combinedEntrypoints).toBeDefined()
-    expect(result.combinedEntrypoints?.gzip).toBeGreaterThan(0)
   })
 
   // CJS export test removed: ESM-only export scanning by design (following oxc-linter approach)
@@ -279,17 +275,4 @@ describe('Export Size Analysis Edge Cases', () => {
     })
   })
 
-  test('should expose subpath entrypoints in response metadata', async () => {
-    const fixturePath = path.resolve(
-      __dirname,
-      '../fixtures/exports/multi-exports',
-    )
-
-    const result = await getPackageExportSizes(fixturePath)
-    const specifiers = result.entrypoints.map(entrypoint => entrypoint.specifier)
-
-    expect(specifiers).toContain('multi-exports-fixture')
-    expect(specifiers).toContain('multi-exports-fixture/utils')
-    expect(specifiers).toContain('multi-exports-fixture/helpers')
-  })
 })

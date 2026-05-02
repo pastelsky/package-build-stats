@@ -12,6 +12,7 @@ import { UnexpectedBuildError } from './errors/CustomError.js'
 import { GetPackageStatsOptions } from './common.types.js'
 import Telemetry from './utils/telemetry.utils.js'
 import { performance } from 'perf_hooks'
+import { getExportsMetadata } from './utils/exports.utils.js'
 
 function getPackageJSONDetails(packageName: string, installPath: string) {
   const startTime = performance.now()
@@ -55,7 +56,11 @@ export default async function getPackageStats(
   const startTime = performance.now()
   const timings: Record<string, number> = {}
 
-  const { name: packageName, isLocal } = parsePackageString(packageString)
+  const {
+    name: packageName,
+    isLocal,
+    normalPath,
+  } = parsePackageString(packageString)
 
   const preparePathStart = performance.now()
   const installPath = await InstallationUtils.preparePath(
@@ -81,6 +86,18 @@ export default async function getPackageStats(
     const externals = getExternals(packageName, installPath)
     timings.getExternals = performance.now() - externalsStart
     console.log(`[PERF] getExternals: ${timings.getExternals.toFixed(2)}ms`)
+
+    const packagePath =
+      normalPath || path.join(installPath, 'node_modules', packageName)
+
+    const exportsMetadataStart = performance.now()
+    const exportsMetadata = await getExportsMetadata(
+      packageString,
+      packagePath,
+      packageName,
+      installPath,
+    )
+    timings.getExportsMetadata = performance.now() - exportsMetadataStart
 
     const parallelStart = performance.now()
     const [pacakgeJSONDetails, builtDetails] = await Promise.all([
@@ -114,14 +131,47 @@ export default async function getPackageStats(
       )
     }
 
+    const entrypointSpecifiers = exportsMetadata.entrypoints.map(
+      entrypoint => entrypoint.specifier,
+    )
+    const combinedEntrypointsBuild =
+      await BuildUtils.buildPackageIgnoringMissingDeps({
+        name: packageName,
+        installPath,
+        externals,
+        options: {
+          customImportPaths: entrypointSpecifiers,
+          includeDependencySizes: false,
+        },
+      })
+
+    const combinedEntrypointsAsset = combinedEntrypointsBuild.assets.find(
+      asset => asset.name === 'main' && asset.type === 'js',
+    )
+
+    const effectiveSize = combinedEntrypointsAsset?.size || mainAsset.size
+    const effectiveGzip = combinedEntrypointsAsset?.gzip || mainAsset.gzip
+
     const totalTime = performance.now() - startTime
     Telemetry.packageStats(packageString, true, totalTime, options)
 
     return {
       ...pacakgeJSONDetails,
       ...builtDetails,
-      size: mainAsset.size,
-      gzip: mainAsset.gzip,
+      size: effectiveSize,
+      gzip: effectiveGzip,
+      entrypoints: exportsMetadata.entrypoints,
+      entrypointAggregate: combinedEntrypointsAsset
+        ? {
+            size: combinedEntrypointsAsset.size,
+            gzip: combinedEntrypointsAsset.gzip,
+            imports: entrypointSpecifiers,
+          }
+        : null,
+      defaultEntrypoint: {
+        size: mainAsset.size,
+        gzip: mainAsset.gzip,
+      },
     }
   } catch (e) {
     Telemetry.packageStats(
