@@ -1,6 +1,6 @@
 {
   "name": "package-build-stats",
-  "version": "8.2.6",
+  "version": "8.2.7",
   "type": "module",
   "author": "Shubham Kanodia <shubham.kanodia10@gmail.com>",
   "repository": "https://github.com/pastelsky/package-build-stats",
@@ -51,7 +51,7 @@
     "package-stats": "./bin/cli.js"
   },
   "devDependencies": {
-    "@rsdoctor/rspack-plugin": "^1.3.8",
+    "@rsdoctor/rspack-plugin": "^1.5.9",
     "@types/autoprefixer": "^9.7.2",
     "@types/debug": "^4.1.12",
     "@types/escape-string-regexp": "^2.0.3",
@@ -79,7 +79,7 @@
   },
   "dependencies": {
     "@babel/core": "^7.28.5",
-    "@rspack/core": "^1.6.0",
+    "@rspack/core": "^2.0.1",
     "@swc/core": "^1.14.0",
     "autoprefixer": "^9.7.6",
     "css-loader": "^7.1.0",
@@ -96,9 +96,9 @@
     "mitt": "^3.0.1",
     "node-fetch": "^2.7.0",
     "np": "^10.0.5",
-    "oxc-parser": "^0.96.0",
-    "oxc-resolver": "^11.13.0",
-    "oxc-walker": "^0.5.2",
+    "oxc-parser": "^0.128.0",
+    "oxc-resolver": "^11.19.1",
+    "oxc-walker": "^0.7.0",
     "pify": "^6.1.0",
     "postcss": "^8.4.0",
     "postcss-loader": "^8.1.0",

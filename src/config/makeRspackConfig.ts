@@ -87,6 +87,16 @@ export default function makeRspackConfig({
       mainFields: ['browser', 'module', 'main', 'style'],
     },
     module: {
+      parser: {
+        javascript: {
+          // Rspack 2.0 changed default from 'warn' to 'error'; keep 'auto'
+          // (warn) so packages with imperfect re-exports still build
+          exportsPresence: 'auto',
+          // Rspack 2.0 changed default from true to false; restore true so
+          // CJS packages that alias require() still resolve correctly
+          requireAlias: true,
+        },
+      },
       rules: [
         {
           type: 'javascript/auto',

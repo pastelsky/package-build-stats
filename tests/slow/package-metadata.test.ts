@@ -88,4 +88,31 @@ describe('Package Structure', () => {
 
     expect(result.peerDependencies).toEqual([])
   })
+
+  test('should return entrypoint metadata for size endpoint', async () => {
+    const fixturePath = path.resolve(
+      __dirname,
+      '../fixtures/exports/multi-exports',
+    )
+    const result = await getPackageStats(fixturePath)
+    const specifiers = result.entrypoints.map(entrypoint => entrypoint.specifier)
+
+    expect(Array.isArray(result.entrypoints)).toBe(true)
+    expect(specifiers).toContain('multi-exports-fixture')
+    expect(specifiers).toContain('multi-exports-fixture/utils')
+    expect(specifiers).toContain('multi-exports-fixture/helpers')
+  })
+
+  test('should return entrypoint aggregate size fields for size endpoint', async () => {
+    const fixturePath = path.resolve(
+      __dirname,
+      '../fixtures/exports/multi-exports',
+    )
+    const result = await getPackageStats(fixturePath)
+
+    expect(result.entrypointAggregate).toBeDefined()
+    expect(result.entrypointAggregate.gzip).toBeGreaterThan(0)
+    expect(result.defaultEntrypoint.gzip).toBeGreaterThan(0)
+    expect(result.gzip).toBeGreaterThan(0)
+  })
 })

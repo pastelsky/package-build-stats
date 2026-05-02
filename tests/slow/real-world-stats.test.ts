@@ -1,4 +1,4 @@
-import { getPackageStats } from '../src'
+import { getPackageStats } from '../../src'
 import pSeries from 'p-series'
 import 'dotenv/config'
 
@@ -107,6 +107,19 @@ const libsWithPeerDeps = [
   },
 ]
 
+const modernEntrypointPatternPackages = [
+  // No exports (legacy/main-driven package)
+  { name: 'lodash@4.17.21', pattern: 'no-exports' },
+  // Exports only (no main/module)
+  { name: 'got@14.4.9', pattern: 'exports-only' },
+  // Exports + main only
+  { name: 'react@19.2.0', pattern: 'exports+main' },
+  // Exports + module only
+  { name: 'nuqs@2.8.1', pattern: 'exports+module' },
+  // Exports + main + module
+  { name: 'zod@4.1.12', pattern: 'exports+main+module' },
+]
+
 expect.extend({
   toBeWithinDeltaOf(original, comparison, name) {
     return {
@@ -120,30 +133,39 @@ expect.extend({
 })
 
 describe('real world stats', () => {
-  let testPackages = async (packages, done) => {
+  const testPackages = async packages => {
     const promises = packages.map(pack => async () => {
       const res = await getPackageStats(pack.name)
       expect(res.size).toBeWithinDeltaOf(pack.size, pack.name)
     })
 
     await pSeries(promises)
-
-    done()
   }
 
-  test('Sizes of popular UI Frameworks', done => {
-    testPackages(UIPackages, done)
+  test('Sizes of popular UI Frameworks', async () => {
+    await testPackages(UIPackages)
   })
 
-  test('Sizes of popular JS Frameworks', done => {
-    testPackages(popularPackages, done)
+  test('Sizes of popular JS Frameworks', async () => {
+    await testPackages(popularPackages)
   })
 
-  test('Sizes of popular UI Libraries', done => {
-    testPackages(UILibraries, done)
+  test('Sizes of popular UI Libraries', async () => {
+    await testPackages(UILibraries)
   })
 
-  test('Sizes of libraries with peer dependencies', done => {
-    testPackages(libsWithPeerDeps, done)
+  test('Sizes of libraries with peer dependencies', async () => {
+    await testPackages(libsWithPeerDeps)
+  })
+
+  test('Modern entrypoint pattern packages build successfully', async () => {
+    const promises = modernEntrypointPatternPackages.map(pack => async () => {
+      const res = await getPackageStats(pack.name)
+      expect(res.size).toBeGreaterThan(0)
+      expect(res.gzip).toBeGreaterThan(0)
+      expect(Array.isArray(res.assets)).toBe(true)
+    })
+
+    await pSeries(promises)
   })
 })

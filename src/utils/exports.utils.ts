@@ -113,6 +113,206 @@ type ResolvedExports = {
   [key: string]: string
 }
 
+type PackageJSON = {
+  exports?: unknown
+  module?: string
+  main?: string
+}
+
+export type PackageEntrypoint = {
+  subpath: string
+  specifier: string
+  target: string
+}
+
+export type ExportsMetadata = {
+  exports: ResolvedExports
+  entrypoints: PackageEntrypoint[]
+}
+
+const CONDITION_PRIORITY = ['import', 'default', 'require', 'node']
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
+}
+
+function normalizeEntryPoint(entryPoint: string): string {
+  if (entryPoint.startsWith('./') || entryPoint.startsWith('../')) {
+    return entryPoint
+  }
+  return `./${entryPoint}`
+}
+
+function resolveExportTarget(value: unknown): string | undefined {
+  if (typeof value === 'string') {
+    return value
+  }
+
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const resolved = resolveExportTarget(item)
+      if (resolved) {
+        return resolved
+      }
+    }
+    return undefined
+  }
+
+  if (!isRecord(value)) {
+    return undefined
+  }
+
+  // If the object uses subpath keys, only "." is the package root target.
+  const keys = Object.keys(value)
+  const hasSubpathKeys = keys.some(key => key.startsWith('.'))
+  if (hasSubpathKeys) {
+    if (Object.prototype.hasOwnProperty.call(value, '.')) {
+      return resolveExportTarget(value['.'])
+    }
+    return undefined
+  }
+
+  // Conditional exports object; prefer ESM-ish conditions first.
+  for (const condition of CONDITION_PRIORITY) {
+    if (Object.prototype.hasOwnProperty.call(value, condition)) {
+      const resolved = resolveExportTarget(value[condition])
+      if (resolved) {
+        return resolved
+      }
+    }
+  }
+
+  // Fall back to declaration order for unknown conditions.
+  for (const key of keys) {
+    const resolved = resolveExportTarget(value[key])
+    if (resolved) {
+      return resolved
+    }
+  }
+
+  return undefined
+}
+
+function resolvePackageEntryPoint(packageJson: PackageJSON): string {
+  const fromExports = resolveExportTarget(packageJson.exports)
+  if (fromExports) {
+    return normalizeEntryPoint(fromExports)
+  }
+
+  if (packageJson.module) {
+    return normalizeEntryPoint(packageJson.module)
+  }
+
+  if (packageJson.main) {
+    return normalizeEntryPoint(packageJson.main)
+  }
+
+  return './index.js'
+}
+
+function resolveEntrypointsFromExports(
+  packageJson: PackageJSON,
+  packageName: string,
+): PackageEntrypoint[] {
+  const entrypoints: PackageEntrypoint[] = []
+  const exportsField = packageJson.exports
+
+  if (isRecord(exportsField)) {
+    const keys = Object.keys(exportsField)
+    const hasSubpathKeys = keys.some(key => key.startsWith('.'))
+
+    if (hasSubpathKeys) {
+      keys.forEach(subpath => {
+        if (subpath !== '.' && !subpath.startsWith('./')) {
+          return
+        }
+        if (subpath.includes('*')) {
+          return
+        }
+
+        const target = resolveExportTarget(exportsField[subpath])
+        if (!target) {
+          return
+        }
+
+        const specifier =
+          subpath === '.'
+            ? packageName
+            : `${packageName}/${subpath.replace(/^\.\//, '')}`
+
+        const normalizedTarget = normalizeEntryPoint(target)
+        if (
+          normalizedTarget.endsWith('.d.ts') ||
+          normalizedTarget.endsWith('.d.mts') ||
+          normalizedTarget.endsWith('.d.cts') ||
+          normalizedTarget.endsWith('.json')
+        ) {
+          return
+        }
+
+        entrypoints.push({
+          subpath,
+          specifier,
+          target: normalizedTarget,
+        })
+      })
+    } else {
+      const target = resolveExportTarget(exportsField)
+      if (target) {
+        const normalizedTarget = normalizeEntryPoint(target)
+        if (
+          normalizedTarget.endsWith('.d.ts') ||
+          normalizedTarget.endsWith('.d.mts') ||
+          normalizedTarget.endsWith('.d.cts') ||
+          normalizedTarget.endsWith('.json')
+        ) {
+          return entrypoints
+        }
+
+        entrypoints.push({
+          subpath: '.',
+          specifier: packageName,
+          target: normalizedTarget,
+        })
+      }
+    }
+  } else {
+    const target = resolveExportTarget(exportsField)
+    if (target) {
+      const normalizedTarget = normalizeEntryPoint(target)
+      if (
+        normalizedTarget.endsWith('.d.ts') ||
+        normalizedTarget.endsWith('.d.mts') ||
+        normalizedTarget.endsWith('.d.cts') ||
+        normalizedTarget.endsWith('.json')
+      ) {
+        return entrypoints
+      }
+
+      entrypoints.push({
+        subpath: '.',
+        specifier: packageName,
+        target: normalizedTarget,
+      })
+    }
+  }
+
+  if (!entrypoints.length) {
+    entrypoints.push({
+      subpath: '.',
+      specifier: packageName,
+      target: resolvePackageEntryPoint(packageJson),
+    })
+  }
+
+  return entrypoints.filter(
+    (entrypoint, index, allEntrypoints) =>
+      allEntrypoints.findIndex(
+        other => other.specifier === entrypoint.specifier,
+      ) === index,
+  )
+}
+
 /**
  * Recursively walk exports following export * statements
  *
@@ -207,20 +407,34 @@ export async function getAllExports(
   lookupPath: string,
   installPath?: string, // Base path for calculating relative paths (optional)
 ) {
+  const metadata = await getExportsMetadata(
+    packageString,
+    context,
+    lookupPath,
+    installPath,
+  )
+  return metadata.exports
+}
+
+export async function getExportsMetadata(
+  packageString: string,
+  context: string,
+  lookupPath: string,
+  installPath?: string, // Base path for calculating relative paths (optional)
+): Promise<ExportsMetadata> {
   const startTime = performance.now()
   const visited = new Set<string>()
 
   try {
     // Read package.json to get the entry point
     const packageJsonPath = path.join(context, 'package.json')
-    const packageJson = JSON.parse(await fs.readFile(packageJsonPath, 'utf8'))
-    // Prefer module field for ESM, fallback to main, then default
-    let entryPoint = packageJson.module || packageJson.main || './index.js'
-
-    // Normalize entry point to start with ./
-    if (!entryPoint.startsWith('./') && !entryPoint.startsWith('../')) {
-      entryPoint = './' + entryPoint
-    }
+    const packageJson = JSON.parse(
+      await fs.readFile(packageJsonPath, 'utf8'),
+    ) as PackageJSON
+    const entrypoints = resolveEntrypointsFromExports(packageJson, lookupPath)
+    const rootEntrypoint = entrypoints.find(entrypoint => entrypoint.subpath === '.')
+    const entryPoint =
+      rootEntrypoint?.target || resolvePackageEntryPoint(packageJson)
 
     // Resolve the entry point relative to context
     // Pass installPath as rootContext for calculating relative paths
@@ -232,7 +446,10 @@ export async function getAllExports(
       true,
     )
     Telemetry.walkPackageExportsTree(packageString, startTime, true)
-    return results
+    return {
+      exports: results,
+      entrypoints,
+    }
   } catch (err) {
     Telemetry.walkPackageExportsTree(packageString, startTime, false, err)
     throw err

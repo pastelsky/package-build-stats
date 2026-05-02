@@ -100,21 +100,61 @@ const BuildUtils = {
     let importStatement: string
 
     if (options.esm) {
-      if (options.customImports) {
+      if (options.customImportPaths) {
+        const importLines = options.customImportPaths.map(
+          (importPath, index) =>
+            `import * as __bp_path_import_${index} from '${importPath}'`,
+        )
+        const aliasRefs = options.customImportPaths.map(
+          (_path, index) => `__bp_path_import_${index}`,
+        )
+
         importStatement = `
-          import { ${options.customImports.join(', ')} } from '${packageName}'; 
-          console.log(${options.customImports.join(', ')})
+          ${importLines.join('\n')}
+          console.log(${aliasRefs.join(', ')})
+        `
+      } else if (options.customImports) {
+        const aliasedImports = options.customImports.map((importName, index) => {
+          const importAlias = `__bp_import_${index}`
+          const quotedImportName = JSON.stringify(importName)
+          return {
+            specifier: `${quotedImportName} as ${importAlias}`,
+            alias: importAlias,
+          }
+        })
+
+        importStatement = `
+          import { ${aliasedImports.map(item => item.specifier).join(', ')} } from '${packageName}';
+          console.log(${aliasedImports.map(item => item.alias).join(', ')})
      `
       } else {
         importStatement = `import * as p from '${packageName}'; console.log(p)`
       }
     } else {
-      if (options.customImports) {
+      if (options.customImportPaths) {
+        const cjsLookups = options.customImportPaths.map(
+          (importPath, index) =>
+            `const __bp_path_import_${index} = require('${importPath}')`,
+        )
+
         importStatement = `
-        const { ${options.customImports.join(
-          ', ',
-        )} } = require('${packageName}'); 
-        console.log(${options.customImports.join(', ')})
+        ${cjsLookups.join('\n')}
+        console.log(${options.customImportPaths
+          .map((_path, index) => `__bp_path_import_${index}`)
+          .join(', ')})
+        `
+      } else if (options.customImports) {
+        const cjsLookups = options.customImports.map((importName, index) => {
+          const importAlias = `__bp_import_${index}`
+          const quotedImportName = JSON.stringify(importName)
+          return `const ${importAlias} = require('${packageName}')[${quotedImportName}]`
+        })
+
+        importStatement = `
+        ${cjsLookups.join('\n')}
+        console.log(${options.customImports
+          .map((_importName, index) => `__bp_import_${index}`)
+          .join(', ')})
         `
       } else {
         importStatement = `const p = require('${packageName}'); console.log(p)`

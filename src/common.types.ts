@@ -2,6 +2,7 @@ type PackageManager = 'npm' | 'yarn' | 'pnpm' | 'bun'
 
 type AllOptions = {
   customImports?: Array<string>
+  customImportPaths?: Array<string>
   splitCustomImports?: boolean
   debug?: boolean
   minify?: boolean
@@ -17,14 +18,18 @@ type AllOptions = {
 
 export type BuildPackageOptions = Pick<
   AllOptions,
-  'customImports' | 'splitCustomImports' | 'debug' | 'minify'
+  | 'customImports'
+  | 'customImportPaths'
+  | 'splitCustomImports'
+  | 'debug'
+  | 'minify'
 > & {
   includeDependencySizes: boolean
 }
 
 export type CreateEntryPointOptions = Pick<
   AllOptions,
-  'esm' | 'customImports' | 'entryFilename'
+  'esm' | 'customImports' | 'customImportPaths' | 'entryFilename'
 >
 export type InstallPackageOptions = Pick<
   AllOptions,
