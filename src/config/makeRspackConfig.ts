@@ -178,6 +178,7 @@ export default function makeRspackConfig({
     },
     output: {
       filename: '[name].bundle.js',
+      assetModuleFilename: '[name].[contenthash:8].bundle[ext]',
       path: outputPath,
     },
     externals: ({ request }, callback) =>
