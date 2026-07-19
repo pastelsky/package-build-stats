@@ -1,5 +1,13 @@
 # package-build-stats
 
+## 8.4.1
+
+### Patch Changes
+
+- 66b540c: Upgrade the TypeScript, Vitest, Rspack, Prettier, and Oxlint toolchain while preserving package module resolution behavior.
+- d91376e: Reduce peak build memory by serializing only the Rspack stats used for package and dependency sizes, and skip source serialization for failed compilations.
+- c2ed23f: Skip Rspack module and source serialization when dependency sizes are not requested.
+
 ## 8.4.0
 
 ### Minor Changes
