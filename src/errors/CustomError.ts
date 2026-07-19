@@ -80,3 +80,10 @@ export class UnexpectedBuildError extends CustomError {
     Object.setPrototypeOf(this, UnexpectedBuildError.prototype)
   }
 }
+
+export class UnsupportedPackageError extends CustomError {
+  constructor(originalError: any, extra?: any) {
+    super('UnsupportedPackageError', originalError, extra)
+    Object.setPrototypeOf(this, UnsupportedPackageError.prototype)
+  }
+}

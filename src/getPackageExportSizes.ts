@@ -104,6 +104,9 @@ export async function getPackageExportSizes(
     debug('Got %d exports for %s', exports.length, packageString)
     console.log(`[PERF] [ExportSizes] Found ${exports.length} exports`)
 
+    const buildExports = exports.slice(0, 1000)
+    const extraExports = exports.slice(1000)
+
     const externalsStart = performance.now()
     const externals = getExternals(packageName, installPath)
     timings.getExternals = performance.now() - externalsStart
@@ -112,22 +115,60 @@ export async function getPackageExportSizes(
     )
 
     const buildStart = performance.now()
-    const builtDetails = await BuildUtils.buildPackageIgnoringMissingDeps({
-      name: packageName,
-      installPath,
-      externals,
-      options: {
-        customImports: exports,
-        splitCustomImports: true,
-        includeDependencySizes: false,
-      },
-    })
+    const chunkSize = 100
+    const assets: Array<{
+      name: string
+      type: string
+      size: number
+      gzip: number
+    }> = []
+    const ignoredMissingDependenciesSet = new Set<string>()
+
+    for (let i = 0; i < buildExports.length; i += chunkSize) {
+      const chunk = buildExports.slice(i, i + chunkSize)
+      const chunkDetails = await BuildUtils.buildPackageIgnoringMissingDeps({
+        name: packageName,
+        installPath,
+        externals,
+        options: {
+          customImports: chunk,
+          splitCustomImports: true,
+          includeDependencySizes: false,
+        },
+      })
+      assets.push(...chunkDetails.assets)
+      if (chunkDetails.ignoredMissingDependencies) {
+        chunkDetails.ignoredMissingDependencies.forEach(dep => {
+          ignoredMissingDependenciesSet.add(dep)
+        })
+      }
+    }
+
+    if (extraExports.length > 0) {
+      const extraAssets = extraExports.map(name => ({
+        name,
+        type: 'js',
+        size: 0,
+        gzip: 0,
+      }))
+      assets.push(...extraAssets)
+    }
+
     timings.build = performance.now() - buildStart
     console.log(
       `[PERF] [ExportSizes] buildPackage: ${timings.build.toFixed(2)}ms`,
     )
 
     Telemetry.packageExportsSizes(packageString, startTime, true, options)
+
+    const builtDetails = {
+      assets,
+      ignoredMissingDependencies:
+        ignoredMissingDependenciesSet.size > 0
+          ? Array.from(ignoredMissingDependenciesSet)
+          : undefined,
+    }
+
     return {
       ...builtDetails,
       assets: builtDetails.assets.map(asset => ({
