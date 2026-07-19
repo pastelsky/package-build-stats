@@ -1,9 +1,11 @@
 import { describe, it, expect } from 'vitest'
-import { minify } from '@swc/core'
+import { minify } from 'oxc-minify'
 import getDependencySizeTree from '../../src/getDependencySizeTree'
 import { MinifyError } from '../../src/errors/CustomError'
 
 type RspackStatsCompilation = Parameters<typeof getDependencySizeTree>[1]
+// Oxc requires a filename and uses its extension to select the parse mode.
+const MINIFY_TEST_FILENAME = 'dependency.js'
 
 type FakeModule = {
   identifier?: string
@@ -23,7 +25,7 @@ function createStats(modules: FakeModule[]): RspackStatsCompilation {
 
 async function minifiedUtf8Size(source: string | Buffer) {
   const text = typeof source === 'string' ? source : source.toString('utf8')
-  const minifiedResult = await minify(text, {
+  const minifiedResult = await minify(MINIFY_TEST_FILENAME, text, {
     compress: true,
     mangle: true,
     module: true,
@@ -83,7 +85,7 @@ describe('getDependencySizeTree - accuracy', () => {
     }
 
     // Compute the expected size using the same minifier, but measure size via Buffer.byteLength
-    const minified = await minify(source, {
+    const minified = await minify(MINIFY_TEST_FILENAME, source, {
       compress: true,
       mangle: true,
       module: true,
@@ -123,7 +125,7 @@ describe('getDependencySizeTree - accuracy', () => {
         'fixture-pkg',
         createStats(stats.modules ?? []),
       )
-      // If it doesn't throw, that's actually okay - SWC might handle it
+      // If it doesn't throw, that's okay - the minifier might handle it
       // This test documents the expected behavior when minification fails
     } catch (error) {
       // If it does throw, it should be a MinifyError
@@ -131,7 +133,7 @@ describe('getDependencySizeTree - accuracy', () => {
         expect(error.name).toBe('MinifyError')
         expect(error.originalError).toBeDefined()
       }
-      // Allow the test to pass whether it throws or not, since SWC is very robust
+      // Allow the test to pass whether it throws or not, since minifiers can be robust
     }
   })
 

@@ -1,8 +1,11 @@
 import path from 'path'
-import { minify } from '@swc/core'
+import { minify } from 'oxc-minify'
+import PQueue from 'p-queue'
 import { MinifyError } from './errors/CustomError.js'
 import Telemetry from './utils/telemetry.utils.js'
 import { performance } from 'perf_hooks'
+
+const minifyQueue = new PQueue({ concurrency: 4 })
 
 function modulePath(identifier: string) {
   // the format of module paths is
@@ -66,18 +69,26 @@ function extractPackageNamesFromPath(moduleFilePath: string): string[] {
   return packages
 }
 
-async function minifyDependencyCode(source: string) {
+async function minifyDependencyCode(source: string, filename: string) {
   if (process.env.DEBUG_SIZE) {
     console.log('Minifying dependency code...')
   }
 
   try {
     const startTime = Date.now()
-    const result = await minify(source, {
+    const result = await minify(filename, source, {
       compress: true,
       mangle: true,
       module: true, // Treat as ES module to support import/export
     })
+
+    if (result.errors.length > 0) {
+      const error = new Error(
+        result.errors.map(diagnostic => diagnostic.message).join('\n'),
+      )
+      Object.assign(error, { filename })
+      throw error
+    }
     const minifyTime = Date.now() - startTime
 
     if (process.env.DEBUG_SIZE) {
@@ -89,7 +100,7 @@ async function minifyDependencyCode(source: string) {
     if (process.env.DEBUG_SIZE) {
       console.log('Minify error occurred')
     }
-    console.error('SWC minify error:', error)
+    console.error('Oxc minify error:', error)
     throw error
   }
 }
@@ -276,75 +287,74 @@ async function bundleSizeTree(
     )
   }
 
-  const resultPromises = flattenedItems
+  const treeItems = flattenedItems
     .map(treeItem => ({
       ...treeItem,
       sources: treeItem.sources.filter(source => !!source),
     }))
     .filter(treeItem => treeItem.sources.length)
-    .map(async treeItem => {
-      if (process.env.DEBUG_SIZE) {
-        console.log(`\n[LOCAL] Processing dependency: ${treeItem.packageName}`)
-      }
 
-      const sourceMinifiedPromises = treeItem.sources.map(
-        async (code: string, idx) => {
-          const originalSize = getUtf8Size(code)
+  const resultPromises = treeItems.map(async treeItem => {
+    if (process.env.DEBUG_SIZE) {
+      console.log(`\n[LOCAL] Processing dependency: ${treeItem.packageName}`)
+    }
 
-          if (process.env.DEBUG_SIZE) {
-            console.log(`Source ${idx}: ${originalSize} bytes (original)`)
-          }
+    try {
+      const minifiedSizes = await Promise.all(
+        treeItem.sources.map((code: string, idx) =>
+          minifyQueue.add(async () => {
+            const originalSize = getUtf8Size(code)
 
-          const minified = await minifyDependencyCode(code)
-          const minifiedSize = getUtf8Size(minified.code || '')
+            if (process.env.DEBUG_SIZE) {
+              console.log(`Source ${idx}: ${originalSize} bytes (original)`)
+            }
 
-          if (process.env.DEBUG_SIZE) {
-            console.log(`Source ${idx}: ${minifiedSize} bytes (minified)`)
-          }
+            const minified = await minifyDependencyCode(
+              code,
+              `${treeItem.packageName}-${idx}.js`,
+            )
+            const minifiedSize = getUtf8Size(minified.code || '')
 
-          return minified
-        },
+            if (process.env.DEBUG_SIZE) {
+              console.log(`Source ${idx}: ${minifiedSize} bytes (minified)`)
+            }
+
+            return minifiedSize
+          }),
+        ),
+      )
+      const size = minifiedSizes.reduce(
+        (total, minifiedSize) => total + minifiedSize,
+        0,
       )
 
-      try {
-        const sources = await Promise.all(sourceMinifiedPromises)
-        const size = sources.reduce((acc: number, source, idx) => {
-          const sourceSize = getUtf8Size(source.code || '')
-          if (process.env.DEBUG_SIZE) {
-            console.log(
-              `Total accumulation at idx ${idx}: ${acc + sourceSize} bytes`,
-            )
-          }
-          return acc + sourceSize
-        }, 0)
-
-        if (process.env.DEBUG_SIZE) {
-          console.log(`Final size for ${treeItem.packageName}: ${size} bytes`)
-        }
-
-        return {
-          name: treeItem.packageName,
-          approximateSize: size,
-        }
-      } catch (error: any) {
-        const { message, filename } = error
-        throw new MinifyError(error, {
-          message: message,
-          filePath: filename,
-        })
+      if (process.env.DEBUG_SIZE) {
+        console.log(`Final size for ${treeItem.packageName}: ${size} bytes`)
       }
-    })
+
+      return {
+        name: treeItem.packageName,
+        approximateSize: size,
+      }
+    } catch (error: any) {
+      const { message, filename } = error
+      throw new MinifyError(error, {
+        message: message,
+        filePath: filename,
+      })
+    }
+  })
 
   try {
     const results = await Promise.all(resultPromises)
-    Telemetry.dependencySizes(packageName, startTime, true, { minifier: 'swc' })
+    Telemetry.dependencySizes(packageName, startTime, true, { minifier: 'oxc' })
     return results
   } catch (e) {
     Telemetry.dependencySizes(
       packageName,
       startTime,
       false,
-      { minifier: 'swc' },
+      { minifier: 'oxc' },
       e,
     )
     throw e
