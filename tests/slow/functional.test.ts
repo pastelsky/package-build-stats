@@ -178,6 +178,8 @@ describe('Functional Tests - Package Building & Sizing', () => {
       const packages = ['redux@3.7.2', 'preact@8.2.5', 'axios@0.16.2']
 
       for (const pkg of packages) {
+        // Keep live registry installs sequential to avoid rate-limit flakes.
+        // oxlint-disable-next-line no-await-in-loop
         const result = await getPackageStats(pkg)
 
         // Gzip should be 20-70% of original size (typical range)

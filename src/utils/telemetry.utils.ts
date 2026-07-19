@@ -1,7 +1,7 @@
 import mitt from 'mitt'
 import type { Emitter, EventType } from 'mitt'
 import { parsePackageString } from './common.utils.js'
-import { performance } from 'perf_hooks'
+import { performance } from 'node:perf_hooks'
 import _ from 'lodash'
 import createDebug from 'debug'
 
@@ -34,6 +34,8 @@ function errorToObject(error: any) {
   return { error }
 }
 
+// The class is the package's existing namespaced telemetry API.
+// oxlint-disable-next-line typescript/no-extraneous-class
 export default class Telemetry {
   static installPackage(
     packageString: string,

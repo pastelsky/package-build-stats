@@ -11,9 +11,17 @@ import {
   getAllPackageExports,
 } from './build/index.js'
 
-const PORT = 3000
+const PORT = Number(process.env.PORT ?? 3000)
+
+if (!Number.isInteger(PORT) || PORT < 1 || PORT > 65535) {
+  throw new Error(
+    `PORT must be an integer between 1 and 65535; received ${process.env.PORT}`,
+  )
+}
+
 const activeRequests = new Map()
 let nextRequestId = 0
+let isShuttingDown = false
 
 const formatMiB = bytes => Number((bytes / 1024 / 1024).toFixed(1))
 const getMemorySnapshot = () => {
@@ -31,6 +39,7 @@ const getMemorySnapshot = () => {
     nativeContextCount: heap.number_of_native_contexts,
     detachedContextCount: heap.number_of_detached_contexts,
     activeRequests: activeRequests.size,
+    isShuttingDown,
   }
 }
 
@@ -88,6 +97,22 @@ const withMemoryLogging = (label, handler) => async ctx => {
   }
 }
 
+const packageRoute = (route, handler) =>
+  get(
+    route,
+    withMemoryLogging(route, async ctx => {
+      try {
+        return json(await handler(decodeURIComponent(ctx.query.p), ctx.query))
+      } catch (error) {
+        console.error(error)
+        return status(500).send({
+          statusCode: 500,
+          body: JSON.stringify(error),
+        })
+      }
+    }),
+  )
+
 const heapSnapshotDir = path.join(process.cwd(), 'reports', 'heap-debug')
 fs.mkdirSync(heapSnapshotDir, { recursive: true })
 
@@ -105,64 +130,18 @@ setInterval(() => {
 console.log(`Starting at port ${PORT}`)
 logMemory('startup')
 
-server({ port: PORT }, [
-  get(
-    '/size',
-    withMemoryLogging('/size', async ctx => {
-      const packageString = decodeURIComponent(ctx.query.p)
-
-      try {
-        const result = await getPackageStats(packageString, {
-          ...ctx.query,
-        })
-        return json(result)
-      } catch (err) {
-        console.log(err)
-        return status(500).send({
-          statusCode: 500,
-          body: JSON.stringify(err),
-        })
-      }
+const application = await server({ port: PORT }, [
+  packageRoute('/size', (packageString, query) =>
+    getPackageStats(packageString, { ...query }),
+  ),
+  packageRoute('/export-sizes', (packageString, query) =>
+    getPackageExportSizes(packageString, {
+      debug: !!query.debug,
+      minifier: query.minifier,
     }),
   ),
-  get(
-    '/export-sizes',
-    withMemoryLogging('/export-sizes', async ctx => {
-      const packageString = decodeURIComponent(ctx.query.p)
-
-      try {
-        const result = await getPackageExportSizes(packageString, {
-          debug: !!ctx.query.debug,
-          minifier: ctx.query.minifier,
-        })
-        return json(result)
-      } catch (err) {
-        console.log(err)
-        return status(500).send({
-          statusCode: 500,
-          body: JSON.stringify(err),
-        })
-      }
-    }),
-  ),
-  get(
-    '/exports',
-    withMemoryLogging('/exports', async ctx => {
-      const packageString = decodeURIComponent(ctx.query.p)
-
-      try {
-        const result = await getAllPackageExports(packageString, {
-          debug: !!ctx.query.debug,
-        })
-        return json(result)
-      } catch (err) {
-        console.log(err)
-        return status(500).send({
-          statusCode: 500,
-          body: JSON.stringify(err),
-        })
-      }
-    }),
+  packageRoute('/exports', (packageString, query) =>
+    getAllPackageExports(packageString, { debug: !!query.debug }),
   ),
   get('/__debug/memory', async () => json(getMemorySnapshot())),
   get('/__debug/heapdump', async () => {
@@ -184,3 +163,31 @@ server({ port: PORT }, [
     })
   }),
 ])
+
+const shutdown = async signal => {
+  if (isShuttingDown) return
+  isShuttingDown = true
+  logMemory('shutdown-start', { signal })
+
+  const forceShutdownTimer = setTimeout(() => {
+    console.error('Graceful shutdown timed out')
+    process.exit(1)
+  }, 10000)
+  forceShutdownTimer.unref()
+
+  try {
+    await application.close()
+    logMemory('shutdown-complete', { signal })
+  } catch (error) {
+    console.error('Graceful shutdown failed:', error)
+    process.exitCode = 1
+  } finally {
+    clearTimeout(forceShutdownTimer)
+  }
+}
+
+for (const signal of ['SIGINT', 'SIGTERM']) {
+  process.once(signal, () => {
+    void shutdown(signal)
+  })
+}

@@ -1,20 +1,18 @@
-import path from 'path'
-import config from '../config/config.js'
-import { Entry, rspack } from '@rspack/core'
+import fs from 'node:fs'
+import path from 'node:path'
+import { performance } from 'node:perf_hooks'
+import { gzipSync } from 'node:zlib'
+import { rspack } from '@rspack/core'
+import type { Entry, Stats, StatsOptions } from '@rspack/core'
 import isValidNPMName from 'is-valid-npm-name'
-import { gzipSync } from 'zlib'
-import fs from 'fs'
 import getDependencySizes from '../getDependencySizeTree.js'
 import makeRspackConfig from '../config/makeRspackConfig.js'
-import { performance } from 'perf_hooks'
-import type { Stats, StatsOptions } from '@rspack/core'
-
 import {
   EntryPointError,
   MissingDependencyError,
   UnexpectedBuildError,
 } from '../errors/CustomError.js'
-import {
+import type {
   Externals,
   BuildPackageOptions,
   CreateEntryPointOptions,
@@ -199,16 +197,13 @@ const BuildUtils = {
   },
 
   parseMissingModules(errors: ReturnType<typeof getCompilationErrors>) {
-    // There's a better way to get the missing module's name, maybe ?
     const missingModuleRegex = /Can't resolve '(.+)' in/
 
     const missingModules = errors.map(err => {
       const matches = err.message.match(missingModuleRegex)
 
       if (!matches) {
-        throw new UnexpectedBuildError(
-          'Expected to find a file path in the module not found error, but found none. Regex for this might be out of date.',
-        )
+        return undefined
       }
 
       const missingFilePath = matches[1]
@@ -228,7 +223,13 @@ const BuildUtils = {
       return packageNameMatch[0]
     })
 
-    let uniqueMissingModules = Array.from(new Set(missingModules))
+    if (missingModules.some(moduleName => moduleName === undefined)) {
+      return []
+    }
+
+    let uniqueMissingModules = Array.from(new Set(missingModules)).filter(
+      notEmpty,
+    )
     uniqueMissingModules = uniqueMissingModules.filter(
       mod => !mod.startsWith(`${uniqueMissingModules[0]}/`),
     )
@@ -242,7 +243,8 @@ const BuildUtils = {
     externals,
     options,
   }: BuildPackageArgs) {
-    const outputPath = config.tmp
+    // Package builds run concurrently, so each install owns its build output.
+    const outputPath = path.join(installPath, 'build')
     let entry: any = {}
 
     if (options.splitCustomImports) {
@@ -276,6 +278,12 @@ const BuildUtils = {
 
     if (compilationErrors.length) {
       const missingModules = BuildUtils.parseMissingModules(compilationErrors)
+
+      if (!missingModules.length) {
+        throw new UnexpectedBuildError(
+          compilationErrors.map(error => error.message),
+        )
+      }
 
       if (missingModules.length === 1 && missingModules[0] === packageName) {
         throw new EntryPointError(compilationErrors.map(err => err.message))

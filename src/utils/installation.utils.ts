@@ -1,22 +1,88 @@
 import { rimraf } from 'rimraf'
-import path from 'path'
-import fs from 'fs/promises'
+import { randomUUID } from 'node:crypto'
+import fs from 'node:fs/promises'
+import path from 'node:path'
+import { performance } from 'node:perf_hooks'
 import sanitize from 'sanitize-filename'
-import { randomUUID } from 'crypto'
 import createDebug from 'debug'
 
 const debug = createDebug('bp:worker')
 import { InstallError, PackageNotFoundError } from '../errors/CustomError.js'
-import { exec } from './common.utils.js'
+import { exec, ProcessExecutionError } from './common.utils.js'
 import config from '../config/config.js'
-import { InstallPackageOptions } from '../common.types.js'
+import { packageManagers } from '../common.types.js'
+import type { InstallPackageOptions, PackageManager } from '../common.types.js'
 import Telemetry from './telemetry.utils.js'
-import { performance } from 'perf_hooks'
 
-// When operating on a local directory, force npm to copy directory structure
-// and all dependencies instead of just symlinking files
-const wrapPackCommand = (packagePath: string) =>
-  `$(npm pack --ignore-scripts ${packagePath} | tail -1)`
+const cachePath = path.join(config.tmp, 'cache')
+
+async function packLocalPackage(
+  packagePath: string,
+  installPath: string,
+  timeout: number,
+) {
+  const output = await exec(
+    'npm',
+    [
+      'pack',
+      '--ignore-scripts',
+      '--json',
+      `--cache=${cachePath}`,
+      '--loglevel=error',
+      packagePath,
+    ],
+    { cwd: installPath, maxBuffer: 1024 * 500 },
+    timeout,
+  )
+  const filename = (JSON.parse(output) as Array<{ filename?: unknown }>)[0]
+    ?.filename
+
+  if (typeof filename !== 'string' || path.basename(filename) !== filename) {
+    throw new Error('npm pack did not return a valid tarball filename')
+  }
+
+  return path.join(installPath, filename)
+}
+
+const flags = (value: string) => value.split(' ')
+const installFlags = {
+  yarn: flags(
+    '--ignore-flags --ignore-engines --skip-integrity-check --exact --json --no-progress --silent --no-lockfile --no-bin-links --ignore-optional',
+  ),
+  npm: flags(
+    `--cache=${cachePath} --no-package-lock --no-shrinkwrap --legacy-peer-deps --no-optional --no-bin-links --progress=false --loglevel=error --ignore-scripts --save-exact --production --json`,
+  ),
+  pnpm: flags('--no-optional --loglevel=error --ignore-scripts --save-exact'),
+  bun: flags(
+    `--cache-dir=${path.join(cachePath, 'bun')} --no-save --production --ignore-scripts --no-progress --silent`,
+  ),
+} satisfies Record<PackageManager, string[]>
+
+function getInstallArgs(
+  client: PackageManager,
+  packageString: string,
+  options: InstallPackageOptions,
+) {
+  const { additionalPackages = [], networkConcurrency } = options
+  const args = [
+    client === 'npm' ? 'install' : 'add',
+    packageString,
+    ...additionalPackages,
+    ...installFlags[client],
+  ]
+
+  if (client === 'yarn' && options.limitConcurrency) {
+    args.push('--mutex', 'network')
+  }
+  if (networkConcurrency && client === 'yarn') {
+    args.push('--network-concurrency', String(networkConcurrency))
+  }
+  if (networkConcurrency && client === 'bun') {
+    args.push(`--network-concurrency=${networkConcurrency}`)
+  }
+
+  return args
+}
 
 const InstallationUtils = {
   getInstallPath(packageName: string) {
@@ -30,8 +96,7 @@ const InstallationUtils = {
 
   async preparePath(
     packageName: string,
-    clientOption?:
-      'npm' | 'yarn' | 'pnpm' | 'bun' | Array<'npm' | 'yarn' | 'pnpm' | 'bun'>,
+    clientOption?: PackageManager | PackageManager[],
   ) {
     const startTime = performance.now()
     const installPath = InstallationUtils.getInstallPath(packageName)
@@ -110,12 +175,14 @@ const InstallationUtils = {
     const clients = Array.isArray(client) ? client : [client]
 
     // Try each client in order until one succeeds
-    let lastError: any = null
+    let lastError: unknown
     for (let i = 0; i < clients.length; i++) {
       const currentClient = clients[i]
       const isLastClient = i === clients.length - 1
 
       try {
+        // Package managers are ordered fallbacks, not parallel alternatives.
+        // oxlint-disable-next-line no-await-in-loop
         await InstallationUtils.installWithClient(
           packageString,
           installPath,
@@ -149,106 +216,34 @@ const InstallationUtils = {
     }
 
     // All clients failed
-    throw lastError
+    throw lastError ?? new InstallError('No package manager was configured')
   },
 
   async installWithClient(
     packageString: string,
     installPath: string,
     installOptions: InstallPackageOptions,
-    currentClient: 'npm' | 'yarn' | 'pnpm' | 'bun',
+    currentClient: PackageManager,
   ) {
-    let flags, command
-    let installStartTime = performance.now()
-
-    const {
-      limitConcurrency,
-      networkConcurrency,
-      additionalPackages = [],
-      isLocal,
-      installTimeout = 45000,
-    } = installOptions
-
-    if (currentClient === 'yarn') {
-      flags = [
-        'ignore-flags',
-        'ignore-engines',
-        'skip-integrity-check',
-        'exact',
-        'json',
-        'no-progress',
-        'silent',
-        'no-lockfile',
-        'no-bin-links',
-        'ignore-optional',
-      ]
-      if (limitConcurrency) {
-        flags.push('mutex network')
-      }
-
-      if (networkConcurrency) {
-        flags.push(`network-concurrency ${networkConcurrency}`)
-      }
-
-      command = `yarn add ${packageString} ${additionalPackages.join(
-        ' ',
-      )} --${flags.join(' --')}`
-    } else if (currentClient === 'npm') {
-      flags = [
-        // Setting cache is required for concurrent `npm install`s to work
-        `cache=${path.join(config.tmp, 'cache')}`,
-        'no-package-lock',
-        'no-shrinkwrap',
-        'legacy-peer-deps',
-        'no-optional',
-        'no-bin-links',
-        'progress false',
-        'loglevel error',
-        'ignore-scripts',
-        'save-exact',
-        'production',
-        'json',
-      ]
-
-      command = `npm install ${
-        isLocal ? wrapPackCommand(packageString) : packageString
-      } ${additionalPackages.join(' ')} --${flags.join(' --')}`
-    } else if (currentClient === 'pnpm') {
-      flags = ['no-optional', 'loglevel error', 'ignore-scripts', 'save-exact']
-
-      command = `pnpm add ${packageString} ${additionalPackages.join(
-        ' ',
-      )} --${[].join(' --')}`
-    } else if (currentClient === 'bun') {
-      flags = [
-        'no-save', // Don't update package.json or save lockfile
-        'production', // Don't install devDependencies
-        'ignore-scripts', // Skip lifecycle scripts
-        'no-progress', // Disable progress bar
-        'silent', // Don't log anything
-      ]
-
-      // Add network concurrency if specified
-      if (networkConcurrency) {
-        flags.push(`network-concurrency=${networkConcurrency}`)
-      }
-
-      command = `bun add ${packageString} ${additionalPackages.join(
-        ' ',
-      )} --cache-dir=${path.join(config.tmp, 'cache', 'bun')} --${flags.join(
-        ' --',
-      )}`
-    } else {
-      console.error('No valid client specified')
-      process.exit(1)
+    if (!packageManagers.includes(currentClient)) {
+      throw new TypeError(`Unsupported package manager: ${currentClient}`)
     }
+
+    const installStartTime = performance.now()
+
+    const { isLocal, installTimeout = 45000 } = installOptions
 
     debug('install start %s', packageString)
 
     try {
+      const packageToInstall = isLocal
+        ? await packLocalPackage(packageString, installPath, installTimeout)
+        : packageString
+
       const execStartTime = performance.now()
       await exec(
-        command,
+        currentClient,
+        getInstallArgs(currentClient, packageToInstall, installOptions),
         {
           cwd: installPath,
           maxBuffer: 1024 * 500,
@@ -276,7 +271,10 @@ const InstallationUtils = {
         ...installOptions,
         client: currentClient,
       })
-      if (typeof err === 'string' && err.includes('code E404')) {
+      if (
+        err instanceof ProcessExecutionError &&
+        `${err.stderr}\n${err.stdout}`.includes('code E404')
+      ) {
         throw new PackageNotFoundError(err)
       } else {
         throw new InstallError(err)

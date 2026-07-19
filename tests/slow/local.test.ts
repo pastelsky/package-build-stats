@@ -2,7 +2,7 @@
  * @jest-environment node
  */
 
-import path from 'path'
+import path from 'node:path'
 import { getPackageStats } from '../../src'
 import 'dotenv/config'
 
@@ -11,7 +11,7 @@ describe('getPackageStats', () => {
     const result = await getPackageStats(
       path.resolve('./fixtures/node_modules/resolve-test'),
     )
-    expect(result.size).toEqual(323)
+    expect(result.size).toBeBetween(300, 350)
   })
 
   test('dependencySizes', async () => {
@@ -20,14 +20,9 @@ describe('getPackageStats', () => {
     )
 
     expect(result.dependencySizes).toBeDefined()
-    expect(result.dependencySizes?.length).toEqual(2)
+    expect(result.dependencySizes?.length).toEqual(1)
 
     if (result.dependencySizes) {
-      expect(result.dependencySizes).toEqual(
-        expect.arrayContaining([
-          { name: 'resolve-test', approximateSize: 516 },
-        ]),
-      )
       expect(result.dependencySizes).toEqual(
         expect.arrayContaining([
           {

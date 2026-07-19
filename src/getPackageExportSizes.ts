@@ -1,6 +1,6 @@
 import Telemetry from './utils/telemetry.utils.js'
-import { performance } from 'perf_hooks'
-import path from 'path'
+import { performance } from 'node:perf_hooks'
+import path from 'node:path'
 
 import createDebug from 'debug'
 
@@ -10,7 +10,7 @@ import { getExternals, parsePackageString } from './utils/common.utils.js'
 import { getAllExports } from './utils/exports.utils.js'
 import InstallationUtils from './utils/installation.utils.js'
 import BuildUtils from './utils/build.utils.js'
-import {
+import type {
   GetPackageStatsOptions,
   InstallPackageOptions,
 } from './common.types.js'
@@ -126,6 +126,8 @@ export async function getPackageExportSizes(
 
     for (let i = 0; i < buildExports.length; i += chunkSize) {
       const chunk = buildExports.slice(i, i + chunkSize)
+      // Build chunks sequentially to cap Rspack's peak memory usage.
+      // oxlint-disable-next-line no-await-in-loop
       const chunkDetails = await BuildUtils.buildPackageIgnoringMissingDeps({
         name: packageName,
         installPath,

@@ -1,8 +1,8 @@
-import fs from 'fs/promises'
-import os from 'os'
-import path from 'path'
+import fs from 'node:fs/promises'
+import os from 'node:os'
+import path from 'node:path'
 
-import { exec } from '../../src/utils/common.utils'
+import { exec, type ProcessExecutionError } from '../../src/utils/common.utils'
 
 const isProcessRunning = (pid: number) => {
   try {
@@ -20,6 +20,8 @@ const waitForProcessToExit = async (pid: number, timeout: number) => {
     if (!isProcessRunning(pid)) {
       return true
     }
+    // Polling is intentionally sequential so the timeout remains bounded.
+    // oxlint-disable-next-line no-await-in-loop
     await new Promise(resolve => setTimeout(resolve, 25))
   }
 
@@ -28,11 +30,35 @@ const waitForProcessToExit = async (pid: number, timeout: number) => {
 
 describe.runIf(process.platform !== 'win32')('exec process cleanup', () => {
   test('returns stdout for a successful command', async () => {
-    await expect(exec(`printf 'completed'`, {})).resolves.toBe('completed')
+    await expect(
+      exec(process.execPath, ['-e', "process.stdout.write('completed')"], {}),
+    ).resolves.toBe('completed')
   })
 
-  test('returns stderr for a failed command', async () => {
-    await expect(exec(`printf 'failed' >&2; exit 1`, {})).rejects.toBe('failed')
+  test('returns a structured error for a failed command', async () => {
+    await expect(
+      exec(
+        process.execPath,
+        ['-e', "process.stderr.write('failed'); process.exit(2)"],
+        {},
+      ),
+    ).rejects.toMatchObject({
+      name: 'ProcessExecutionError',
+      message: 'failed',
+      stderr: 'failed',
+      exitCode: 2,
+    } satisfies Partial<ProcessExecutionError>)
+  })
+
+  test('passes arguments literally instead of evaluating shell syntax', async () => {
+    const shellSyntax = '$(printf injected); semicolon; *'
+    await expect(
+      exec(
+        process.execPath,
+        ['-e', 'process.stdout.write(process.argv[1])', shellSyntax],
+        {},
+      ),
+    ).resolves.toBe(shellSyntax)
   })
 
   test('kills descendants when a command times out', async () => {
@@ -43,10 +69,10 @@ describe.runIf(process.platform !== 'win32')('exec process cleanup', () => {
     let descendantPid: number | undefined
 
     try {
-      const command = `sh -c 'sleep 30 & echo $! > "${pidFile}"; wait'`
+      const command = `sleep 30 & echo $! > "${pidFile}"; wait`
       const startedAt = performance.now()
 
-      await expect(exec(command, {}, 100)).rejects.toContain(
+      await expect(exec('sh', ['-c', command], {}, 100)).rejects.toThrow(
         'cancelled as it exceeded a timeout',
       )
 

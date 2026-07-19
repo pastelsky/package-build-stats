@@ -9,18 +9,20 @@
   },
   "license": "MIT",
   "engines": {
-    "node": ">=20.0.0",
+    "node": ">=22.0.0",
     "npm": ">=10.0.0"
   },
   "files": [
     "build",
+    "bin",
     "src"
   ],
   "main": "build/index.js",
+  "types": "build/index.d.ts",
   "scripts": {
-    "start": "ts-node --files index.js",
-    "dev": "DEBUG=bp* ts-node-dev --files index.js",
-    "dev:perf": "DEBUG=bp-telemetry* ts-node-dev --files index.js",
+    "start": "node index.js",
+    "dev": "DEBUG=bp* node --watch index.js",
+    "dev:perf": "DEBUG=bp-telemetry* node --watch index.js",
     "build": "tsc",
     "type-check": "tsc --noEmit",
     "lint": "oxlint src tests",
@@ -60,7 +62,7 @@
     "@types/debug": "^4.1.12",
     "@types/escape-string-regexp": "^2.0.3",
     "@types/lodash": "^4.17.13",
-    "@types/node": "^24.9.2",
+    "@types/node": "^22.0.0",
     "@types/pify": "^6.1.0",
     "@types/rimraf": "^4.0.5",
     "@types/sanitize-filename": "^1.6.3",
@@ -76,8 +78,6 @@
     "prettier": "^3.9.5",
     "pretty-quick": "^4.0.0",
     "semver": "^7.7.3",
-    "ts-node": "^10.9.2",
-    "ts-node-dev": "^2.0.0",
     "typescript": "^7.0.2",
     "vitest": "4.1.10"
   },
@@ -88,7 +88,6 @@
     "css-loader": "^7.1.0",
     "debug": "^4.4.3",
     "esbuild": "^0.25.12",
-    "esbuild-register": "^3.6.0",
     "escape-string-regexp": "^5.0.0",
     "fast-safe-stringify": "^2.1.1",
     "firebase-admin": "^13.6.0",
