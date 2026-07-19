@@ -3,15 +3,14 @@
  * name.
  */
 class CustomError extends Error {
-  originalError: any
-  extra: any
+  readonly originalError: unknown
+  readonly extra: unknown
 
-  constructor(name: string, originalError: Error, extra?: any) {
-    super(name)
+  constructor(name: string, originalError: unknown, extra?: unknown) {
+    super(name, { cause: originalError })
     this.name = name
     this.originalError = originalError
     this.extra = extra
-    Object.setPrototypeOf(this, CustomError.prototype)
   }
 
   toJSON() {
@@ -24,66 +23,60 @@ class CustomError extends Error {
 }
 
 export class BuildError extends CustomError {
-  constructor(originalError: any, extra?: any) {
+  constructor(originalError: unknown, extra?: unknown) {
     super('BuildError', originalError, extra)
-    Object.setPrototypeOf(this, BuildError.prototype)
   }
 }
 
 export class EntryPointError extends CustomError {
-  constructor(originalError: any, extra?: any) {
+  constructor(originalError: unknown, extra?: unknown) {
     super('EntryPointError', originalError, extra)
-    Object.setPrototypeOf(this, EntryPointError.prototype)
   }
 }
 
 export class InstallError extends CustomError {
-  constructor(originalError: any, extra?: any) {
+  constructor(originalError: unknown, extra?: unknown) {
     super('InstallError', originalError, extra)
-    Object.setPrototypeOf(this, InstallError.prototype)
   }
 }
 
 export class PackageNotFoundError extends CustomError {
-  constructor(originalError: any, extra?: any) {
+  constructor(originalError: unknown, extra?: unknown) {
     super('PackageNotFoundError', originalError, extra)
-    Object.setPrototypeOf(this, PackageNotFoundError.prototype)
   }
 }
 
 export class CLIBuildError extends CustomError {
-  constructor(originalError: any, extra?: any) {
+  constructor(originalError: unknown, extra?: unknown) {
     super('CLIBuildError', originalError, extra)
-    Object.setPrototypeOf(this, CLIBuildError.prototype)
   }
 }
 
 export class MinifyError extends CustomError {
-  constructor(originalError: any, extra?: any) {
+  constructor(originalError: unknown, extra?: unknown) {
     super('MinifyError', originalError, extra)
-    Object.setPrototypeOf(this, MinifyError.prototype)
   }
 }
 
 export class MissingDependencyError extends CustomError {
   missingModules: Array<string>
-  constructor(originalError: any, extra: { missingModules: Array<string> }) {
+  constructor(
+    originalError: unknown,
+    extra: { missingModules: Array<string> },
+  ) {
     super('MissingDependencyError', originalError, extra)
     this.missingModules = extra.missingModules
-    Object.setPrototypeOf(this, MissingDependencyError.prototype)
   }
 }
 
 export class UnexpectedBuildError extends CustomError {
-  constructor(originalError: any, extra?: any) {
+  constructor(originalError: unknown, extra?: unknown) {
     super('UnexpectedBuildError', originalError, extra)
-    Object.setPrototypeOf(this, UnexpectedBuildError.prototype)
   }
 }
 
 export class UnsupportedPackageError extends CustomError {
-  constructor(originalError: any, extra?: any) {
+  constructor(originalError: unknown, extra?: unknown) {
     super('UnsupportedPackageError', originalError, extra)
-    Object.setPrototypeOf(this, UnsupportedPackageError.prototype)
   }
 }

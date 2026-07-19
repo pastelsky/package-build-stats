@@ -1,13 +1,26 @@
-import childProcess from 'child_process'
-import path from 'path'
-import { builtinModules } from 'module'
-import fs from 'fs'
-import os from 'os'
+import childProcess from 'node:child_process'
+import fs from 'node:fs'
+import { builtinModules } from 'node:module'
+import os from 'node:os'
+import path from 'node:path'
 
 const homeDirectory = os.homedir()
 
 interface ExecOptions extends childProcess.SpawnOptions {
   maxBuffer?: number
+}
+
+export class ProcessExecutionError extends Error {
+  constructor(
+    message: string,
+    readonly stdout = '',
+    readonly stderr = '',
+    readonly exitCode: number | null = null,
+    readonly signal: NodeJS.Signals | null = null,
+  ) {
+    super(message)
+    this.name = 'ProcessExecutionError'
+  }
 }
 
 export const getBuiltInModules = () =>
@@ -37,16 +50,17 @@ function killProcessTree(child: childProcess.ChildProcess) {
 
 export function exec(
   command: string,
+  args: readonly string[],
   options: ExecOptions,
   timeout?: number,
 ): Promise<string> {
-  let timerId: NodeJS.Timeout
+  let timerId: NodeJS.Timeout | undefined
   return new Promise<string>((resolve, reject) => {
     const { maxBuffer = 1024 * 1024, ...spawnOptions } = options
-    const child = childProcess.spawn(command, [], {
+    const child = childProcess.spawn(command, args, {
       ...spawnOptions,
       detached: process.platform !== 'win32',
-      shell: spawnOptions.shell ?? true,
+      shell: false,
       stdio: ['ignore', 'pipe', 'pipe'],
     })
     const stdout: Buffer[] = []
@@ -68,8 +82,19 @@ export function exec(
 
     const rejectAndKill = (message: string) => {
       finish(() => {
-        killProcessTree(child)
-        reject(message)
+        try {
+          killProcessTree(child)
+        } catch (error) {
+          reject(error)
+          return
+        }
+        reject(
+          new ProcessExecutionError(
+            message,
+            Buffer.concat(stdout).toString(),
+            Buffer.concat(stderr).toString(),
+          ),
+        )
       })
     }
 
@@ -93,14 +118,23 @@ export function exec(
       finish(() => reject(error))
     })
 
-    child.once('close', code => {
+    child.once('close', (code, signal) => {
       finish(() => {
         const stdoutText = Buffer.concat(stdout).toString()
         const stderrText = Buffer.concat(stderr).toString()
         if (code === 0) {
           resolve(stdoutText)
         } else {
-          reject(stderrText)
+          reject(
+            new ProcessExecutionError(
+              stderrText.trim() ||
+                `Command exited with ${signal ? `signal ${signal}` : `code ${code}`}`,
+              stdoutText,
+              stderrText,
+              code,
+              signal,
+            ),
+          )
         }
       })
     })

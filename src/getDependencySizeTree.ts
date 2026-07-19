@@ -1,9 +1,9 @@
-import path from 'path'
+import path from 'node:path'
+import { performance } from 'node:perf_hooks'
 import { minify } from 'oxc-minify'
 import PQueue from 'p-queue'
 import { MinifyError } from './errors/CustomError.js'
 import Telemetry from './utils/telemetry.utils.js'
-import { performance } from 'perf_hooks'
 
 const minifyQueue = new PQueue({ concurrency: 4 })
 

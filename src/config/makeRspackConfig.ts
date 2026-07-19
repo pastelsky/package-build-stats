@@ -3,11 +3,11 @@ import autoprefixer from 'autoprefixer'
 import escapeRegex from 'escape-string-regexp'
 import type { Entry, Configuration } from '@rspack/core'
 import rspack from '@rspack/core'
-import { createRequire } from 'module'
+import { createRequire } from 'node:module'
 
 const require = createRequire(import.meta.url)
 
-import { Externals } from '../common.types.js'
+import type { Externals } from '../common.types.js'
 
 type MakeRspackConfigOptions = {
   packageName: string

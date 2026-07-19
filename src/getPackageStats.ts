@@ -3,15 +3,15 @@
  * @see https://github.com/wix/import-cost/blob/master/packages/import-cost/src/webpack.js
  */
 
-import fs from 'fs/promises'
-import path from 'path'
+import fs from 'node:fs/promises'
+import path from 'node:path'
+import { performance } from 'node:perf_hooks'
 import { getExternals, parsePackageString } from './utils/common.utils.js'
 import InstallationUtils from './utils/installation.utils.js'
 import BuildUtils from './utils/build.utils.js'
 import { UnexpectedBuildError } from './errors/CustomError.js'
-import { GetPackageStatsOptions } from './common.types.js'
+import type { GetPackageStatsOptions } from './common.types.js'
 import Telemetry from './utils/telemetry.utils.js'
-import { performance } from 'perf_hooks'
 
 function getPackageJSONDetails(packageName: string, installPath: string) {
   const startTime = performance.now()
@@ -42,8 +42,9 @@ function getPackageJSONDetails(packageName: string, installPath: string) {
             : [],
       }
     },
-    err => {
-      Telemetry.getPackageJSONDetails(packageName, false, startTime, err)
+    error => {
+      Telemetry.getPackageJSONDetails(packageName, false, startTime, error)
+      throw error
     },
   )
 }
@@ -129,6 +130,7 @@ export default async function getPackageStats(
       false,
       performance.now() - startTime,
       options,
+      e,
     )
     throw e
   } finally {

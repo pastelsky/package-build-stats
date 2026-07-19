@@ -1,20 +1,18 @@
-import path from 'path'
-import config from '../config/config.js'
-import { Entry, rspack } from '@rspack/core'
+import fs from 'node:fs'
+import path from 'node:path'
+import { performance } from 'node:perf_hooks'
+import { gzipSync } from 'node:zlib'
+import { rspack } from '@rspack/core'
+import type { Entry, Stats, StatsOptions } from '@rspack/core'
 import isValidNPMName from 'is-valid-npm-name'
-import { gzipSync } from 'zlib'
-import fs from 'fs'
 import getDependencySizes from '../getDependencySizeTree.js'
 import makeRspackConfig from '../config/makeRspackConfig.js'
-import { performance } from 'perf_hooks'
-import type { Stats, StatsOptions } from '@rspack/core'
-
 import {
   EntryPointError,
   MissingDependencyError,
   UnexpectedBuildError,
 } from '../errors/CustomError.js'
-import {
+import type {
   Externals,
   BuildPackageOptions,
   CreateEntryPointOptions,
@@ -242,7 +240,7 @@ const BuildUtils = {
     externals,
     options,
   }: BuildPackageArgs) {
-    const outputPath = config.tmp
+    const outputPath = path.join(installPath, 'build')
     let entry: any = {}
 
     if (options.splitCustomImports) {
@@ -387,7 +385,7 @@ const BuildUtils = {
         e.missingModules.length <= 6 &&
         e.missingModules.every(mod => isValidNPMName(mod))
       ) {
-        const { missingModules } = e.extra
+        const { missingModules } = e
         const newExternals = {
           ...externals,
           externalPackages: externals.externalPackages.concat(missingModules),

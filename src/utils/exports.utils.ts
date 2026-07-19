@@ -5,12 +5,13 @@
  * using the public npm packages oxc-parser and oxc-resolver.
  */
 
-import { parseSync, StaticExport, StaticExportEntry } from 'oxc-parser'
+import { parseSync } from 'oxc-parser'
+import type { StaticExport, StaticExportEntry } from 'oxc-parser'
 import { ResolverFactory } from 'oxc-resolver'
-import path from 'path'
-import fs from 'fs/promises'
+import fs from 'node:fs/promises'
+import path from 'node:path'
+import { performance } from 'node:perf_hooks'
 import Telemetry from './telemetry.utils.js'
-import { performance } from 'perf_hooks'
 
 // Initialize resolver with ESM-first configuration
 // - main_fields: ["module", "main"] - prioritize ESM entry points

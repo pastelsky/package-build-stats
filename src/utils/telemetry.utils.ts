@@ -1,7 +1,7 @@
 import mitt from 'mitt'
 import type { Emitter, EventType } from 'mitt'
 import { parsePackageString } from './common.utils.js'
-import { performance } from 'perf_hooks'
+import { performance } from 'node:perf_hooks'
 import _ from 'lodash'
 import createDebug from 'debug'
 

@@ -1,6 +1,4 @@
-// Use ES6 supported by Node v6.10 only!
-
-import path from 'path'
+import path from 'node:path'
 
 export default {
   tmp: path.join('/tmp', 'tmp-build'),
