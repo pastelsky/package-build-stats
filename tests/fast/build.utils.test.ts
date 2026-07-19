@@ -21,6 +21,7 @@ const { default: BuildUtils } = await import('../../src/utils/build.utils.js')
 
 describe('BuildUtils.compilePackage', () => {
   afterEach(() => {
+    vi.restoreAllMocks()
     vi.clearAllMocks()
   })
 
@@ -75,5 +76,48 @@ describe('BuildUtils.compilePackage', () => {
         },
       }),
     ).rejects.toThrow('close failed')
+  })
+})
+
+describe('BuildUtils.buildPackage', () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+    vi.clearAllMocks()
+  })
+
+  const buildArgs = {
+    name: 'demo-package',
+    installPath: '/tmp/demo-package',
+    externals: {
+      externalPackages: [],
+      externalBuiltIns: [],
+    },
+    options: {
+      includeDependencySizes: false,
+    },
+  }
+
+  test('preserves missing-dependency errors without requiring JSON stats', async () => {
+    const compilationError = {
+      message: "Can't resolve 'missing-package' in '/tmp/demo-package'",
+      toString: () => "Can't resolve 'missing-package' in '/tmp/demo-package'",
+    }
+    const stats = {
+      compilation: { errors: [compilationError] },
+      toJson: () => {
+        throw new Error('JSON stats should not be needed for a failed build')
+      },
+    }
+
+    vi.spyOn(BuildUtils, 'createEntryPoint').mockReturnValue('/tmp/index.js')
+    vi.spyOn(BuildUtils, 'compilePackage').mockResolvedValue({
+      error: null,
+      stats: stats as any,
+    })
+
+    await expect(BuildUtils.buildPackage(buildArgs)).rejects.toMatchObject({
+      name: 'MissingDependencyError',
+      missingModules: ['missing-package'],
+    })
   })
 })
