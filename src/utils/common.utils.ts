@@ -6,40 +6,114 @@ import os from 'os'
 
 const homeDirectory = os.homedir()
 
+interface ExecOptions extends childProcess.SpawnOptions {
+  maxBuffer?: number
+}
+
 export const getBuiltInModules = () =>
   builtinModules.flatMap(mod => [mod, 'node:' + mod])
 
-export function exec(command: string, options: any, timeout?: number) {
-  let timerId: NodeJS.Timeout
-  return new Promise((resolve, reject) => {
-    const child = childProcess.exec(
-      command,
-      options,
-      (error, stdout, stderr) => {
-        if (error) {
-          reject(stderr)
-        } else {
-          resolve(stdout)
-        }
+function killProcessTree(child: childProcess.ChildProcess) {
+  if (!child.pid) {
+    return
+  }
 
-        if (timerId) {
-          clearTimeout(timerId)
+  try {
+    if (process.platform === 'win32') {
+      childProcess.spawnSync(
+        'taskkill',
+        ['/pid', String(child.pid), '/T', '/F'],
+        { windowsHide: true },
+      )
+    } else {
+      process.kill(-child.pid, 'SIGKILL')
+    }
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'ESRCH') {
+      throw error
+    }
+  }
+}
+
+export function exec(
+  command: string,
+  options: ExecOptions,
+  timeout?: number,
+): Promise<string> {
+  let timerId: NodeJS.Timeout
+  return new Promise<string>((resolve, reject) => {
+    const { maxBuffer = 1024 * 1024, ...spawnOptions } = options
+    const child = childProcess.spawn(command, [], {
+      ...spawnOptions,
+      detached: process.platform !== 'win32',
+      shell: spawnOptions.shell ?? true,
+      stdio: ['ignore', 'pipe', 'pipe'],
+    })
+    const stdout: Buffer[] = []
+    const stderr: Buffer[] = []
+    let stdoutLength = 0
+    let stderrLength = 0
+    let settled = false
+
+    const finish = (callback: () => void) => {
+      if (settled) {
+        return
+      }
+      settled = true
+      if (timerId) {
+        clearTimeout(timerId)
+      }
+      callback()
+    }
+
+    const rejectAndKill = (message: string) => {
+      finish(() => {
+        killProcessTree(child)
+        reject(message)
+      })
+    }
+
+    child.stdout?.on('data', (chunk: Buffer) => {
+      stdout.push(chunk)
+      stdoutLength += chunk.length
+      if (stdoutLength > maxBuffer) {
+        rejectAndKill(`stdout exceeded maxBuffer of ${maxBuffer} bytes`)
+      }
+    })
+
+    child.stderr?.on('data', (chunk: Buffer) => {
+      stderr.push(chunk)
+      stderrLength += chunk.length
+      if (stderrLength > maxBuffer) {
+        rejectAndKill(`stderr exceeded maxBuffer of ${maxBuffer} bytes`)
+      }
+    })
+
+    child.once('error', error => {
+      finish(() => reject(error))
+    })
+
+    child.once('close', code => {
+      finish(() => {
+        const stdoutText = Buffer.concat(stdout).toString()
+        const stderrText = Buffer.concat(stderr).toString()
+        if (code === 0) {
+          resolve(stdoutText)
+        } else {
+          reject(stderrText)
         }
-      },
-    )
+      })
+    })
 
     if (timeout) {
       timerId = setTimeout(() => {
-        if (child.pid) {
-          process.kill(child.pid)
-        }
-        reject(
+        rejectAndKill(
           `Execution of ${command.substring(
             0,
             40,
           )}... cancelled as it exceeded a timeout of ${timeout} ms`,
         )
-      }, timeout * 10)
+      }, timeout)
     }
   })
 }
