@@ -249,25 +249,67 @@ describe('Export Size Analysis Edge Cases', () => {
     })
   })
 
-  test('should throw UnsupportedPackageError if package has more than 1000 exports', async () => {
+  test('should only compile the first 1000 exports and return placeholders with size 0/gzip 0 for the rest', async () => {
     const installSpy = vi.spyOn(InstallationUtils, 'installPackage').mockImplementation(async () => {})
-    const spy = vi.spyOn(exportsUtils, 'getAllExports').mockImplementation(async () => {
+    const getAllExportsSpy = vi.spyOn(exportsUtils, 'getAllExports').mockImplementation(async () => {
       const mockExports: Record<string, string> = {}
-      for (let i = 0; i < 1005; i++) {
+      for (let i = 0; i < 1050; i++) {
         mockExports[`export_${i}`] = `src/file_${i}.js`
       }
       return mockExports
     })
 
+    const buildSpy = vi.spyOn(BuildUtils, 'buildPackageIgnoringMissingDeps').mockImplementation(async (args) => {
+      const customImports = args.options?.customImports || []
+      const assets = customImports.map(name => ({
+        name,
+        type: 'js',
+        size: 100,
+        gzip: 50,
+      }))
+      return {
+        assets,
+      }
+    })
+
     try {
-      await getPackageExportSizes('some-package')
-      throw new Error('Should have thrown UnsupportedPackageError')
-    } catch (error: any) {
-      expect(error).toBeInstanceOf(UnsupportedPackageError)
-      expect(error.name).toBe('UnsupportedPackageError')
-      expect(error.extra.reason).toContain('Package has too many exports')
+      const result = await getPackageExportSizes('some-package')
+      
+      expect(buildSpy).toHaveBeenCalledTimes(10)
+      expect(result.assets.length).toBe(1050)
+      
+      expect(result.assets[0]).toEqual({
+        name: 'export_0',
+        type: 'js',
+        size: 100,
+        gzip: 50,
+        path: 'src/file_0.js',
+      })
+      expect(result.assets[999]).toEqual({
+        name: 'export_999',
+        type: 'js',
+        size: 100,
+        gzip: 50,
+        path: 'src/file_999.js',
+      })
+
+      expect(result.assets[1000]).toEqual({
+        name: 'export_1000',
+        type: 'js',
+        size: 0,
+        gzip: 0,
+        path: 'src/file_1000.js',
+      })
+      expect(result.assets[1049]).toEqual({
+        name: 'export_1049',
+        type: 'js',
+        size: 0,
+        gzip: 0,
+        path: 'src/file_1049.js',
+      })
     } finally {
-      spy.mockRestore()
+      getAllExportsSpy.mockRestore()
+      buildSpy.mockRestore()
       installSpy.mockRestore()
     }
   })

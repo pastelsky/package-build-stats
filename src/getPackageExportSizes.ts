@@ -14,7 +14,6 @@ import {
   GetPackageStatsOptions,
   InstallPackageOptions,
 } from './common.types.js'
-import { UnsupportedPackageError } from './errors/CustomError.js'
 
 async function installPackage(
   packageString: string,
@@ -105,14 +104,8 @@ export async function getPackageExportSizes(
     debug('Got %d exports for %s', exports.length, packageString)
     console.log(`[PERF] [ExportSizes] Found ${exports.length} exports`)
 
-    if (exports.length > 1000) {
-      throw new UnsupportedPackageError(
-        new Error(`Package has too many exports (${exports.length})`),
-        {
-          reason: `Package has too many exports (${exports.length}). Export analysis is only supported for packages with up to 1,000 exports.`,
-        },
-      )
-    }
+    const buildExports = exports.slice(0, 1000)
+    const extraExports = exports.slice(1000)
 
     const externalsStart = performance.now()
     const externals = getExternals(packageName, installPath)
@@ -131,8 +124,8 @@ export async function getPackageExportSizes(
     }> = []
     const ignoredMissingDependenciesSet = new Set<string>()
 
-    for (let i = 0; i < exports.length; i += chunkSize) {
-      const chunk = exports.slice(i, i + chunkSize)
+    for (let i = 0; i < buildExports.length; i += chunkSize) {
+      const chunk = buildExports.slice(i, i + chunkSize)
       const chunkDetails = await BuildUtils.buildPackageIgnoringMissingDeps({
         name: packageName,
         installPath,
@@ -149,6 +142,16 @@ export async function getPackageExportSizes(
           ignoredMissingDependenciesSet.add(dep)
         })
       }
+    }
+
+    if (extraExports.length > 0) {
+      const extraAssets = extraExports.map(name => ({
+        name,
+        type: 'js',
+        size: 0,
+        gzip: 0,
+      }))
+      assets.push(...extraAssets)
     }
 
     timings.build = performance.now() - buildStart
