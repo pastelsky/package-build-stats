@@ -7,11 +7,9 @@ import fs from 'fs'
 import getDependencySizes from '../getDependencySizeTree.js'
 import makeRspackConfig from '../config/makeRspackConfig.js'
 import { performance } from 'perf_hooks'
-import type { Stats } from '@rspack/core'
+import type { Stats, StatsOptions } from '@rspack/core'
 
 import {
-  BuildError,
-  CLIBuildError,
   EntryPointError,
   MissingDependencyError,
   UnexpectedBuildError,
@@ -65,6 +63,28 @@ type BuildPackageResultWithIgnored = BuildPackageResult & {
 
 type RspackStatsCompilation = ReturnType<Stats['toJson']>
 type RspackStatsAsset = NonNullable<RspackStatsCompilation['assets']>[0]
+
+const PACKAGE_STATS_OPTIONS: StatsOptions = {
+  all: false,
+
+  assets: true,
+  cachedAssets: true,
+  assetsSpace: Number.POSITIVE_INFINITY,
+  assetsSort: '!size',
+
+  modules: true,
+  cachedModules: true,
+  orphanModules: true,
+  dependentModules: true,
+  runtimeModules: true,
+  nestedModules: true,
+  source: true,
+
+  depth: true,
+  modulesSort: 'depth',
+  modulesSpace: Number.POSITIVE_INFINITY,
+  nestedModulesSpace: Number.POSITIVE_INFINITY,
+}
 
 function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
   return value !== null && value !== undefined
@@ -239,7 +259,7 @@ const BuildUtils = {
       })
     }
 
-    const { stats, error } = await BuildUtils.compilePackage({
+    const { stats } = await BuildUtils.compilePackage({
       name: packageName,
       entry,
       externals,
@@ -248,21 +268,23 @@ const BuildUtils = {
       outputPath,
     })
 
+    const compilationErrors = getCompilationErrors(stats)
+
+    if (compilationErrors.length) {
+      const missingModules = BuildUtils.parseMissingModules(compilationErrors)
+
+      if (missingModules.length === 1 && missingModules[0] === packageName) {
+        throw new EntryPointError(compilationErrors.map(err => err.message))
+      }
+
+      throw new MissingDependencyError(
+        compilationErrors.map(err => err.toString()),
+        { missingModules },
+      )
+    }
+
     const jsonStatsStartTime = performance.now()
-    let jsonStats = stats.toJson({
-      assets: true,
-      source: true,
-      chunks: false,
-      chunkGroups: false,
-      chunkModules: true,
-      modules: true,
-      nestedModules: true,
-      reasons: true,
-      depth: true,
-      errors: true,
-      entrypoints: false,
-      warnings: false,
-    })
+    const jsonStats = stats.toJson(PACKAGE_STATS_OPTIONS)
 
     if (!jsonStats) {
       Telemetry.parseWebpackStats(packageName, false, jsonStatsStartTime)
@@ -273,94 +295,60 @@ const BuildUtils = {
       Telemetry.parseWebpackStats(packageName, true, jsonStatsStartTime)
     }
 
-    const compilationErrors = getCompilationErrors(stats)
+    const getAssetStats = async (asset: RspackStatsAsset) => {
+      const bundle = path.join(outputPath, asset.name)
+      const bundleContents = await fs.promises.readFile(bundle)
+      const gzip = gzipSync(bundleContents, {}).length
+      const matches = asset.name.match(/(.+?)\.bundle\.(.+)$/)
 
-    if (error && !stats) {
-      throw new BuildError(error)
-    } else if (compilationErrors.length) {
-      const missingModules = BuildUtils.parseMissingModules(compilationErrors)
-
-      if (missingModules.length) {
-        if (missingModules.length === 1 && missingModules[0] === packageName) {
-          throw new EntryPointError(compilationErrors.map(err => err.message))
-        } else {
-          throw new MissingDependencyError(
-            compilationErrors.map(err => err.toString()),
-            { missingModules },
-          )
-        }
-      } else if (jsonStats.errors && jsonStats.errors.length > 0) {
-        if (
-          jsonStats.errors.some(jsonError =>
-            jsonError.message.includes("Unexpected character '#'"),
-          )
-        ) {
-          throw new CLIBuildError(jsonStats.errors)
-        } else {
-          throw new BuildError(jsonStats.errors)
-        }
-      } else {
+      if (!matches) {
         throw new UnexpectedBuildError(
-          'The webpack stats object was unexpectedly empty',
+          'Found an asset without the `.bundle` suffix. ' +
+            'A loader customization might be needed to recognize this asset type' +
+            asset.name,
         )
       }
-    } else {
-      const getAssetStats = async (asset: RspackStatsAsset) => {
-        const bundle = path.join(outputPath, asset.name)
-        const bundleContents = await fs.promises.readFile(bundle)
 
-        const gzip = gzipSync(bundleContents, {}).length
-        const matches = asset.name.match(/(.+?)\.bundle\.(.+)$/)
-
-        if (!matches) {
-          throw new UnexpectedBuildError(
-            'Found an asset without the `.bundle` suffix. ' +
-              'A loader customization might be needed to recognize this asset type' +
-              asset.name,
-          )
-        }
-
-        const [, entryName, extension] = matches
-
-        return {
-          name: entryName,
-          type: extension,
-          size: asset.size,
-          gzip,
-        }
-      }
-
-      const assetStatsPromises =
-        jsonStats?.assets
-          ?.filter(
-            asset =>
-              !asset.chunkNames?.some(
-                name =>
-                  name === 'runtime' ||
-                  (typeof name === 'string' && name.startsWith('runtime~')),
-              ),
-          )
-          .filter(
-            asset =>
-              typeof asset.name === 'string' &&
-              !asset.name.endsWith('LICENSE.txt'),
-          )
-          .map(getAssetStats) || []
-      const assetStats = await Promise.all(assetStatsPromises)
-      Telemetry.assetsGZIPParseTime(packageName, performance.now())
-
-      let dependencySizeResults = {}
-      if (options.includeDependencySizes) {
-        const dependencySizes = await getDependencySizes(packageName, jsonStats)
-        dependencySizeResults = {
-          dependencySizes,
-        }
-      }
+      const [, entryName, extension] = matches
 
       return {
-        assets: assetStats || [],
-        ...dependencySizeResults,
+        name: entryName,
+        type: extension,
+        size: asset.size,
+        gzip,
       }
+    }
+
+    const assetStatsPromises =
+      jsonStats?.assets
+        ?.filter(
+          asset =>
+            !asset.chunkNames?.some(
+              name =>
+                name === 'runtime' ||
+                (typeof name === 'string' && name.startsWith('runtime~')),
+            ),
+        )
+        .filter(
+          asset =>
+            typeof asset.name === 'string' &&
+            !asset.name.endsWith('LICENSE.txt'),
+        )
+        .map(getAssetStats) || []
+    const assetStats = await Promise.all(assetStatsPromises)
+    Telemetry.assetsGZIPParseTime(packageName, performance.now())
+
+    let dependencySizeResults = {}
+    if (options.includeDependencySizes) {
+      const dependencySizes = await getDependencySizes(packageName, jsonStats)
+      dependencySizeResults = {
+        dependencySizes,
+      }
+    }
+
+    return {
+      assets: assetStats || [],
+      ...dependencySizeResults,
     }
   },
   async buildPackageIgnoringMissingDeps({
