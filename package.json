@@ -34,13 +34,16 @@
     "test:watch": "vitest tests/fast",
     "test:coverage": "vitest run --coverage tests/fast",
     "test:ci": "yarn check && yarn test && yarn test:coverage",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "changeset publish",
     "compare": "tsx scripts/index.ts",
     "compare:list": "tsx scripts/index.ts list",
     "compare:test": "tsx scripts/index.ts test",
     "compare:top": "tsx scripts/index.ts top",
     "compare:advanced": "tsx scripts/index.ts compare",
     "perf:test": "tsx scripts/performance-test.ts",
-    "prepack": "rm -rf build && yarn check && yarn build && yarn format"
+    "prepack": "rm -rf build && yarn check && yarn build"
   },
   "prettier": {
     "semi": false,
@@ -51,6 +54,7 @@
     "package-stats": "./bin/cli.js"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.31.1",
     "@rsdoctor/rspack-plugin": "^1.3.8",
     "@types/autoprefixer": "^9.7.2",
     "@types/debug": "^4.1.12",
