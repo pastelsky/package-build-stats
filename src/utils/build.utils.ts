@@ -240,6 +240,7 @@ const BuildUtils = {
     externals,
     options,
   }: BuildPackageArgs) {
+    // Package builds run concurrently, so each install owns its build output.
     const outputPath = path.join(installPath, 'build')
     let entry: any = {}
 
@@ -385,7 +386,7 @@ const BuildUtils = {
         e.missingModules.length <= 6 &&
         e.missingModules.every(mod => isValidNPMName(mod))
       ) {
-        const { missingModules } = e
+        const { missingModules } = e.extra
         const newExternals = {
           ...externals,
           externalPackages: externals.externalPackages.concat(missingModules),

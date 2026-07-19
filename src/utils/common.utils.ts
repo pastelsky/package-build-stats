@@ -21,6 +21,10 @@ export class ProcessExecutionError extends Error {
     super(message)
     this.name = 'ProcessExecutionError'
   }
+
+  toJSON() {
+    return this.stderr || this.message
+  }
 }
 
 export const getBuiltInModules = () =>

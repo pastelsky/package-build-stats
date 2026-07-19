@@ -2,11 +2,11 @@
  * Wraps the original error with a identifiable
  * name.
  */
-class CustomError extends Error {
+class CustomError<TExtra = unknown> extends Error {
   readonly originalError: unknown
-  readonly extra: unknown
+  readonly extra: TExtra
 
-  constructor(name: string, originalError: unknown, extra?: unknown) {
+  constructor(name: string, originalError: unknown, extra: TExtra) {
     super(name, { cause: originalError })
     this.name = name
     this.originalError = originalError
@@ -58,14 +58,18 @@ export class MinifyError extends CustomError {
   }
 }
 
-export class MissingDependencyError extends CustomError {
+export class MissingDependencyError extends CustomError<{
   missingModules: Array<string>
+}> {
+  get missingModules() {
+    return this.extra.missingModules
+  }
+
   constructor(
     originalError: unknown,
     extra: { missingModules: Array<string> },
   ) {
     super('MissingDependencyError', originalError, extra)
-    this.missingModules = extra.missingModules
   }
 }
 
