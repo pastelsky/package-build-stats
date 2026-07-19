@@ -1,5 +1,13 @@
 # package-build-stats
 
+## 9.0.0
+
+### Major Changes
+
+- 7b90e66: Require Node.js 22 or newer and validate compatibility on Node.js 22 and 24.
+  Also harden package installation, errors, CLI compatibility, build isolation,
+  and server shutdown.
+
 ## 8.4.1
 
 ### Patch Changes
