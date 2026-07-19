@@ -1,10 +1,15 @@
 {
   "$schema": "https://oxc.rs/schema/oxlintrc.json",
-  "rules": {
-    "typescript": "error",
+  "categories": {
     "correctness": "error",
     "suspicious": "warn",
     "perf": "warn"
+  },
+  "plugins": ["typescript"],
+  "rules": {
+    "no-shadow": "off",
+    "no-underscore-dangle": "off",
+    "no-unused-vars": "off"
   },
   "env": {
     "node": true,

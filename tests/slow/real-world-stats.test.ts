@@ -1,4 +1,4 @@
-import { getPackageStats } from '../src'
+import { getPackageStats } from '../../src'
 import pSeries from 'p-series'
 import 'dotenv/config'
 

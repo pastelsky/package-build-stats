@@ -31,11 +31,7 @@ const InstallationUtils = {
   async preparePath(
     packageName: string,
     clientOption?:
-      | 'npm'
-      | 'yarn'
-      | 'pnpm'
-      | 'bun'
-      | Array<'npm' | 'yarn' | 'pnpm' | 'bun'>,
+      'npm' | 'yarn' | 'pnpm' | 'bun' | Array<'npm' | 'yarn' | 'pnpm' | 'bun'>,
   ) {
     const startTime = performance.now()
     const installPath = InstallationUtils.getInstallPath(packageName)

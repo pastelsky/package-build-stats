@@ -1,4 +1,5 @@
 import autoprefixer from 'autoprefixer'
+import path from 'path'
 
 import escapeRegex from 'escape-string-regexp'
 import type { Entry, Configuration } from '@rspack/core'
@@ -16,6 +17,7 @@ type MakeRspackConfigOptions = {
   minify?: boolean
   entry: Entry
   outputPath: string
+  installPath?: string
 }
 
 export default function makeRspackConfig({
@@ -25,6 +27,7 @@ export default function makeRspackConfig({
   debug: _debug,
   minify = true,
   outputPath,
+  installPath,
 }: MakeRspackConfigOptions): Configuration {
   const externalsRegex = makeExternalsRegex(externals.externalPackages)
   const isExternalRequest = (request: string) => {
@@ -72,7 +75,9 @@ export default function makeRspackConfig({
       chunkModules: true,
     },
     resolve: {
-      modules: ['node_modules'],
+      modules: installPath
+        ? [path.resolve(installPath, 'node_modules')]
+        : ['node_modules'],
       extensions: [
         '.web.mjs',
         '.mjs',

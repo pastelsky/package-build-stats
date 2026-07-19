@@ -30,6 +30,7 @@ type CompilePackageArgs = {
   debug?: boolean
   minify?: boolean
   outputPath: string
+  installPath?: string
 }
 
 type CompilePackageReturn = {
@@ -136,6 +137,7 @@ const BuildUtils = {
     debug,
     minify,
     outputPath,
+    installPath,
   }: CompilePackageArgs) {
     const startTime = performance.now()
 
@@ -146,6 +148,7 @@ const BuildUtils = {
       debug,
       minify,
       outputPath,
+      installPath,
     })
 
     const compiler = rspack(options)
@@ -246,6 +249,7 @@ const BuildUtils = {
       debug: options.debug,
       minify: options.minify,
       outputPath,
+      installPath,
     })
 
     const jsonStatsStartTime = performance.now()
