@@ -9,10 +9,8 @@ export default defineConfig({
     setupFiles: ['./tests/helpers/custom-matchers.ts'],
     testTimeout: 90000, // 90 seconds for functional tests with package installations
     pool: 'forks', // Use forks instead of threads for coverage (fixes ERR_INSPECTOR_NOT_CONNECTED)
-    poolOptions: {
-      forks: {
-        singleFork: true, // Run tests in single fork to avoid concurrency issues with coverage
-      },
+    forks: {
+      singleFork: true, // Run tests in single fork to avoid concurrency issues with coverage
     },
     coverage: {
       provider: 'v8',

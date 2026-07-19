@@ -65,15 +65,17 @@ describe('Missing Dependencies', () => {
 
     const result = await getPackageStats(fixturePath)
 
-    // This test covers line 147 - scoped package parsing
+    // This test covers scoped package name parsing from deep import paths
     expect(result).toHaveProperty('ignoredMissingDependencies')
     if (
       'ignoredMissingDependencies' in result &&
       result.ignoredMissingDependencies &&
       result.ignoredMissingDependencies.length > 0
     ) {
-      // Should correctly parse @babel/runtime from @babel/runtime/helpers/typeof
-      expect(result.ignoredMissingDependencies).toContain('@babel/runtime')
+      // Should correctly parse @missing-scope-xyz/nonexistent-package from the deep import path
+      expect(result.ignoredMissingDependencies).toContain(
+        '@missing-scope-xyz/nonexistent-package',
+      )
     }
   })
 })

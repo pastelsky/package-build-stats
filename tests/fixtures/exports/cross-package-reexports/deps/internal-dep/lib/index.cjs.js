@@ -17,7 +17,7 @@ exports.computed = function (getter) {
   return { value: getter() }
 }
 
-exports.watch = function (source, cb) {
+exports.watch = function (_source, _cb) {
   return function () {}
 }
 

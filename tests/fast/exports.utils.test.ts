@@ -1,5 +1,4 @@
-import { getExportsDetails, getAllExports } from '../../src/utils/exports.utils'
-import path from 'path'
+import { getExportsDetails } from '../../src/utils/exports.utils'
 
 describe('individual exports', () => {
   test('variable exports', () => {

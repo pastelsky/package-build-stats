@@ -1,11 +1,11 @@
 {
   "$schema": "https://oxc.rs/schema/oxlintrc.json",
-  "rules": {
-    "typescript": "error",
+  "categories": {
     "correctness": "error",
     "suspicious": "warn",
     "perf": "warn"
   },
+  "plugins": ["typescript"],
   "env": {
     "node": true,
     "es2022": true

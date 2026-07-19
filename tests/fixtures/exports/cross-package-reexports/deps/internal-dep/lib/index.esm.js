@@ -16,7 +16,7 @@ export function computed(getter) {
   return { value: getter() }
 }
 
-export function watch(source, cb) {
+export function watch(_source, _cb) {
   return () => {}
 }
 

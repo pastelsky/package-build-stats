@@ -31,11 +31,7 @@ const InstallationUtils = {
   async preparePath(
     packageName: string,
     clientOption?:
-      | 'npm'
-      | 'yarn'
-      | 'pnpm'
-      | 'bun'
-      | Array<'npm' | 'yarn' | 'pnpm' | 'bun'>,
+      'npm' | 'yarn' | 'pnpm' | 'bun' | Array<'npm' | 'yarn' | 'pnpm' | 'bun'>,
   ) {
     const startTime = performance.now()
     const installPath = InstallationUtils.getInstallPath(packageName)
@@ -120,7 +116,7 @@ const InstallationUtils = {
       const isLastClient = i === clients.length - 1
 
       try {
-        await InstallationUtils._installWithClient(
+        await InstallationUtils.installWithClient(
           packageString,
           installPath,
           {
@@ -156,7 +152,7 @@ const InstallationUtils = {
     throw lastError
   },
 
-  async _installWithClient(
+  async installWithClient(
     packageString: string,
     installPath: string,
     installOptions: InstallPackageOptions,

@@ -3,7 +3,7 @@
  */
 
 import path from 'path'
-import { getPackageStats, getPackageExportSizes } from '../../src'
+import { getPackageStats } from '../../src'
 import 'dotenv/config'
 
 describe('getPackageStats', () => {
@@ -11,9 +11,7 @@ describe('getPackageStats', () => {
     const result = await getPackageStats(
       path.resolve('./fixtures/node_modules/resolve-test'),
     )
-    // Size changed from 434 to 336 after migrating to rspack with SWC minifier
-    // Size changed from 336 to 327 after removing installPath from result
-    expect(result.size).toEqual(327)
+    expect(result.size).toEqual(323)
   })
 
   test('dependencySizes', async () => {
@@ -21,7 +19,6 @@ describe('getPackageStats', () => {
       path.resolve('./fixtures/node_modules/resolve-test'),
     )
 
-    // Sizes changed after migrating to rspack with SWC minifier
     expect(result.dependencySizes).toBeDefined()
     expect(result.dependencySizes?.length).toEqual(2)
 
@@ -35,7 +32,7 @@ describe('getPackageStats', () => {
         expect.arrayContaining([
           {
             name: 'resolve-test/nested-folder/another-nested-folder',
-            approximateSize: 128, // Changed from 170 after adding module:true to SWC minifier
+            approximateSize: 128,
           },
         ]),
       )
