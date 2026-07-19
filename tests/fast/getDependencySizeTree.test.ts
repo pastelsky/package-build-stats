@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { minify } from '@swc/core'
+import { minify } from 'oxc-minify'
 import getDependencySizeTree from '../../src/getDependencySizeTree'
 import { MinifyError } from '../../src/errors/CustomError'
 
@@ -23,11 +23,12 @@ function createStats(modules: FakeModule[]): RspackStatsCompilation {
 
 async function minifiedUtf8Size(source: string | Buffer) {
   const text = typeof source === 'string' ? source : source.toString('utf8')
-  const minifiedResult = await minify(text, {
+  const minifiedResult = await minify('dependency.js', text, {
     compress: true,
     mangle: true,
     module: true,
   })
+  expect(minifiedResult.errors).toEqual([])
   return Buffer.byteLength(minifiedResult.code || '', 'utf8')
 }
 
@@ -83,11 +84,12 @@ describe('getDependencySizeTree - accuracy', () => {
     }
 
     // Compute the expected size using the same minifier, but measure size via Buffer.byteLength
-    const minified = await minify(source, {
+    const minified = await minify('emoji-pkg.js', source, {
       compress: true,
       mangle: true,
       module: true,
     })
+    expect(minified.errors).toEqual([])
     const expectedSize = Buffer.byteLength(minified.code || '', 'utf8')
 
     const result = await getDependencySizeTree(
@@ -103,9 +105,7 @@ describe('getDependencySizeTree - accuracy', () => {
 
   it('throws MinifyError when minification fails on invalid code', async () => {
     const base = '/project'
-    // Create source that is technically parseable by rspack but might fail minification
-    // Using null bytes or other special characters that could cause issues
-    const source = Buffer.from([0x00, 0x01, 0x02, 0x03]).toString('utf8')
+    const source = 'export const ='
 
     const stats: FakeStats = {
       modules: [
@@ -118,21 +118,9 @@ describe('getDependencySizeTree - accuracy', () => {
       ],
     }
 
-    try {
-      await getDependencySizeTree(
-        'fixture-pkg',
-        createStats(stats.modules ?? []),
-      )
-      // If it doesn't throw, that's actually okay - SWC might handle it
-      // This test documents the expected behavior when minification fails
-    } catch (error) {
-      // If it does throw, it should be a MinifyError
-      if (error instanceof MinifyError) {
-        expect(error.name).toBe('MinifyError')
-        expect(error.originalError).toBeDefined()
-      }
-      // Allow the test to pass whether it throws or not, since SWC is very robust
-    }
+    await expect(
+      getDependencySizeTree('fixture-pkg', createStats(stats.modules ?? [])),
+    ).rejects.toBeInstanceOf(MinifyError)
   })
 
   it('aggregates nested pnpm, scoped, buffer, and virtual deps into accurate package sizes', async () => {
