@@ -4,6 +4,8 @@ import getDependencySizeTree from '../../src/getDependencySizeTree'
 import { MinifyError } from '../../src/errors/CustomError'
 
 type RspackStatsCompilation = Parameters<typeof getDependencySizeTree>[1]
+// Oxc requires a filename and uses its extension to select the parse mode.
+const MINIFY_TEST_FILENAME = 'dependency.js'
 
 type FakeModule = {
   identifier?: string
@@ -23,7 +25,7 @@ function createStats(modules: FakeModule[]): RspackStatsCompilation {
 
 async function minifiedUtf8Size(source: string | Buffer) {
   const text = typeof source === 'string' ? source : source.toString('utf8')
-  const minifiedResult = await minify('dependency.js', text, {
+  const minifiedResult = await minify(MINIFY_TEST_FILENAME, text, {
     compress: true,
     mangle: true,
     module: true,
@@ -83,7 +85,7 @@ describe('getDependencySizeTree - accuracy', () => {
     }
 
     // Compute the expected size using the same minifier, but measure size via Buffer.byteLength
-    const minified = await minify('emoji-pkg.js', source, {
+    const minified = await minify(MINIFY_TEST_FILENAME, source, {
       compress: true,
       mangle: true,
       module: true,
