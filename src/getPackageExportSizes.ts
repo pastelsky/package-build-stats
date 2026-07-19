@@ -14,6 +14,7 @@ import {
   GetPackageStatsOptions,
   InstallPackageOptions,
 } from './common.types.js'
+import { UnsupportedPackageError } from './errors/CustomError.js'
 
 async function installPackage(
   packageString: string,
@@ -104,6 +105,15 @@ export async function getPackageExportSizes(
     debug('Got %d exports for %s', exports.length, packageString)
     console.log(`[PERF] [ExportSizes] Found ${exports.length} exports`)
 
+    if (exports.length > 1000) {
+      throw new UnsupportedPackageError(
+        new Error(`Package has too many exports (${exports.length})`),
+        {
+          reason: `Package has too many exports (${exports.length}). Export analysis is only supported for packages with up to 1,000 exports.`,
+        },
+      )
+    }
+
     const externalsStart = performance.now()
     const externals = getExternals(packageName, installPath)
     timings.getExternals = performance.now() - externalsStart
@@ -112,22 +122,50 @@ export async function getPackageExportSizes(
     )
 
     const buildStart = performance.now()
-    const builtDetails = await BuildUtils.buildPackageIgnoringMissingDeps({
-      name: packageName,
-      installPath,
-      externals,
-      options: {
-        customImports: exports,
-        splitCustomImports: true,
-        includeDependencySizes: false,
-      },
-    })
+    const chunkSize = 100
+    const assets: Array<{
+      name: string
+      type: string
+      size: number
+      gzip: number
+    }> = []
+    const ignoredMissingDependenciesSet = new Set<string>()
+
+    for (let i = 0; i < exports.length; i += chunkSize) {
+      const chunk = exports.slice(i, i + chunkSize)
+      const chunkDetails = await BuildUtils.buildPackageIgnoringMissingDeps({
+        name: packageName,
+        installPath,
+        externals,
+        options: {
+          customImports: chunk,
+          splitCustomImports: true,
+          includeDependencySizes: false,
+        },
+      })
+      assets.push(...chunkDetails.assets)
+      if (chunkDetails.ignoredMissingDependencies) {
+        chunkDetails.ignoredMissingDependencies.forEach(dep => {
+          ignoredMissingDependenciesSet.add(dep)
+        })
+      }
+    }
+
     timings.build = performance.now() - buildStart
     console.log(
       `[PERF] [ExportSizes] buildPackage: ${timings.build.toFixed(2)}ms`,
     )
 
     Telemetry.packageExportsSizes(packageString, startTime, true, options)
+
+    const builtDetails = {
+      assets,
+      ignoredMissingDependencies:
+        ignoredMissingDependenciesSet.size > 0
+          ? Array.from(ignoredMissingDependenciesSet)
+          : undefined,
+    }
+
     return {
       ...builtDetails,
       assets: builtDetails.assets.map(asset => ({

@@ -10,7 +10,25 @@ import {
   getAllPackageExports,
   getPackageExportSizes,
 } from '../../src/getPackageExportSizes'
-import { PackageNotFoundError } from '../../src/errors/CustomError'
+import { PackageNotFoundError, UnsupportedPackageError } from '../../src/errors/CustomError'
+import { vi } from 'vitest'
+import * as exportsUtils from '../../src/utils/exports.utils.js'
+import BuildUtils from '../../src/utils/build.utils.js'
+import InstallationUtils from '../../src/utils/installation.utils.js'
+
+vi.mock('../../src/utils/common.utils.js', async (importOriginal) => {
+  const original = await importOriginal() as any
+  return {
+    ...original,
+    getExternals: vi.fn((packageName, installPath) => {
+      try {
+        return original.getExternals(packageName, installPath)
+      } catch (err) {
+        return { externalPackages: [], externalBuiltIns: [] }
+      }
+    })
+  }
+})
 
 describe('getAllPackageExports', () => {
   test('should get exports from package with multiple exports', async () => {
@@ -229,5 +247,86 @@ describe('Export Size Analysis Edge Cases', () => {
       expect(typeof asset.path).toBe('string')
       expect(asset.path.length).toBeGreaterThan(0)
     })
+  })
+
+  test('should throw UnsupportedPackageError if package has more than 1000 exports', async () => {
+    const installSpy = vi.spyOn(InstallationUtils, 'installPackage').mockImplementation(async () => {})
+    const spy = vi.spyOn(exportsUtils, 'getAllExports').mockImplementation(async () => {
+      const mockExports: Record<string, string> = {}
+      for (let i = 0; i < 1005; i++) {
+        mockExports[`export_${i}`] = `src/file_${i}.js`
+      }
+      return mockExports
+    })
+
+    try {
+      await getPackageExportSizes('some-package')
+      throw new Error('Should have thrown UnsupportedPackageError')
+    } catch (error: any) {
+      expect(error).toBeInstanceOf(UnsupportedPackageError)
+      expect(error.name).toBe('UnsupportedPackageError')
+      expect(error.extra.reason).toContain('Package has too many exports')
+    } finally {
+      spy.mockRestore()
+      installSpy.mockRestore()
+    }
+  })
+
+  test('should chunk export compilation serially in batches of 100 internally without breaking response format', async () => {
+    const installSpy = vi.spyOn(InstallationUtils, 'installPackage').mockImplementation(async () => {})
+    const getAllExportsSpy = vi.spyOn(exportsUtils, 'getAllExports').mockImplementation(async () => {
+      const mockExports: Record<string, string> = {}
+      for (let i = 0; i < 150; i++) {
+        mockExports[`export_${i}`] = `src/file_${i}.js`
+      }
+      return mockExports
+    })
+
+    const buildSpy = vi.spyOn(BuildUtils, 'buildPackageIgnoringMissingDeps').mockImplementation(async (args) => {
+      const customImports = args.options?.customImports || []
+      const assets = customImports.map(name => ({
+        name,
+        type: 'js',
+        size: 100,
+        gzip: 50,
+      }))
+      return {
+        assets,
+      }
+    })
+
+    try {
+      const result = await getPackageExportSizes('some-package')
+      
+      expect(buildSpy).toHaveBeenCalledTimes(2)
+      
+      expect(buildSpy.mock.calls[0][0].options?.customImports?.length).toBe(100)
+      expect(buildSpy.mock.calls[0][0].options?.customImports?.[0]).toBe('export_0')
+      expect(buildSpy.mock.calls[0][0].options?.customImports?.[99]).toBe('export_99')
+
+      expect(buildSpy.mock.calls[1][0].options?.customImports?.length).toBe(50)
+      expect(buildSpy.mock.calls[1][0].options?.customImports?.[0]).toBe('export_100')
+      expect(buildSpy.mock.calls[1][0].options?.customImports?.[49]).toBe('export_149')
+
+      expect(result.assets.length).toBe(150)
+      expect(result.assets[0]).toEqual({
+        name: 'export_0',
+        type: 'js',
+        size: 100,
+        gzip: 50,
+        path: 'src/file_0.js',
+      })
+      expect(result.assets[149]).toEqual({
+        name: 'export_149',
+        type: 'js',
+        size: 100,
+        gzip: 50,
+        path: 'src/file_149.js',
+      })
+    } finally {
+      getAllExportsSpy.mockRestore()
+      buildSpy.mockRestore()
+      installSpy.mockRestore()
+    }
   })
 })
