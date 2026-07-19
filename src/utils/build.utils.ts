@@ -30,7 +30,6 @@ type CompilePackageArgs = {
   debug?: boolean
   minify?: boolean
   outputPath: string
-  installPath?: string
 }
 
 type CompilePackageReturn = {
@@ -137,7 +136,6 @@ const BuildUtils = {
     debug,
     minify,
     outputPath,
-    installPath,
   }: CompilePackageArgs) {
     const startTime = performance.now()
 
@@ -148,7 +146,6 @@ const BuildUtils = {
       debug,
       minify,
       outputPath,
-      installPath,
     })
 
     const compiler = rspack(options)
@@ -177,7 +174,7 @@ const BuildUtils = {
     })
   },
 
-  _parseMissingModules(errors: ReturnType<typeof getCompilationErrors>) {
+  parseMissingModules(errors: ReturnType<typeof getCompilationErrors>) {
     // There's a better way to get the missing module's name, maybe ?
     const missingModuleRegex = /Can't resolve '(.+)' in/
 
@@ -216,7 +213,7 @@ const BuildUtils = {
   },
 
   async buildPackage({
-    name,
+    name: packageName,
     installPath,
     externals,
     options,
@@ -229,27 +226,26 @@ const BuildUtils = {
         return { assets: [] }
       }
       options.customImports.forEach(importt => {
-        entry[importt] = BuildUtils.createEntryPoint(name, installPath, {
+        entry[importt] = BuildUtils.createEntryPoint(packageName, installPath, {
           customImports: [importt],
           entryFilename: importt,
           esm: true,
         })
       })
     } else {
-      entry['main'] = BuildUtils.createEntryPoint(name, installPath, {
+      entry['main'] = BuildUtils.createEntryPoint(packageName, installPath, {
         esm: true,
         customImports: options.customImports,
       })
     }
 
     const { stats, error } = await BuildUtils.compilePackage({
-      name,
+      name: packageName,
       entry,
       externals,
       debug: options.debug,
       minify: options.minify,
       outputPath,
-      installPath,
     })
 
     const jsonStatsStartTime = performance.now()
@@ -269,12 +265,12 @@ const BuildUtils = {
     })
 
     if (!jsonStats) {
-      Telemetry.parseWebpackStats(name, false, jsonStatsStartTime)
+      Telemetry.parseWebpackStats(packageName, false, jsonStatsStartTime)
       throw new UnexpectedBuildError(
         'Expected webpack json stats to be non-null, but was null',
       )
     } else {
-      Telemetry.parseWebpackStats(name, true, jsonStatsStartTime)
+      Telemetry.parseWebpackStats(packageName, true, jsonStatsStartTime)
     }
 
     const compilationErrors = getCompilationErrors(stats)
@@ -282,10 +278,10 @@ const BuildUtils = {
     if (error && !stats) {
       throw new BuildError(error)
     } else if (compilationErrors.length) {
-      const missingModules = BuildUtils._parseMissingModules(compilationErrors)
+      const missingModules = BuildUtils.parseMissingModules(compilationErrors)
 
       if (missingModules.length) {
-        if (missingModules.length === 1 && missingModules[0] === name) {
+        if (missingModules.length === 1 && missingModules[0] === packageName) {
           throw new EntryPointError(compilationErrors.map(err => err.message))
         } else {
           throw new MissingDependencyError(
@@ -295,8 +291,8 @@ const BuildUtils = {
         }
       } else if (jsonStats.errors && jsonStats.errors.length > 0) {
         if (
-          jsonStats.errors.some(error =>
-            error.message.includes("Unexpected character '#'"),
+          jsonStats.errors.some(jsonError =>
+            jsonError.message.includes("Unexpected character '#'"),
           )
         ) {
           throw new CLIBuildError(jsonStats.errors)
@@ -351,11 +347,11 @@ const BuildUtils = {
           )
           .map(getAssetStats) || []
       const assetStats = await Promise.all(assetStatsPromises)
-      Telemetry.assetsGZIPParseTime(name, performance.now())
+      Telemetry.assetsGZIPParseTime(packageName, performance.now())
 
       let dependencySizeResults = {}
       if (options.includeDependencySizes) {
-        const dependencySizes = await getDependencySizes(name, jsonStats)
+        const dependencySizes = await getDependencySizes(packageName, jsonStats)
         dependencySizeResults = {
           dependencySizes,
         }

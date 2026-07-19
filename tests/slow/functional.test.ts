@@ -56,7 +56,7 @@ describe('Functional Tests - Package Building & Sizing', () => {
       expect(result.gzip).toBeLessThan(result.size)
       expect(result.gzip).toBeGreaterThan(result.size * 0.2)
 
-      // Redux has no dependencies
+      // Redux 3.7.2 declares four runtime dependencies
       expect(result.dependencyCount).toBe(4)
     })
 

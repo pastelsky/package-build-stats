@@ -23,7 +23,7 @@ vi.mock('../../src/utils/common.utils.js', async importOriginal => {
     getExternals: vi.fn((packageName, installPath) => {
       try {
         return original.getExternals(packageName, installPath)
-      } catch (err) {
+      } catch {
         return { externalPackages: [], externalBuiltIns: [] }
       }
     }),

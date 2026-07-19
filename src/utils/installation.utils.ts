@@ -116,7 +116,7 @@ const InstallationUtils = {
       const isLastClient = i === clients.length - 1
 
       try {
-        await InstallationUtils._installWithClient(
+        await InstallationUtils.installWithClient(
           packageString,
           installPath,
           {
@@ -152,7 +152,7 @@ const InstallationUtils = {
     throw lastError
   },
 
-  async _installWithClient(
+  async installWithClient(
     packageString: string,
     installPath: string,
     installOptions: InstallPackageOptions,

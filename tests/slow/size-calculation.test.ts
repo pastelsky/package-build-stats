@@ -26,7 +26,7 @@ describe('Bundle Size Calculation', () => {
     // Snapshot stable properties only (exclude size and gzip)
     const { gzip: _gzip, size: _size, ...resultWithoutVolatile } = result
     const assetsWithoutVolatile = result.assets.map(
-      ({ gzip, size, ...asset }) => asset,
+      ({ gzip: _g, size: _s, ...asset }) => asset,
     )
 
     // Remove installPath (non-deterministic) before snapshot
@@ -70,7 +70,7 @@ describe('Bundle Size Calculation', () => {
     // Snapshot stable properties only
     const { gzip: _gzip, size: _size, ...resultWithoutVolatile } = result
     const assetsWithoutVolatile = result.assets.map(
-      ({ gzip, size, ...asset }) => asset,
+      ({ gzip: _g, size: _s, ...asset }) => asset,
     )
 
     expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile })
@@ -112,7 +112,7 @@ describe('Bundle Size Calculation', () => {
     // Snapshot stable properties only
     const { gzip: _gzip, size: _size, ...resultWithoutVolatile } = result
     const assetsWithoutVolatile = result.assets.map(
-      ({ gzip, size, ...asset }) => asset,
+      ({ gzip: _g, size: _s, ...asset }) => asset,
     )
 
     expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile })
@@ -161,7 +161,7 @@ describe('Bundle Size Calculation', () => {
     // Snapshot stable properties only
     const { gzip: _gzip, size: _size, ...resultWithoutVolatile } = result
     const assetsWithoutVolatile = result.assets.map(
-      ({ gzip, size, ...asset }) => asset,
+      ({ gzip: _g, size: _s, ...asset }) => asset,
     )
 
     // Remove approximateSize from dependencySizes (also non-deterministic)
@@ -233,7 +233,7 @@ describe('Bundle Size Calculation', () => {
     // Snapshot stable properties only
     const { gzip: _gzip, size: _size, ...resultWithoutVolatile } = result
     const assetsWithoutVolatile = result.assets.map(
-      ({ gzip, size, ...asset }) => asset,
+      ({ gzip: _g, size: _s, ...asset }) => asset,
     )
 
     // Remove approximateSize from dependencySizes (also non-deterministic)
@@ -332,7 +332,7 @@ describe('Gzip Compression', () => {
     // Snapshot stable properties only
     const { gzip: _gzip, size: _size, ...resultWithoutVolatile } = result
     const assetsWithoutVolatile = result.assets.map(
-      ({ gzip, size, ...asset }) => asset,
+      ({ gzip: _g, size: _s, ...asset }) => asset,
     )
 
     expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile })
@@ -374,7 +374,7 @@ describe('Gzip Compression', () => {
     // Snapshot stable properties only
     const { gzip: _gzip, size: _size, ...resultWithoutVolatile } = result
     const assetsWithoutVolatile = result.assets.map(
-      ({ gzip, size, ...asset }) => asset,
+      ({ gzip: _g, size: _s, ...asset }) => asset,
     )
 
     expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile })
@@ -416,7 +416,7 @@ describe('Gzip Compression', () => {
     // Snapshot stable properties only
     const { gzip: _gzip, size: _size, ...resultWithoutVolatile } = result
     const assetsWithoutVolatile = result.assets.map(
-      ({ gzip, size, ...asset }) => asset,
+      ({ gzip: _g, size: _s, ...asset }) => asset,
     )
 
     expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile })
@@ -458,7 +458,7 @@ describe('Gzip Compression', () => {
     // Snapshot stable properties only
     const { gzip: _gzip, size: _size, ...resultWithoutVolatile } = result
     const assetsWithoutVolatile = result.assets.map(
-      ({ gzip, size, ...asset }) => asset,
+      ({ gzip: _g, size: _s, ...asset }) => asset,
     )
 
     const dependencySizesStable = result.dependencySizes?.map(
@@ -524,7 +524,7 @@ describe('Gzip Compression', () => {
     const resultsWithoutVolatile = results.map(result => {
       const { gzip: _gzip, size: _size, ...resultWithoutVolatile } = result
       const assetsWithoutVolatile = result.assets.map(
-        ({ gzip, size, ...asset }) => asset,
+        ({ gzip: _g, size: _s, ...asset }) => asset,
       )
       return { ...resultWithoutVolatile, assets: assetsWithoutVolatile }
     })
@@ -621,7 +621,7 @@ describe('Dependency Size Trees', () => {
     // Snapshot stable properties only
     const { gzip: _gzip, size: _size, ...resultWithoutVolatile } = result
     const assetsWithoutVolatile = result.assets.map(
-      ({ gzip, size, ...asset }) => asset,
+      ({ gzip: _g, size: _s, ...asset }) => asset,
     )
 
     expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile })
@@ -662,7 +662,7 @@ describe('Dependency Size Trees', () => {
     // Snapshot stable properties only
     const { gzip: _gzip, size: _size, ...resultWithoutVolatile } = result
     const assetsWithoutVolatile = result.assets.map(
-      ({ gzip, size, ...asset }) => asset,
+      ({ gzip: _g, size: _s, ...asset }) => asset,
     )
 
     expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile })
@@ -703,7 +703,7 @@ describe('Dependency Size Trees', () => {
     // Snapshot stable properties only
     const { gzip: _gzip, size: _size, ...resultWithoutVolatile } = result
     const assetsWithoutVolatile = result.assets.map(
-      ({ gzip, size, ...asset }) => asset,
+      ({ gzip: _g, size: _s, ...asset }) => asset,
     )
 
     expect({ ...resultWithoutVolatile, assets: assetsWithoutVolatile })
@@ -761,7 +761,7 @@ describe('Complex Dependency Scenarios', () => {
     // Snapshot stable properties only
     const { gzip: _gzip, size: _size, ...resultWithoutVolatile } = result
     const assetsWithoutVolatile = result.assets.map(
-      ({ gzip, size, ...asset }) => asset,
+      ({ gzip: _g, size: _s, ...asset }) => asset,
     )
 
     // Remove approximateSize from dependencySizes (non-deterministic)
@@ -841,7 +841,7 @@ describe('Complex Dependency Scenarios', () => {
     // Snapshot stable properties only
     const { gzip: _gzip, size: _size, ...resultWithoutVolatile } = result
     const assetsWithoutVolatile = result.assets.map(
-      ({ gzip, size, ...asset }) => asset,
+      ({ gzip: _g, size: _s, ...asset }) => asset,
     )
 
     // Remove approximateSize from dependencySizes (non-deterministic)
@@ -918,7 +918,7 @@ describe('Complex Dependency Scenarios', () => {
     // Snapshot stable properties only
     const { gzip: _gzip, size: _size, ...resultWithoutVolatile } = result
     const assetsWithoutVolatile = result.assets.map(
-      ({ gzip, size, ...asset }) => asset,
+      ({ gzip: _g, size: _s, ...asset }) => asset,
     )
 
     // Remove approximateSize from dependencySizes (non-deterministic)
