@@ -64,13 +64,17 @@ type BuildPackageResultWithIgnored = BuildPackageResult & {
 type RspackStatsCompilation = ReturnType<Stats['toJson']>
 type RspackStatsAsset = NonNullable<RspackStatsCompilation['assets']>[0]
 
-const PACKAGE_STATS_OPTIONS: StatsOptions = {
+const ASSET_STATS_OPTIONS: StatsOptions = {
   all: false,
 
   assets: true,
   cachedAssets: true,
   assetsSpace: Number.POSITIVE_INFINITY,
   assetsSort: '!size',
+}
+
+const DEPENDENCY_STATS_OPTIONS: StatsOptions = {
+  ...ASSET_STATS_OPTIONS,
 
   modules: true,
   cachedModules: true,
@@ -284,7 +288,11 @@ const BuildUtils = {
     }
 
     const jsonStatsStartTime = performance.now()
-    const jsonStats = stats.toJson(PACKAGE_STATS_OPTIONS)
+    const jsonStats = stats.toJson(
+      options.includeDependencySizes
+        ? DEPENDENCY_STATS_OPTIONS
+        : ASSET_STATS_OPTIONS,
+    )
 
     if (!jsonStats) {
       Telemetry.parseWebpackStats(packageName, false, jsonStatsStartTime)
