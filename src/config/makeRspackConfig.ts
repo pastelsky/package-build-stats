@@ -86,6 +86,11 @@ export default function makeRspackConfig({
       ],
       mainFields: ['browser', 'module', 'main', 'style'],
     },
+    resolveLoader: {
+      alias: {
+        'svelte-loader': require.resolve('svelte-loader'),
+      },
+    },
     module: {
       rules: [
         {

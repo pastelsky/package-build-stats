@@ -34,6 +34,8 @@ function errorToObject(error: any) {
   return { error }
 }
 
+// The class is the package's existing namespaced telemetry API.
+// oxlint-disable-next-line typescript/no-extraneous-class
 export default class Telemetry {
   static installPackage(
     packageString: string,

@@ -180,13 +180,17 @@ describe('Less Processing', () => {
 })
 
 describe('Svelte Processing', () => {
-  test('should compile Svelte component with scoped styles', async () => {
-    const fixturePath = path.resolve(
-      __dirname,
-      '../fixtures/styles/svelte-package',
-    )
-    const result = await getPackageStats(fixturePath)
+  const fixturePath = path.resolve(
+    __dirname,
+    '../fixtures/styles/svelte-package',
+  )
+  let result: Awaited<ReturnType<typeof getPackageStats>>
 
+  beforeAll(async () => {
+    result = await getPackageStats(fixturePath)
+  })
+
+  test('should compile Svelte component with scoped styles', () => {
     // Should have exactly 2 assets: JS and CSS
     expect(result.assets).toHaveLength(2)
 
@@ -199,13 +203,7 @@ describe('Svelte Processing', () => {
     expect(cssAsset!.type).toBe('css')
   })
 
-  test('should extract CSS from Svelte component', async () => {
-    const fixturePath = path.resolve(
-      __dirname,
-      '../fixtures/styles/svelte-package',
-    )
-    const result = await getPackageStats(fixturePath)
-
+  test('should extract CSS from Svelte component', () => {
     const cssAsset = result.assets.find(a => a.type === 'css')
 
     // Svelte scoped styles should be extracted
@@ -214,13 +212,7 @@ describe('Svelte Processing', () => {
     expect(cssAsset!.gzip).toBeGreaterThan(0)
   })
 
-  test('should use svelte-loader for Svelte compilation', async () => {
-    const fixturePath = path.resolve(
-      __dirname,
-      '../fixtures/styles/svelte-package',
-    )
-    const result = await getPackageStats(fixturePath)
-
+  test('should use svelte-loader for Svelte compilation', () => {
     // Should successfully compile without errors
     expect(result.assets).toHaveLength(2)
     const jsAsset = result.assets.find(a => a.type === 'js')

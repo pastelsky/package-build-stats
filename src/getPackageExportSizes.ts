@@ -126,6 +126,8 @@ export async function getPackageExportSizes(
 
     for (let i = 0; i < buildExports.length; i += chunkSize) {
       const chunk = buildExports.slice(i, i + chunkSize)
+      // Build chunks sequentially to cap Rspack's peak memory usage.
+      // oxlint-disable-next-line no-await-in-loop
       const chunkDetails = await BuildUtils.buildPackageIgnoringMissingDeps({
         name: packageName,
         installPath,

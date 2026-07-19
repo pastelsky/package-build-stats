@@ -197,16 +197,13 @@ const BuildUtils = {
   },
 
   parseMissingModules(errors: ReturnType<typeof getCompilationErrors>) {
-    // There's a better way to get the missing module's name, maybe ?
     const missingModuleRegex = /Can't resolve '(.+)' in/
 
     const missingModules = errors.map(err => {
       const matches = err.message.match(missingModuleRegex)
 
       if (!matches) {
-        throw new UnexpectedBuildError(
-          'Expected to find a file path in the module not found error, but found none. Regex for this might be out of date.',
-        )
+        return undefined
       }
 
       const missingFilePath = matches[1]
@@ -226,7 +223,13 @@ const BuildUtils = {
       return packageNameMatch[0]
     })
 
-    let uniqueMissingModules = Array.from(new Set(missingModules))
+    if (missingModules.some(moduleName => moduleName === undefined)) {
+      return []
+    }
+
+    let uniqueMissingModules = Array.from(new Set(missingModules)).filter(
+      notEmpty,
+    )
     uniqueMissingModules = uniqueMissingModules.filter(
       mod => !mod.startsWith(`${uniqueMissingModules[0]}/`),
     )
@@ -275,6 +278,12 @@ const BuildUtils = {
 
     if (compilationErrors.length) {
       const missingModules = BuildUtils.parseMissingModules(compilationErrors)
+
+      if (!missingModules.length) {
+        throw new UnexpectedBuildError(
+          compilationErrors.map(error => error.message),
+        )
+      }
 
       if (missingModules.length === 1 && missingModules[0] === packageName) {
         throw new EntryPointError(compilationErrors.map(err => err.message))

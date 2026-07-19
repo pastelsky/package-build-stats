@@ -288,6 +288,7 @@ async function bundleSizeTree(
   }
 
   const treeItems = flattenedItems
+    .filter(treeItem => treeItem.packageName !== packageName)
     .map(treeItem => ({
       ...treeItem,
       sources: treeItem.sources.filter(source => !!source),

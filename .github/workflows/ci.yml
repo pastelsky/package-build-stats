@@ -12,20 +12,24 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
         node-version: [22.x, 24.x]
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node-version }}
 
       - name: Enable Corepack
         run: corepack enable
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies
         run: corepack yarn install --immutable
@@ -45,13 +49,8 @@ jobs:
       - name: Run fast tests
         run: corepack yarn test
 
-      # These tests install live packages with npm, pnpm, yarn, and Bun. Their
-      # results depend on registry state, package-manager availability, and
-      # platform-specific bundle output, so they should inform PRs without
-      # making deterministic unit and build checks permanently red.
-      - name: Run slow integration tests (non-blocking)
+      - name: Run slow integration tests
         run: corepack yarn test:slow
-        continue-on-error: true
 
       - name: Run tests with coverage (Node 24 only)
         if: matrix.node-version == '24.x'
@@ -59,7 +58,7 @@ jobs:
         continue-on-error: true
 
       - name: Upload coverage reports
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v7
         if: matrix.node-version == '24.x'
         with:
           files: ./coverage/lcov.info
@@ -73,10 +72,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 24.x
 

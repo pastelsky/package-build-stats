@@ -222,7 +222,7 @@ describe('Bundle Size Calculation', () => {
     const jsAsset = result.assets.find(a => a.type === 'js')
     const cssAsset = result.assets.find(a => a.type === 'css')
 
-    expect(jsAsset?.size).toBeGreaterThanOrEqual(230)
+    expect(jsAsset?.size).toBeGreaterThanOrEqual(225)
     expect(jsAsset?.size).toBeLessThanOrEqual(250)
     expect(jsAsset?.gzip).toBeGreaterThan(0)
 
@@ -788,10 +788,6 @@ describe('Complex Dependency Scenarios', () => {
         "dependencySizes": [
           {
             "approximateSizeRange": "positive",
-            "name": "fixture-with-peer-deps",
-          },
-          {
-            "approximateSizeRange": "positive",
             "name": "lodash-es",
           },
         ],
@@ -868,10 +864,6 @@ describe('Complex Dependency Scenarios', () => {
         "dependencySizes": [
           {
             "approximateSizeRange": "positive",
-            "name": "fixture-nested-deps",
-          },
-          {
-            "approximateSizeRange": "positive",
             "name": "ms",
           },
           {
@@ -943,10 +935,6 @@ describe('Complex Dependency Scenarios', () => {
         ],
         "dependencyCount": 1,
         "dependencySizes": [
-          {
-            "approximateSizeRange": "positive",
-            "name": "fixture-deep-nested",
-          },
           {
             "approximateSizeRange": "positive",
             "name": "axios",

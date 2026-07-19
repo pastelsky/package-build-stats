@@ -20,6 +20,8 @@ const waitForProcessToExit = async (pid: number, timeout: number) => {
     if (!isProcessRunning(pid)) {
       return true
     }
+    // Polling is intentionally sequential so the timeout remains bounded.
+    // oxlint-disable-next-line no-await-in-loop
     await new Promise(resolve => setTimeout(resolve, 25))
   }
 

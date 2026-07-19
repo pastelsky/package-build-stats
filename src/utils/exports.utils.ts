@@ -160,6 +160,8 @@ async function walkExportsRecursive(
     // If this is a re-export (export { foo } from './module.js'), resolve to the source file
     if (exp.moduleRequest) {
       try {
+        // Resolve one export at a time to avoid unbounded filesystem work.
+        // oxlint-disable-next-line no-await-in-loop
         sourcePath = await resolveModule(
           path.dirname(resolvedPath),
           exp.moduleRequest,

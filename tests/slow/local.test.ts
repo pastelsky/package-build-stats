@@ -20,14 +20,9 @@ describe('getPackageStats', () => {
     )
 
     expect(result.dependencySizes).toBeDefined()
-    expect(result.dependencySizes?.length).toEqual(2)
+    expect(result.dependencySizes?.length).toEqual(1)
 
     if (result.dependencySizes) {
-      expect(result.dependencySizes).toEqual(
-        expect.arrayContaining([
-          { name: 'resolve-test', approximateSize: 516 },
-        ]),
-      )
       expect(result.dependencySizes).toEqual(
         expect.arrayContaining([
           {

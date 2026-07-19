@@ -181,6 +181,8 @@ const InstallationUtils = {
       const isLastClient = i === clients.length - 1
 
       try {
+        // Package managers are ordered fallbacks, not parallel alternatives.
+        // oxlint-disable-next-line no-await-in-loop
         await InstallationUtils.installWithClient(
           packageString,
           installPath,
@@ -234,10 +236,9 @@ const InstallationUtils = {
     debug('install start %s', packageString)
 
     try {
-      const packageToInstall =
-        currentClient === 'npm' && isLocal
-          ? await packLocalPackage(packageString, installPath, installTimeout)
-          : packageString
+      const packageToInstall = isLocal
+        ? await packLocalPackage(packageString, installPath, installTimeout)
+        : packageString
 
       const execStartTime = performance.now()
       await exec(
