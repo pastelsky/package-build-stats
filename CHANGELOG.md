@@ -1,5 +1,16 @@
 # package-build-stats
 
+## 9.1.0
+
+### Minor Changes
+
+- 2fce8b3: Use Oxc with bounded concurrency to minify Rspack JavaScript bundles.
+
+### Patch Changes
+
+- 319c8e0: Always close the Rspack compiler when compilation fails without producing stats.
+- 08cdf8b: Resolve package entry points exposed through the `svelte` export condition.
+
 ## 9.0.0
 
 ### Major Changes
