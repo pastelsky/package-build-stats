@@ -175,11 +175,16 @@ const BuildUtils = {
     return new Promise<CompilePackageReturn>((resolve, reject) => {
       compiler.run(async (error, stats) => {
         try {
-          if (!stats) {
-            throw new Error('stats is null')
-          }
-
           await closeCompiler(compiler)
+        } catch (closeError) {
+          reject(error && !stats ? error : closeError)
+          return
+        }
+
+        try {
+          if (!stats) {
+            throw error ?? new Error('stats is null')
+          }
 
           if (error) {
             console.error(error)
@@ -189,8 +194,8 @@ const BuildUtils = {
           }
 
           resolve({ stats, error })
-        } catch (closeError) {
-          reject(closeError)
+        } catch (buildError) {
+          reject(buildError)
         }
       })
     })
