@@ -1,0 +1,9 @@
+{
+  "name": "svelte-condition-fixture",
+  "version": "1.0.0",
+  "exports": {
+    ".": {
+      "svelte": "./src/index.js"
+    }
+  }
+}

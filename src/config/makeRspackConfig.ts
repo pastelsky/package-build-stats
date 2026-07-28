@@ -73,6 +73,7 @@ export default function makeRspackConfig({
     },
     resolve: {
       modules: ['node_modules'],
+      conditionNames: ['svelte', '...'],
       extensions: [
         '.web.mjs',
         '.mjs',
