@@ -77,6 +77,51 @@ describe('BuildUtils.compilePackage', () => {
       }),
     ).rejects.toThrow('close failed')
   })
+
+  test('closes the compiler and preserves an error returned without stats', async () => {
+    const runError = new Error('compile failed')
+    const close = vi.fn(callback => callback())
+
+    mockRspack.mockReturnValue({
+      run: (callback: (error: Error, stats?: never) => void) =>
+        callback(runError),
+      close,
+    })
+
+    await expect(
+      BuildUtils.compilePackage({
+        name: 'demo-package',
+        entry: { main: '/tmp/index.js' },
+        externals: {
+          externalPackages: [],
+          externalBuiltIns: [],
+        },
+      }),
+    ).rejects.toBe(runError)
+    expect(close).toHaveBeenCalledTimes(1)
+  })
+
+  test('preserves the build error when compiler cleanup also fails', async () => {
+    const runError = new Error('compile failed')
+    const closeError = new Error('close failed')
+
+    mockRspack.mockReturnValue({
+      run: (callback: (error: Error, stats?: never) => void) =>
+        callback(runError),
+      close: (callback: (error: Error) => void) => callback(closeError),
+    })
+
+    await expect(
+      BuildUtils.compilePackage({
+        name: 'demo-package',
+        entry: { main: '/tmp/index.js' },
+        externals: {
+          externalPackages: [],
+          externalBuiltIns: [],
+        },
+      }),
+    ).rejects.toBe(runError)
+  })
 })
 
 describe('BuildUtils.buildPackage', () => {
