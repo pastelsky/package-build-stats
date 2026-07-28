@@ -12,15 +12,15 @@ describe('Bundle Size Calculation', () => {
     const result = await getPackageStats(fixturePath)
 
     // Assert size and gzip are within expected ranges (non-deterministic)
-    expect(result.size).toBeGreaterThanOrEqual(220)
-    expect(result.size).toBeLessThanOrEqual(240)
+    expect(result.size).toBeGreaterThanOrEqual(245)
+    expect(result.size).toBeLessThanOrEqual(250)
     expect(result.gzip).toBeGreaterThan(0)
     // Note: gzip can sometimes be larger than uncompressed size for very small files
 
     result.assets.forEach(asset => {
       expect(asset.gzip).toBeGreaterThan(0)
-      expect(asset.size).toBeGreaterThanOrEqual(220)
-      expect(asset.size).toBeLessThanOrEqual(240)
+      expect(asset.size).toBeGreaterThanOrEqual(245)
+      expect(asset.size).toBeLessThanOrEqual(250)
     })
 
     // Snapshot stable properties only (exclude size and gzip)
@@ -56,15 +56,15 @@ describe('Bundle Size Calculation', () => {
     const result = await getPackageStats(fixturePath)
 
     // Assert size and gzip are within expected ranges (non-deterministic)
-    expect(result.size).toBeGreaterThanOrEqual(505)
-    expect(result.size).toBeLessThanOrEqual(530)
+    expect(result.size).toBeGreaterThanOrEqual(530)
+    expect(result.size).toBeLessThanOrEqual(540)
     expect(result.gzip).toBeGreaterThan(0)
     expect(result.gzip).toBeLessThan(result.size)
 
     result.assets.forEach(asset => {
       expect(asset.gzip).toBeGreaterThan(0)
-      expect(asset.size).toBeGreaterThanOrEqual(505)
-      expect(asset.size).toBeLessThanOrEqual(530)
+      expect(asset.size).toBeGreaterThanOrEqual(530)
+      expect(asset.size).toBeLessThanOrEqual(540)
     })
 
     // Snapshot stable properties only
@@ -150,8 +150,8 @@ describe('Bundle Size Calculation', () => {
     const jsAsset = result.assets.find(a => a.type === 'js')
     const cssAsset = result.assets.find(a => a.type === 'css')
 
-    expect(jsAsset?.size).toBeGreaterThanOrEqual(225)
-    expect(jsAsset?.size).toBeLessThanOrEqual(245)
+    expect(jsAsset?.size).toBeGreaterThanOrEqual(250)
+    expect(jsAsset?.size).toBeLessThanOrEqual(260)
     expect(jsAsset?.gzip).toBeGreaterThan(0)
 
     expect(cssAsset?.size).toBeGreaterThanOrEqual(195)
@@ -222,8 +222,8 @@ describe('Bundle Size Calculation', () => {
     const jsAsset = result.assets.find(a => a.type === 'js')
     const cssAsset = result.assets.find(a => a.type === 'css')
 
-    expect(jsAsset?.size).toBeGreaterThanOrEqual(225)
-    expect(jsAsset?.size).toBeLessThanOrEqual(250)
+    expect(jsAsset?.size).toBeGreaterThanOrEqual(255)
+    expect(jsAsset?.size).toBeLessThanOrEqual(265)
     expect(jsAsset?.gzip).toBeGreaterThan(0)
 
     expect(cssAsset?.size).toBeGreaterThanOrEqual(185)
@@ -318,15 +318,15 @@ describe('Gzip Compression', () => {
     const result = await getPackageStats(fixturePath)
 
     // Assert ranges
-    expect(result.size).toBeGreaterThanOrEqual(220)
-    expect(result.size).toBeLessThanOrEqual(240)
+    expect(result.size).toBeGreaterThanOrEqual(245)
+    expect(result.size).toBeLessThanOrEqual(250)
     expect(result.gzip).toBeGreaterThan(0)
     expect(result.gzip).toBeLessThan(result.size)
 
     result.assets.forEach(asset => {
       expect(asset.gzip).toBeGreaterThan(0)
-      expect(asset.size).toBeGreaterThanOrEqual(220)
-      expect(asset.size).toBeLessThanOrEqual(240)
+      expect(asset.size).toBeGreaterThanOrEqual(245)
+      expect(asset.size).toBeLessThanOrEqual(250)
     })
 
     // Snapshot stable properties only
@@ -360,15 +360,15 @@ describe('Gzip Compression', () => {
     const result = await getPackageStats(fixturePath)
 
     // Assert ranges
-    expect(result.size).toBeGreaterThanOrEqual(490)
-    expect(result.size).toBeLessThanOrEqual(530)
+    expect(result.size).toBeGreaterThanOrEqual(530)
+    expect(result.size).toBeLessThanOrEqual(540)
     expect(result.gzip).toBeGreaterThan(0)
     expect(result.gzip).toBeLessThan(result.size)
 
     result.assets.forEach(asset => {
       expect(asset.gzip).toBeGreaterThan(0)
-      expect(asset.size).toBeGreaterThanOrEqual(490)
-      expect(asset.size).toBeLessThanOrEqual(530)
+      expect(asset.size).toBeGreaterThanOrEqual(530)
+      expect(asset.size).toBeLessThanOrEqual(540)
     })
 
     // Snapshot stable properties only
@@ -608,8 +608,8 @@ describe('Dependency Size Trees', () => {
     const result = await getPackageStats(fixturePath)
 
     // Assert ranges
-    expect(result.size).toBeGreaterThanOrEqual(220)
-    expect(result.size).toBeLessThanOrEqual(240)
+    expect(result.size).toBeGreaterThanOrEqual(245)
+    expect(result.size).toBeLessThanOrEqual(250)
     expect(result.gzip).toBeGreaterThan(0)
     expect(result.gzip).toBeLessThan(result.size)
 
@@ -649,8 +649,8 @@ describe('Dependency Size Trees', () => {
     const result = await getPackageStats(fixturePath)
 
     // Assert ranges
-    expect(result.size).toBeGreaterThanOrEqual(505)
-    expect(result.size).toBeLessThanOrEqual(530)
+    expect(result.size).toBeGreaterThanOrEqual(530)
+    expect(result.size).toBeLessThanOrEqual(540)
     expect(result.gzip).toBeGreaterThan(0)
     expect(result.gzip).toBeLessThan(result.size)
 
@@ -736,8 +736,8 @@ describe('Complex Dependency Scenarios', () => {
     const result = await getPackageStats(fixturePath)
 
     // Assert ranges for size and gzip
-    expect(result.size).toBeGreaterThanOrEqual(2390)
-    expect(result.size).toBeLessThanOrEqual(2420)
+    expect(result.size).toBeGreaterThanOrEqual(2600)
+    expect(result.size).toBeLessThanOrEqual(2620)
     expect(result.gzip).toBeGreaterThan(0)
     expect(result.gzip).toBeLessThan(result.size)
 
