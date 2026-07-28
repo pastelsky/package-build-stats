@@ -234,10 +234,8 @@ describe('Functional Tests - Package Building & Sizing', () => {
       expect(result.size).toBeWithinDelta(5.76 * 1024, 3 * 1024)
     })
 
-    test('should work with swc minifier', async () => {
-      const result = await getPackageStats('redux@3.7.2', {
-        minifier: 'swc',
-      })
+    test('should work with the default Oxc minifier', async () => {
+      const result = await getPackageStats('redux@3.7.2')
 
       expect(result).toHaveProperty('size')
       expect(result.size).toBeGreaterThan(0)
@@ -365,7 +363,6 @@ describe('Functional Tests - Bundler Comparison', () => {
 
         const rspackResult = await getPackageStats(packageName, {
           bundler: 'rspack',
-          minifier: 'swc',
         })
 
         // Sizes should be within 10% of each other

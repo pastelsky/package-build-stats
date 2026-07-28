@@ -5,6 +5,8 @@ import type { Entry, Configuration } from '@rspack/core'
 import rspack from '@rspack/core'
 import { createRequire } from 'node:module'
 
+import OxcJsMinimizerRspackPlugin from './OxcJsMinimizerRspackPlugin.js'
+
 const require = createRequire(import.meta.url)
 
 import type { Externals } from '../common.types.js'
@@ -46,13 +48,13 @@ export default function makeRspackConfig({
       runtimeChunk: 'multiple',
       realContentHash: false,
       minimize: minify,
+      minimizer: [
+        new OxcJsMinimizerRspackPlugin(),
+        new rspack.LightningCssMinimizerRspackPlugin(),
+      ],
       // Enable tree-shaking optimizations
       usedExports: true, // Mark unused exports for removal
       sideEffects: true, // Respect package.json sideEffects field
-      // Rspack automatically uses its built-in default minifiers:
-      // - SwcJsMinimizerRspackPlugin for JS (SWC-based, very fast)
-      // - LightningCssMinimizerRspackPlugin for CSS (Lightning CSS-based)
-      // See: https://rspack.rs/guide/optimization/production
       splitChunks: {
         cacheGroups: {
           styles: {
