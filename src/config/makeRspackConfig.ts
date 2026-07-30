@@ -77,6 +77,10 @@ export default function makeRspackConfig({
       modules: ['node_modules'],
       conditionNames: ['svelte', '...'],
       extensions: [
+        '.web.tsx',
+        '.web.ts',
+        '.tsx',
+        '.ts',
         '.web.mjs',
         '.mjs',
         '.web.js',
@@ -96,6 +100,14 @@ export default function makeRspackConfig({
     },
     module: {
       rules: [
+        {
+          test: /\.tsx?$/,
+          loader: 'builtin:swc-loader',
+          options: {
+            detectSyntax: 'auto',
+          },
+          type: 'javascript/auto',
+        },
         {
           type: 'javascript/auto',
           test: /\.mjs$/,
