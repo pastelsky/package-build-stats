@@ -1,5 +1,11 @@
 # package-build-stats
 
+## 9.1.1
+
+### Patch Changes
+
+- de899ec: Build packages that publish TypeScript source files.
+
 ## 9.1.0
 
 ### Minor Changes
