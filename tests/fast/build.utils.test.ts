@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, test, vi } from 'vitest'
+import { BuildCancelledError } from '../../src/errors/CustomError'
 
 const mockRspack = vi.fn()
 const mockCompilePackage = vi.fn()
@@ -121,6 +122,53 @@ describe('BuildUtils.compilePackage', () => {
         },
       }),
     ).rejects.toBe(runError)
+  })
+
+  test('does not start rspack when its signal is already aborted', async () => {
+    const controller = new AbortController()
+    controller.abort()
+
+    expect(() =>
+      BuildUtils.compilePackage({
+        name: 'demo-package',
+        entry: { main: '/tmp/index.js' },
+        externals: {
+          externalPackages: [],
+          externalBuiltIns: [],
+        },
+        signal: controller.signal,
+      }),
+    ).toThrow(BuildCancelledError)
+    expect(mockRspack).not.toHaveBeenCalled()
+  })
+
+  test('rejects an aborted compile after closing the compiler', async () => {
+    const controller = new AbortController()
+    const close = vi.fn(callback => callback())
+    let finishCompile: ((error: null, stats: any) => void) | undefined
+
+    mockRspack.mockReturnValue({
+      run: (callback: (error: null, stats: any) => void) => {
+        finishCompile = callback
+      },
+      close,
+    })
+
+    const compilation = BuildUtils.compilePackage({
+      name: 'demo-package',
+      entry: { main: '/tmp/index.js' },
+      externals: {
+        externalPackages: [],
+        externalBuiltIns: [],
+      },
+      signal: controller.signal,
+    })
+
+    controller.abort()
+    finishCompile?.(null, { compilation: { errors: [] } })
+
+    await expect(compilation).rejects.toBeInstanceOf(BuildCancelledError)
+    expect(close).toHaveBeenCalledTimes(1)
   })
 })
 

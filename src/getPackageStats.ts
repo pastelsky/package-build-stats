@@ -6,7 +6,11 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { performance } from 'node:perf_hooks'
-import { getExternals, parsePackageString } from './utils/common.utils.js'
+import {
+  getExternals,
+  parsePackageString,
+  throwIfAborted,
+} from './utils/common.utils.js'
 import InstallationUtils from './utils/installation.utils.js'
 import BuildUtils from './utils/build.utils.js'
 import { UnexpectedBuildError } from './errors/CustomError.js'
@@ -62,11 +66,13 @@ export default async function getPackageStats(
   const installPath = await InstallationUtils.preparePath(
     packageName,
     options.client,
+    options.signal,
   )
   timings.preparePath = performance.now() - preparePathStart
   console.log(`[PERF] preparePath: ${timings.preparePath.toFixed(2)}ms`)
 
   try {
+    throwIfAborted(options.signal)
     const installStart = performance.now()
     await InstallationUtils.installPackage(packageString, installPath, {
       isLocal,
@@ -74,12 +80,15 @@ export default async function getPackageStats(
       limitConcurrency: options.limitConcurrency,
       networkConcurrency: options.networkConcurrency,
       installTimeout: options.installTimeout,
+      signal: options.signal,
     })
+    throwIfAborted(options.signal)
     timings.install = performance.now() - installStart
     console.log(`[PERF] installPackage: ${timings.install.toFixed(2)}ms`)
 
     const externalsStart = performance.now()
     const externals = getExternals(packageName, installPath)
+    throwIfAborted(options.signal)
     timings.getExternals = performance.now() - externalsStart
     console.log(`[PERF] getExternals: ${timings.getExternals.toFixed(2)}ms`)
 
@@ -95,9 +104,11 @@ export default async function getPackageStats(
           minify: options.minify !== false,
           customImports: options.customImports,
           includeDependencySizes: true,
+          signal: options.signal,
         },
       }),
     ])
+    throwIfAborted(options.signal)
     timings.parallelBuild = performance.now() - parallelStart
     console.log(
       `[PERF] parallel (packageJSON + build): ${timings.parallelBuild.toFixed(2)}ms`,

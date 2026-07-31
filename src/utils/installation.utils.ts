@@ -7,8 +7,12 @@ import sanitize from 'sanitize-filename'
 import createDebug from 'debug'
 
 const debug = createDebug('bp:worker')
-import { InstallError, PackageNotFoundError } from '../errors/CustomError.js'
-import { exec, ProcessExecutionError } from './common.utils.js'
+import {
+  BuildCancelledError,
+  InstallError,
+  PackageNotFoundError,
+} from '../errors/CustomError.js'
+import { exec, ProcessExecutionError, throwIfAborted } from './common.utils.js'
 import config from '../config/config.js'
 import { packageManagers } from '../common.types.js'
 import type { InstallPackageOptions, PackageManager } from '../common.types.js'
@@ -20,6 +24,7 @@ async function packLocalPackage(
   packagePath: string,
   installPath: string,
   timeout: number,
+  signal?: AbortSignal,
 ) {
   const output = await exec(
     'npm',
@@ -31,7 +36,7 @@ async function packLocalPackage(
       '--loglevel=error',
       packagePath,
     ],
-    { cwd: installPath, maxBuffer: 1024 * 500 },
+    { cwd: installPath, maxBuffer: 1024 * 500, signal },
     timeout,
   )
   const filename = (JSON.parse(output) as Array<{ filename?: unknown }>)[0]
@@ -97,7 +102,9 @@ const InstallationUtils = {
   async preparePath(
     packageName: string,
     clientOption?: PackageManager | PackageManager[],
+    signal?: AbortSignal,
   ) {
+    throwIfAborted(signal)
     const startTime = performance.now()
     const installPath = InstallationUtils.getInstallPath(packageName)
 
@@ -199,6 +206,9 @@ const InstallationUtils = {
         }
         return
       } catch (error) {
+        if (error instanceof BuildCancelledError) {
+          throw error
+        }
         lastError = error
 
         if (!isLastClient) {
@@ -231,13 +241,18 @@ const InstallationUtils = {
 
     const installStartTime = performance.now()
 
-    const { isLocal, installTimeout = 45000 } = installOptions
+    const { isLocal, installTimeout = 45000, signal } = installOptions
 
     debug('install start %s', packageString)
 
     try {
       const packageToInstall = isLocal
-        ? await packLocalPackage(packageString, installPath, installTimeout)
+        ? await packLocalPackage(
+            packageString,
+            installPath,
+            installTimeout,
+            signal,
+          )
         : packageString
 
       const execStartTime = performance.now()
@@ -247,6 +262,7 @@ const InstallationUtils = {
         {
           cwd: installPath,
           maxBuffer: 1024 * 500,
+          signal,
         },
         installTimeout,
       )
@@ -264,6 +280,9 @@ const InstallationUtils = {
         client: currentClient,
       })
     } catch (err) {
+      if (err instanceof BuildCancelledError) {
+        throw err
+      }
       if (installOptions.debug || process.env.DEBUG_TIMING) {
         console.log(`[INSTALL ERROR] ${currentClient}:`, err)
       }

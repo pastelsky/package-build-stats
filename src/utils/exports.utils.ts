@@ -12,6 +12,7 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import { performance } from 'node:perf_hooks'
 import Telemetry from './telemetry.utils.js'
+import { throwIfAborted } from './common.utils.js'
 
 // Initialize resolver with ESM-first configuration
 // - main_fields: ["module", "main"] - prioritize ESM entry points
@@ -102,7 +103,9 @@ function getExportsFromStaticExports(staticExports: StaticExport[]): {
 async function resolveModule(
   context: string,
   lookupPath: string,
+  signal?: AbortSignal,
 ): Promise<string> {
+  throwIfAborted(signal)
   const result = resolver.sync(context, lookupPath)
   if (!result.path) {
     throw new Error(`Cannot resolve module '${lookupPath}' from '${context}'`)
@@ -125,10 +128,12 @@ async function walkExportsRecursive(
   visited: Set<string>,
   rootContext?: string,
   _isRootCall: boolean = false,
+  signal?: AbortSignal,
 ): Promise<ResolvedExports> {
+  throwIfAborted(signal)
   // Use rootContext for calculating relative paths, context for resolution
   const root = rootContext || context
-  const resolvedPath = await resolveModule(context, lookupPath)
+  const resolvedPath = await resolveModule(context, lookupPath, signal)
 
   // Avoid circular dependencies
   if (visited.has(resolvedPath)) {
@@ -138,6 +143,7 @@ async function walkExportsRecursive(
 
   // Parse the file to get exports
   const code = await fs.readFile(resolvedPath, 'utf8')
+  throwIfAborted(signal)
   const parseResult = parseSync(resolvedPath, code, {
     sourceType: 'module',
   })
@@ -155,6 +161,7 @@ async function walkExportsRecursive(
 
   // Add direct exports from this module, resolving re-exports to their source files
   for (const exp of exports) {
+    throwIfAborted(signal)
     let sourcePath = resolvedPath
 
     // If this is a re-export (export { foo } from './module.js'), resolve to the source file
@@ -165,8 +172,10 @@ async function walkExportsRecursive(
         sourcePath = await resolveModule(
           path.dirname(resolvedPath),
           exp.moduleRequest,
+          signal,
         )
       } catch {
+        throwIfAborted(signal)
         // If resolution fails, fall back to current file
         sourcePath = resolvedPath
       }
@@ -188,6 +197,8 @@ async function walkExportsRecursive(
       location,
       visited,
       root, // Pass root context through recursion
+      false,
+      signal,
     )
     // Merge star exports into our exports
     Object.keys(starExports).forEach(expKey => {
@@ -196,6 +207,7 @@ async function walkExportsRecursive(
   })
 
   await Promise.all(promises)
+  throwIfAborted(signal)
   return resolvedExports
 }
 
@@ -209,14 +221,17 @@ export async function getAllExports(
   context: string,
   lookupPath: string,
   installPath?: string, // Base path for calculating relative paths (optional)
+  signal?: AbortSignal,
 ) {
   const startTime = performance.now()
   const visited = new Set<string>()
 
   try {
+    throwIfAborted(signal)
     // Read package.json to get the entry point
     const packageJsonPath = path.join(context, 'package.json')
     const packageJson = JSON.parse(await fs.readFile(packageJsonPath, 'utf8'))
+    throwIfAborted(signal)
     // Prefer module field for ESM, fallback to main, then default
     let entryPoint = packageJson.module || packageJson.main || './index.js'
 
@@ -233,6 +248,7 @@ export async function getAllExports(
       visited,
       installPath,
       true,
+      signal,
     )
     Telemetry.walkPackageExportsTree(packageString, startTime, true)
     return results

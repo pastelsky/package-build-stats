@@ -1,7 +1,9 @@
 import fs from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
+import { vi } from 'vitest'
 
+import { BuildCancelledError } from '../../src/errors/CustomError.js'
 import InstallationUtils from '../../src/utils/installation.utils.js'
 
 describe('InstallationUtils', () => {
@@ -61,5 +63,25 @@ describe('InstallationUtils', () => {
         'invalid' as 'npm',
       ),
     ).rejects.toThrow('Unsupported package manager: invalid')
+  })
+
+  test('does not try a fallback package manager after cancellation', async () => {
+    const installWithClient = vi
+      .spyOn(InstallationUtils, 'installWithClient')
+      .mockRejectedValue(new BuildCancelledError())
+
+    await expect(
+      InstallationUtils.installPackage('example', '/tmp/unused', {
+        client: ['bun', 'npm'],
+      }),
+    ).rejects.toBeInstanceOf(BuildCancelledError)
+
+    expect(installWithClient).toHaveBeenCalledTimes(1)
+    expect(installWithClient).toHaveBeenCalledWith(
+      'example',
+      '/tmp/unused',
+      expect.objectContaining({ client: 'bun' }),
+      'bun',
+    )
   })
 })

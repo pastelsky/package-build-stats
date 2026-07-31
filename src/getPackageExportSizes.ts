@@ -6,7 +6,11 @@ import createDebug from 'debug'
 
 const debug = createDebug('bp:worker')
 
-import { getExternals, parsePackageString } from './utils/common.utils.js'
+import {
+  getExternals,
+  parsePackageString,
+  throwIfAborted,
+} from './utils/common.utils.js'
 import { getAllExports } from './utils/exports.utils.js'
 import InstallationUtils from './utils/installation.utils.js'
 import BuildUtils from './utils/build.utils.js'
@@ -28,6 +32,7 @@ async function installPackage(
     limitConcurrency: options.limitConcurrency,
     networkConcurrency: options.networkConcurrency,
     installTimeout: options.installTimeout,
+    signal: options.signal,
   })
 }
 
@@ -37,10 +42,16 @@ export async function getAllPackageExports(
 ) {
   const startTime = performance.now()
   const { name: packageName, normalPath } = parsePackageString(packageString)
-  const installPath = await InstallationUtils.preparePath(packageName)
+  const installPath = await InstallationUtils.preparePath(
+    packageName,
+    options.client,
+    options.signal,
+  )
 
   try {
+    throwIfAborted(options.signal)
     await installPackage(packageString, installPath, options)
+    throwIfAborted(options.signal)
     // The package is installed in node_modules subdirectory
     const packagePath =
       normalPath || path.join(installPath, 'node_modules', packageName)
@@ -49,6 +60,7 @@ export async function getAllPackageExports(
       packagePath,
       packageName,
       installPath, // Pass installPath as base for relative path calculation
+      options.signal,
     )
     Telemetry.packageExports(packageString, startTime, true)
     return results
@@ -70,15 +82,21 @@ export async function getPackageExportSizes(
   const { name: packageName, normalPath } = parsePackageString(packageString)
 
   const preparePathStart = performance.now()
-  const installPath = await InstallationUtils.preparePath(packageName)
+  const installPath = await InstallationUtils.preparePath(
+    packageName,
+    options.client,
+    options.signal,
+  )
   timings.preparePath = performance.now() - preparePathStart
   console.log(
     `[PERF] [ExportSizes] preparePath: ${timings.preparePath.toFixed(2)}ms`,
   )
 
   try {
+    throwIfAborted(options.signal)
     const installStart = performance.now()
     await installPackage(packageString, installPath, options)
+    throwIfAborted(options.signal)
     timings.install = performance.now() - installStart
     console.log(
       `[PERF] [ExportSizes] installPackage: ${timings.install.toFixed(2)}ms`,
@@ -94,7 +112,9 @@ export async function getPackageExportSizes(
       packagePath,
       packageName,
       installPath, // Pass installPath as base for relative path calculation
+      options.signal,
     )
+    throwIfAborted(options.signal)
     timings.getAllExports = performance.now() - getAllExportsStart
     console.log(
       `[PERF] [ExportSizes] getAllExports: ${timings.getAllExports.toFixed(2)}ms`,
@@ -109,6 +129,7 @@ export async function getPackageExportSizes(
 
     const externalsStart = performance.now()
     const externals = getExternals(packageName, installPath)
+    throwIfAborted(options.signal)
     timings.getExternals = performance.now() - externalsStart
     console.log(
       `[PERF] [ExportSizes] getExternals: ${timings.getExternals.toFixed(2)}ms`,
@@ -125,6 +146,7 @@ export async function getPackageExportSizes(
     const ignoredMissingDependenciesSet = new Set<string>()
 
     for (let i = 0; i < buildExports.length; i += chunkSize) {
+      throwIfAborted(options.signal)
       const chunk = buildExports.slice(i, i + chunkSize)
       // Build chunks sequentially to cap Rspack's peak memory usage.
       // oxlint-disable-next-line no-await-in-loop
@@ -136,8 +158,10 @@ export async function getPackageExportSizes(
           customImports: chunk,
           splitCustomImports: true,
           includeDependencySizes: false,
+          signal: options.signal,
         },
       })
+      throwIfAborted(options.signal)
       assets.push(...chunkDetails.assets)
       if (chunkDetails.ignoredMissingDependencies) {
         chunkDetails.ignoredMissingDependencies.forEach(dep => {

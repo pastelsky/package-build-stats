@@ -3,6 +3,7 @@ import fs from 'node:fs'
 import { builtinModules } from 'node:module'
 import os from 'node:os'
 import path from 'node:path'
+import { BuildCancelledError } from '../errors/CustomError.js'
 
 const homeDirectory = os.homedir()
 
@@ -29,6 +30,12 @@ export class ProcessExecutionError extends Error {
 
 export const getBuiltInModules = () =>
   builtinModules.flatMap(mod => [mod, 'node:' + mod])
+
+export function throwIfAborted(signal?: AbortSignal) {
+  if (signal?.aborted) {
+    throw new BuildCancelledError()
+  }
+}
 
 function killProcessTree(child: childProcess.ChildProcess) {
   if (!child.pid) {
@@ -60,7 +67,11 @@ export function exec(
 ): Promise<string> {
   let timerId: NodeJS.Timeout | undefined
   return new Promise<string>((resolve, reject) => {
-    const { maxBuffer = 1024 * 1024, ...spawnOptions } = options
+    const { maxBuffer = 1024 * 1024, signal, ...spawnOptions } = options
+    if (signal?.aborted) {
+      reject(new BuildCancelledError())
+      return
+    }
     const child = childProcess.spawn(command, args, {
       ...spawnOptions,
       detached: process.platform !== 'win32',
@@ -81,6 +92,7 @@ export function exec(
       if (timerId) {
         clearTimeout(timerId)
       }
+      signal?.removeEventListener('abort', onAbort)
       callback()
     }
 
@@ -99,6 +111,18 @@ export function exec(
             Buffer.concat(stderr).toString(),
           ),
         )
+      })
+    }
+
+    const onAbort = () => {
+      finish(() => {
+        try {
+          killProcessTree(child)
+        } catch (error) {
+          reject(error)
+          return
+        }
+        reject(new BuildCancelledError())
       })
     }
 
@@ -122,7 +146,7 @@ export function exec(
       finish(() => reject(error))
     })
 
-    child.once('close', (code, signal) => {
+    child.once('close', (code, exitSignal) => {
       finish(() => {
         const stdoutText = Buffer.concat(stdout).toString()
         const stderrText = Buffer.concat(stderr).toString()
@@ -132,16 +156,22 @@ export function exec(
           reject(
             new ProcessExecutionError(
               stderrText.trim() ||
-                `Command exited with ${signal ? `signal ${signal}` : `code ${code}`}`,
+                `Command exited with ${exitSignal ? `signal ${exitSignal}` : `code ${code}`}`,
               stdoutText,
               stderrText,
               code,
-              signal,
+              exitSignal,
             ),
           )
         }
       })
     })
+
+    signal?.addEventListener('abort', onAbort, { once: true })
+    if (signal?.aborted) {
+      onAbort()
+      return
+    }
 
     if (timeout) {
       timerId = setTimeout(() => {
