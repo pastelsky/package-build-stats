@@ -1,5 +1,11 @@
 # package-build-stats
 
+## 9.2.0
+
+### Minor Changes
+
+- b26393f: Add AbortSignal support so callers can cancel package installers and stop package analysis between build phases.
+
 ## 9.1.1
 
 ### Patch Changes
