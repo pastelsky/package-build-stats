@@ -2,6 +2,7 @@ import fs from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 
+import { BuildCancelledError } from '../../src/errors/CustomError'
 import { exec, type ProcessExecutionError } from '../../src/utils/common.utils'
 
 const isProcessRunning = (pid: number) => {
@@ -87,5 +88,56 @@ describe.runIf(process.platform !== 'win32')('exec process cleanup', () => {
       }
       await fs.rm(temporaryDirectory, { recursive: true, force: true })
     }
+  })
+
+  test('kills descendants when the operation is aborted', async () => {
+    const temporaryDirectory = await fs.mkdtemp(
+      path.join(os.tmpdir(), 'package-build-stats-abort-'),
+    )
+    const pidFile = path.join(temporaryDirectory, 'child.pid')
+    const controller = new AbortController()
+    let descendantPid: number | undefined
+
+    try {
+      const command = `sleep 30 & echo $! > "${pidFile}"; wait`
+      const execution = exec('sh', ['-c', command], {
+        signal: controller.signal,
+      })
+
+      while (!descendantPid) {
+        try {
+          // Polling is intentionally sequential until the child publishes its PID.
+          // oxlint-disable-next-line no-await-in-loop
+          descendantPid = Number(await fs.readFile(pidFile, 'utf8'))
+        } catch {
+          // Wait until the shell has started its descendant.
+          // oxlint-disable-next-line no-await-in-loop
+          await new Promise(resolve => setTimeout(resolve, 10))
+        }
+      }
+
+      const startedAt = performance.now()
+      controller.abort()
+
+      await expect(execution).rejects.toBeInstanceOf(BuildCancelledError)
+      expect(performance.now() - startedAt).toBeLessThan(750)
+      expect(await waitForProcessToExit(descendantPid, 1000)).toBe(true)
+    } finally {
+      if (descendantPid && isProcessRunning(descendantPid)) {
+        process.kill(descendantPid, 'SIGKILL')
+      }
+      await fs.rm(temporaryDirectory, { recursive: true, force: true })
+    }
+  })
+
+  test('does not start a command when its signal is already aborted', async () => {
+    const controller = new AbortController()
+    controller.abort()
+
+    await expect(
+      exec(process.execPath, ['-e', 'process.exit(1)'], {
+        signal: controller.signal,
+      }),
+    ).rejects.toBeInstanceOf(BuildCancelledError)
   })
 })

@@ -18,6 +18,7 @@ import type {
   CreateEntryPointOptions,
 } from '../common.types.js'
 import Telemetry from './telemetry.utils.js'
+import { throwIfAborted } from './common.utils.js'
 
 type CompilePackageArgs = {
   name: string
@@ -26,6 +27,7 @@ type CompilePackageArgs = {
   debug?: boolean
   minify?: boolean
   outputPath: string
+  signal?: AbortSignal
 }
 
 type CompilePackageReturn = {
@@ -158,7 +160,9 @@ const BuildUtils = {
     debug,
     minify,
     outputPath,
+    signal,
   }: CompilePackageArgs) {
+    throwIfAborted(signal)
     const startTime = performance.now()
 
     const options = makeRspackConfig({
@@ -182,6 +186,7 @@ const BuildUtils = {
         }
 
         try {
+          throwIfAborted(signal)
           if (!stats) {
             throw error ?? new Error('stats is null')
           }
@@ -248,6 +253,7 @@ const BuildUtils = {
     externals,
     options,
   }: BuildPackageArgs) {
+    throwIfAborted(options.signal)
     // Package builds run concurrently, so each install owns its build output.
     const outputPath = path.join(installPath, 'build')
     let entry: any = {}
@@ -277,7 +283,9 @@ const BuildUtils = {
       debug: options.debug,
       minify: options.minify,
       outputPath,
+      signal: options.signal,
     })
+    throwIfAborted(options.signal)
 
     const compilationErrors = getCompilationErrors(stats)
 
@@ -301,6 +309,7 @@ const BuildUtils = {
     }
 
     const jsonStatsStartTime = performance.now()
+    throwIfAborted(options.signal)
     const jsonStats = stats.toJson(
       options.includeDependencySizes
         ? DEPENDENCY_STATS_OPTIONS
@@ -317,8 +326,10 @@ const BuildUtils = {
     }
 
     const getAssetStats = async (asset: RspackStatsAsset) => {
+      throwIfAborted(options.signal)
       const bundle = path.join(outputPath, asset.name)
       const bundleContents = await fs.promises.readFile(bundle)
+      throwIfAborted(options.signal)
       const gzip = gzipSync(bundleContents, {}).length
       const matches = asset.name.match(/(.+?)\.bundle\.(.+)$/)
 
@@ -357,11 +368,13 @@ const BuildUtils = {
         )
         .map(getAssetStats) || []
     const assetStats = await Promise.all(assetStatsPromises)
+    throwIfAborted(options.signal)
     Telemetry.assetsGZIPParseTime(packageName, performance.now())
 
     let dependencySizeResults = {}
     if (options.includeDependencySizes) {
       const dependencySizes = await getDependencySizes(packageName, jsonStats)
+      throwIfAborted(options.signal)
       dependencySizeResults = {
         dependencySizes,
       }
@@ -378,6 +391,7 @@ const BuildUtils = {
     installPath,
     options,
   }: BuildPackageArgs): Promise<BuildPackageResultWithIgnored> {
+    throwIfAborted(options.signal)
     const buildStartTime = performance.now()
     let buildIteration = 1
 
@@ -394,6 +408,7 @@ const BuildUtils = {
       })
       return buildResult
     } catch (e) {
+      throwIfAborted(options.signal)
       buildIteration++
       if (
         e instanceof MissingDependencyError &&
@@ -406,6 +421,7 @@ const BuildUtils = {
           externalPackages: externals.externalPackages.concat(missingModules),
         }
 
+        throwIfAborted(options.signal)
         const rebuiltResult = await BuildUtils.buildPackage({
           name,
           externals: newExternals,

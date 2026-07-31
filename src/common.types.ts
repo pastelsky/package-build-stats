@@ -14,11 +14,12 @@ type AllOptions = {
   additionalPackages?: Array<string>
   isLocal?: boolean
   installTimeout?: number
+  signal?: AbortSignal
 }
 
 export type BuildPackageOptions = Pick<
   AllOptions,
-  'customImports' | 'splitCustomImports' | 'debug' | 'minify'
+  'customImports' | 'splitCustomImports' | 'debug' | 'minify' | 'signal'
 > & {
   includeDependencySizes: boolean
 }
@@ -36,6 +37,7 @@ export type InstallPackageOptions = Pick<
   | 'isLocal'
   | 'installTimeout'
   | 'debug'
+  | 'signal'
 >
 
 export type GetPackageStatsOptions = Pick<
@@ -47,6 +49,7 @@ export type GetPackageStatsOptions = Pick<
   | 'customImports'
   | 'installTimeout'
   | 'minify'
+  | 'signal'
 >
 
 export type Externals = {

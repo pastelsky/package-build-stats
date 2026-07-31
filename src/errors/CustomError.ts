@@ -28,6 +28,14 @@ export class BuildError extends CustomError {
   }
 }
 
+export class BuildCancelledError extends CustomError {
+  readonly code = 'BUILD_CANCELLED'
+
+  constructor() {
+    super('BuildCancelledError', 'Package build was cancelled', undefined)
+  }
+}
+
 export class EntryPointError extends CustomError {
   constructor(originalError: unknown, extra?: unknown) {
     super('EntryPointError', originalError, extra)
