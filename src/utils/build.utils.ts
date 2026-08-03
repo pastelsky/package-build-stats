@@ -332,9 +332,16 @@ const BuildUtils = {
       throwIfAborted(options.signal)
       const gzip = gzipSync(bundleContents, {}).length
       const matches = asset.name.match(/(.+?)\.bundle\.(.+)$/)
-      const parsedAssetName = path.parse(asset.name)
-      const entryName = matches?.[1] || parsedAssetName.name
-      const extension = matches?.[2] || parsedAssetName.ext.slice(1) || 'asset'
+
+      if (!matches) {
+        throw new UnexpectedBuildError(
+          'Found an asset without the `.bundle` suffix. ' +
+            'A loader customization might be needed to recognize this asset type' +
+            asset.name,
+        )
+      }
+
+      const [, entryName, extension] = matches
 
       return {
         name: entryName,

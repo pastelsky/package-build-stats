@@ -1,5 +1,4 @@
 import { afterEach, describe, expect, test, vi } from 'vitest'
-import fs from 'node:fs'
 import { BuildCancelledError } from '../../src/errors/CustomError'
 
 const mockRspack = vi.fn()
@@ -16,8 +15,6 @@ vi.mock('../../src/config/makeRspackConfig.js', () => ({
 vi.mock('../../src/utils/telemetry.utils.js', () => ({
   default: {
     compilePackage: mockCompilePackage,
-    parseWebpackStats: vi.fn(),
-    assetsGZIPParseTime: vi.fn(),
   },
 }))
 
@@ -214,34 +211,6 @@ describe('BuildUtils.buildPackage', () => {
     await expect(BuildUtils.buildPackage(buildArgs)).rejects.toMatchObject({
       name: 'MissingDependencyError',
       missingModules: ['missing-package'],
-    })
-  })
-
-  test('preserves emitted assets that do not use the bundle filename pattern', async () => {
-    const stats = {
-      compilation: { errors: [] },
-      toJson: () => ({
-        assets: [
-          { name: 'main.bundle.js', size: 100, chunkNames: ['main'] },
-          { name: 'assets/module.wasm', size: 50, chunkNames: [] },
-        ],
-      }),
-    }
-
-    vi.spyOn(BuildUtils, 'createEntryPoint').mockReturnValue('/tmp/index.js')
-    vi.spyOn(BuildUtils, 'compilePackage').mockResolvedValue({
-      error: null,
-      stats: stats as any,
-    })
-    vi.spyOn(fs.promises, 'readFile').mockResolvedValue(
-      Buffer.from('asset contents'),
-    )
-
-    await expect(BuildUtils.buildPackage(buildArgs)).resolves.toMatchObject({
-      assets: [
-        { name: 'main', type: 'js', size: 100 },
-        { name: 'module', type: 'wasm', size: 50 },
-      ],
     })
   })
 })

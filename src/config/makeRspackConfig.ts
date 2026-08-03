@@ -198,6 +198,7 @@ export default function makeRspackConfig({
     },
     output: {
       filename: '[name].bundle.js',
+      webassemblyModuleFilename: '[hash].bundle.wasm',
       path: outputPath,
     },
     externals: ({ request }, callback) =>
