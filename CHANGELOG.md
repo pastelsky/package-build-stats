@@ -1,5 +1,12 @@
 # package-build-stats
 
+## 9.2.1
+
+### Patch Changes
+
+- b80df42: Support packages that emit auxiliary assets such as WebAssembly files.
+- 1ac5bff: Support packages that emit asset modules such as JSON, fonts, and images.
+
 ## 9.2.0
 
 ### Minor Changes
