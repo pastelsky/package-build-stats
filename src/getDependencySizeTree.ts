@@ -186,6 +186,14 @@ async function bundleSizeTree(
   const makeModule = (
     mod: RspackModule,
   ): { path: string; source: string } | null => {
+    if (
+      mod.moduleType &&
+      !mod.moduleType.startsWith('javascript') &&
+      !mod.moduleType.startsWith('json')
+    ) {
+      return null
+    }
+
     const identifier = mod.identifier || ''
     const resolvedPath = modulePath(identifier)
     const source = normaliseModuleSource(mod)

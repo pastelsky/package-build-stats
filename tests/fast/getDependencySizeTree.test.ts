@@ -137,6 +137,32 @@ describe('getDependencySizeTree - accuracy', () => {
     }
   })
 
+  it('does not pass non-JavaScript modules to the JavaScript minifier', async () => {
+    const base = '/project'
+    const javascriptSource = 'export const value = 42'
+    const stats = createStats([
+      {
+        identifier: `${base}/node_modules/wasm-package/index.js`,
+        moduleType: 'javascript/esm',
+        source: javascriptSource,
+      },
+      {
+        identifier: `webassembly/async|${base}/node_modules/wasm-package/module.wasm|evaluation`,
+        moduleType: 'webassembly/async',
+        source: Buffer.from([0x00, 0x01, 0x02, 0x03]),
+      },
+    ])
+
+    const result = await getDependencySizeTree('fixture-pkg', stats)
+
+    expect(result).toEqual([
+      {
+        name: 'wasm-package',
+        approximateSize: await minifiedUtf8Size(javascriptSource),
+      },
+    ])
+  })
+
   it('aggregates nested pnpm, scoped, buffer, and virtual deps into accurate package sizes', async () => {
     const base = '/project'
     const levelOneSource = 'export const levelOne = () => "one"'
