@@ -26,6 +26,23 @@ const results = await getPackageStats('moment')
 const results = await getPackageStats('moment@2.24.0')
 ```
 
+##### Discovering and building public import points
+
+```js
+import { getPackageImportPoints, getPackageStats } from 'package-build-stats'
+
+const importPoints = await getPackageImportPoints('react-dom@19.2.0')
+// ['react-dom', 'react-dom/client', 'react-dom/profiling', ...]
+
+const results = await getPackageStats('react-dom@19.2.0', {
+  importPoint: 'react-dom/client',
+})
+```
+
+`importPoint` only accepts an exact value returned by
+`getPackageImportPoints()` for that package version. This keeps generated build
+entries limited to package-declared public imports.
+
 ##### Building local packages (beta)
 
 ```js
@@ -53,14 +70,15 @@ const results = await getBuiltPackageStats('moment', options)
 
 ##### Options
 
-| Option             | Values                          | Default  | Description                                                                                                                                                     |
-| ------------------ | ------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| client             | `npm`, `yarn`, `pnpm`, or `bun` | `npm`    | Which client to use to install package for building. **Bun is 13x faster!**                                                                                     |
-| limitConcurrency   | `true` or `false`               | `false`  | When using `yarn` as the client, use the network mutex to limit concurrency                                                                                     |
-| networkConcurrency | `number`                        | `false`  | When using `yarn` or `bun` as client, limit simultaneous installs to this number.                                                                               |
-| customImports      | `Array<string>`                 | `null`   | By default, the default export is used for calculating sizes. Setting this option allows calculation of package stats based on more granular top-level exports. |
-| minifier           | `terser` or `esbuild`           | `terser` | ESbuild is faster, albeit with marginally larger file sizes                                                                                                     |
-| installTimeout     | number (ms)                     | 30000    | Timeout for package install                                                                                                                                     |
+| Option             | Values                          | Default      | Description                                                                                                                                                     |
+| ------------------ | ------------------------------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| client             | `npm`, `yarn`, `pnpm`, or `bun` | `npm`        | Which client to use to install package for building. **Bun is 13x faster!**                                                                                     |
+| limitConcurrency   | `true` or `false`               | `false`      | When using `yarn` as the client, use the network mutex to limit concurrency                                                                                     |
+| networkConcurrency | `number`                        | `false`      | When using `yarn` or `bun` as client, limit simultaneous installs to this number.                                                                               |
+| customImports      | `Array<string>`                 | `null`       | By default, the default export is used for calculating sizes. Setting this option allows calculation of package stats based on more granular top-level exports. |
+| importPoint        | `string`                        | package root | Public package import to bundle. Must exactly match a value returned by `getPackageImportPoints()`.                                                             |
+| minifier           | `terser` or `esbuild`           | `terser`     | ESbuild is faster, albeit with marginally larger file sizes                                                                                                     |
+| installTimeout     | number (ms)                     | 30000        | Timeout for package install                                                                                                                                     |
 
 ## Listening to events
 

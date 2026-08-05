@@ -13,9 +13,13 @@ import {
 } from './utils/common.utils.js'
 import InstallationUtils from './utils/installation.utils.js'
 import BuildUtils from './utils/build.utils.js'
-import { UnexpectedBuildError } from './errors/CustomError.js'
+import {
+  InvalidImportPointError,
+  UnexpectedBuildError,
+} from './errors/CustomError.js'
 import type { GetPackageStatsOptions } from './common.types.js'
 import Telemetry from './utils/telemetry.utils.js'
+import { getImportPointsFromPackage } from './utils/importPoints.utils.js'
 
 function getPackageJSONDetails(packageName: string, installPath: string) {
   const startTime = performance.now()
@@ -86,6 +90,18 @@ export default async function getPackageStats(
     timings.install = performance.now() - installStart
     console.log(`[PERF] installPackage: ${timings.install.toFixed(2)}ms`)
 
+    if (options.importPoint) {
+      const packagePath = path.join(installPath, 'node_modules', packageName)
+      const importPoints = await getImportPointsFromPackage(
+        packageName,
+        packagePath,
+        options.signal,
+      )
+      if (!importPoints.includes(options.importPoint)) {
+        throw new InvalidImportPointError(options.importPoint)
+      }
+    }
+
     const externalsStart = performance.now()
     const externals = getExternals(packageName, installPath)
     throwIfAborted(options.signal)
@@ -103,6 +119,7 @@ export default async function getPackageStats(
           debug: options.debug,
           minify: options.minify !== false,
           customImports: options.customImports,
+          importPoint: options.importPoint,
           includeDependencySizes: true,
           signal: options.signal,
         },

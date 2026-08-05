@@ -1,0 +1,22 @@
+{
+  "name": "import-points-fixture",
+  "version": "1.0.0",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "import": "./src/index.js",
+      "default": "./src/index.js"
+    },
+    "./feature": {
+      "types": "./src/feature.d.ts",
+      "import": "./src/feature.js",
+      "default": "./src/feature.js"
+    },
+    "./features/*": "./src/features/*.js",
+    "./features/private/*": null,
+    "./package.json": "./package.json",
+    "./private": null
+  }
+}
