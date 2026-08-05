@@ -16,6 +16,9 @@
     },
     "./features/*": "./src/features/*.js",
     "./features/private/*": null,
+    "./runtime-specific": {
+      "react-server": "./src/runtime-specific.js"
+    },
     "./package.json": "./package.json",
     "./private": null
   }

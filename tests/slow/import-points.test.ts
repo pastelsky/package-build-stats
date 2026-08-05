@@ -14,6 +14,7 @@ describe('package import points', () => {
       'import-points-fixture/feature',
       'import-points-fixture/features/alpha',
       'import-points-fixture/features/beta',
+      'import-points-fixture/runtime-specific',
     ])
   })
 

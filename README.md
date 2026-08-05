@@ -41,7 +41,8 @@ const results = await getPackageStats('react-dom@19.2.0', {
 
 `importPoint` only accepts an exact value returned by
 `getPackageImportPoints()` for that package version. This keeps generated build
-entries limited to package-declared public imports.
+entries limited to discovered package imports while respecting `exports`
+encapsulation when it is present.
 
 ##### Building local packages (beta)
 

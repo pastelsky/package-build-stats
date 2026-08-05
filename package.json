@@ -104,6 +104,7 @@
     "oxc-walker": "^0.5.2",
     "p-queue": "^9.3.1",
     "pify": "^6.1.0",
+    "pkg-entry-points": "^1.1.2",
     "postcss": "^8.4.0",
     "postcss-loader": "^8.1.0",
     "rimraf": "^6.1.0",

@@ -12,6 +12,7 @@ describe('getImportPointsFromPackage', () => {
       'import-points-fixture/feature',
       'import-points-fixture/features/alpha',
       'import-points-fixture/features/beta',
+      'import-points-fixture/runtime-specific',
     ])
   })
 
@@ -31,7 +32,7 @@ describe('getImportPointsFromPackage', () => {
     )
   })
 
-  test('returns the package root when exports metadata is absent', async () => {
+  test('lists importable files when exports metadata is absent', async () => {
     const legacyFixturePath = path.resolve(
       __dirname,
       '../fixtures/basic/simple-esm',
@@ -39,6 +40,9 @@ describe('getImportPointsFromPackage', () => {
 
     await expect(
       getImportPointsFromPackage('simple-esm-fixture', legacyFixturePath),
-    ).resolves.toEqual(['simple-esm-fixture'])
+    ).resolves.toEqual([
+      'simple-esm-fixture',
+      'simple-esm-fixture/src/index.js',
+    ])
   })
 })
