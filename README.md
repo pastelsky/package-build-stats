@@ -45,6 +45,25 @@ const results = await getPackageStats('lodash', { client: 'pnpm' })
 const results = await getPackageStats('lodash', { client: 'yarn' })
 ```
 
+Analysis functions install packages locally by default. A service can instead
+provide a reusable installation without changing those APIs:
+
+```js
+await getPackageStats('lodash', {
+  installationService: { url: 'http://127.0.0.1:7003' },
+})
+```
+
+The service implements `POST /installations` to return
+`{ packageString, packageName, installPath, packagePath }`. Generated entries
+and bundles are written to a separate per-analysis directory, so the returned
+installation can be safely reused. Transport failures fall back to a local
+install unless `fallbackToLocal` is `false`.
+
+The `package-build-stats/installation` subpath exports `installPackage` and
+`disposePackage` for implementing that service. Standalone callers do not need
+an installation service.
+
 #### Passing options to the build
 
 ```js

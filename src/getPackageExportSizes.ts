@@ -1,60 +1,30 @@
 import Telemetry from './utils/telemetry.utils.js'
 import { performance } from 'node:perf_hooks'
-import path from 'node:path'
 
 import createDebug from 'debug'
 
 const debug = createDebug('bp:worker')
 
-import {
-  getExternals,
-  parsePackageString,
-  throwIfAborted,
-} from './utils/common.utils.js'
+import { getExternals, throwIfAborted } from './utils/common.utils.js'
 import { getAllExports } from './utils/exports.utils.js'
-import InstallationUtils from './utils/installation.utils.js'
 import BuildUtils from './utils/build.utils.js'
 import type {
   GetPackageStatsOptions,
   InstallPackageOptions,
 } from './common.types.js'
-
-async function installPackage(
-  packageString: string,
-  installPath: string,
-  options: InstallPackageOptions,
-) {
-  const { isLocal } = parsePackageString(packageString)
-
-  await InstallationUtils.installPackage(packageString, installPath, {
-    isLocal,
-    client: options.client,
-    limitConcurrency: options.limitConcurrency,
-    networkConcurrency: options.networkConcurrency,
-    installTimeout: options.installTimeout,
-    signal: options.signal,
-  })
-}
+import { preparePackage, type PreparedPackage } from './packageInstallation.js'
 
 export async function getAllPackageExports(
   packageString: string,
   options: InstallPackageOptions = {},
 ) {
   const startTime = performance.now()
-  const { name: packageName, normalPath } = parsePackageString(packageString)
-  const installPath = await InstallationUtils.preparePath(
-    packageName,
-    options.client,
-    options.signal,
-  )
+  let preparedPackage: PreparedPackage | undefined
 
   try {
+    preparedPackage = await preparePackage(packageString, options, false)
+    const { packageName, packagePath, installPath } = preparedPackage
     throwIfAborted(options.signal)
-    await installPackage(packageString, installPath, options)
-    throwIfAborted(options.signal)
-    // The package is installed in node_modules subdirectory
-    const packagePath =
-      normalPath || path.join(installPath, 'node_modules', packageName)
     const results = await getAllExports(
       packageString,
       packagePath,
@@ -68,7 +38,7 @@ export async function getAllPackageExports(
     Telemetry.packageExports(packageString, startTime, false, err)
     throw err
   } finally {
-    await InstallationUtils.cleanupPath(installPath)
+    await preparedPackage?.cleanup()
   }
 }
 
@@ -78,34 +48,17 @@ export async function getPackageExportSizes(
 ) {
   const startTime = performance.now()
   const timings: Record<string, number> = {}
-
-  const { name: packageName, normalPath } = parsePackageString(packageString)
-
-  const preparePathStart = performance.now()
-  const installPath = await InstallationUtils.preparePath(
-    packageName,
-    options.client,
-    options.signal,
-  )
-  timings.preparePath = performance.now() - preparePathStart
-  console.log(
-    `[PERF] [ExportSizes] preparePath: ${timings.preparePath.toFixed(2)}ms`,
-  )
+  let preparedPackage: PreparedPackage | undefined
 
   try {
-    throwIfAborted(options.signal)
     const installStart = performance.now()
-    await installPackage(packageString, installPath, options)
+    preparedPackage = await preparePackage(packageString, options)
+    const { packageName, packagePath, installPath, buildPath } = preparedPackage
     throwIfAborted(options.signal)
     timings.install = performance.now() - installStart
     console.log(
       `[PERF] [ExportSizes] installPackage: ${timings.install.toFixed(2)}ms`,
     )
-
-    // The package is installed in node_modules subdirectory
-    const packagePath =
-      normalPath || path.join(installPath, 'node_modules', packageName)
-
     const getAllExportsStart = performance.now()
     const exportMap = await getAllExports(
       packageString,
@@ -152,7 +105,8 @@ export async function getPackageExportSizes(
       // oxlint-disable-next-line no-await-in-loop
       const chunkDetails = await BuildUtils.buildPackageIgnoringMissingDeps({
         name: packageName,
-        installPath,
+        installPath: buildPath,
+        dependencyPath: installPath,
         externals,
         options: {
           customImports: chunk,
@@ -206,6 +160,6 @@ export async function getPackageExportSizes(
     Telemetry.packageExportsSizes(packageString, startTime, false, options, err)
     throw err
   } finally {
-    await InstallationUtils.cleanupPath(installPath)
+    await preparedPackage?.cleanup()
   }
 }

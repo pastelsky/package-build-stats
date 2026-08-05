@@ -6,16 +6,12 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { performance } from 'node:perf_hooks'
-import {
-  getExternals,
-  parsePackageString,
-  throwIfAborted,
-} from './utils/common.utils.js'
-import InstallationUtils from './utils/installation.utils.js'
+import { getExternals, throwIfAborted } from './utils/common.utils.js'
 import BuildUtils from './utils/build.utils.js'
 import { UnexpectedBuildError } from './errors/CustomError.js'
 import type { GetPackageStatsOptions } from './common.types.js'
 import Telemetry from './utils/telemetry.utils.js'
+import { preparePackage, type PreparedPackage } from './packageInstallation.js'
 
 function getPackageJSONDetails(packageName: string, installPath: string) {
   const startTime = performance.now()
@@ -59,29 +55,12 @@ export default async function getPackageStats(
 ) {
   const startTime = performance.now()
   const timings: Record<string, number> = {}
-
-  const { name: packageName, isLocal } = parsePackageString(packageString)
-
-  const preparePathStart = performance.now()
-  const installPath = await InstallationUtils.preparePath(
-    packageName,
-    options.client,
-    options.signal,
-  )
-  timings.preparePath = performance.now() - preparePathStart
-  console.log(`[PERF] preparePath: ${timings.preparePath.toFixed(2)}ms`)
+  let preparedPackage: PreparedPackage | undefined
 
   try {
-    throwIfAborted(options.signal)
     const installStart = performance.now()
-    await InstallationUtils.installPackage(packageString, installPath, {
-      isLocal,
-      client: options.client,
-      limitConcurrency: options.limitConcurrency,
-      networkConcurrency: options.networkConcurrency,
-      installTimeout: options.installTimeout,
-      signal: options.signal,
-    })
+    preparedPackage = await preparePackage(packageString, options)
+    const { packageName, installPath, buildPath } = preparedPackage
     throwIfAborted(options.signal)
     timings.install = performance.now() - installStart
     console.log(`[PERF] installPackage: ${timings.install.toFixed(2)}ms`)
@@ -97,7 +76,8 @@ export default async function getPackageStats(
       getPackageJSONDetails(packageName, installPath),
       BuildUtils.buildPackageIgnoringMissingDeps({
         name: packageName,
-        installPath,
+        installPath: buildPath,
+        dependencyPath: installPath,
         externals,
         options: {
           debug: options.debug,
@@ -145,8 +125,6 @@ export default async function getPackageStats(
     )
     throw e
   } finally {
-    if (!options.debug) {
-      await InstallationUtils.cleanupPath(installPath)
-    }
+    await preparedPackage?.cleanup(options.debug)
   }
 }

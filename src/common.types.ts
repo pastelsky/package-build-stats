@@ -1,6 +1,11 @@
 export const packageManagers = ['npm', 'yarn', 'pnpm', 'bun'] as const
 export type PackageManager = (typeof packageManagers)[number]
 
+export type InstallationServiceOptions = {
+  url: string
+  fallbackToLocal?: boolean
+}
+
 type AllOptions = {
   customImports?: Array<string>
   splitCustomImports?: boolean
@@ -15,6 +20,7 @@ type AllOptions = {
   isLocal?: boolean
   installTimeout?: number
   signal?: AbortSignal
+  installationService?: InstallationServiceOptions
 }
 
 export type BuildPackageOptions = Pick<
@@ -38,6 +44,7 @@ export type InstallPackageOptions = Pick<
   | 'installTimeout'
   | 'debug'
   | 'signal'
+  | 'installationService'
 >
 
 export type GetPackageStatsOptions = Pick<
@@ -50,6 +57,7 @@ export type GetPackageStatsOptions = Pick<
   | 'installTimeout'
   | 'minify'
   | 'signal'
+  | 'installationService'
 >
 
 export type Externals = {
