@@ -4,6 +4,7 @@ import escapeRegex from 'escape-string-regexp'
 import type { Entry, Configuration } from '@rspack/core'
 import rspack from '@rspack/core'
 import { createRequire } from 'node:module'
+import path from 'node:path'
 
 import OxcJsMinimizerRspackPlugin from './OxcJsMinimizerRspackPlugin.js'
 
@@ -17,12 +18,14 @@ type MakeRspackConfigOptions = {
   debug?: boolean
   minify?: boolean
   entry: Entry
+  dependencyPath?: string
   outputPath: string
 }
 
 export default function makeRspackConfig({
   packageName: _packageName,
   entry,
+  dependencyPath,
   externals,
   debug: _debug,
   minify = true,
@@ -74,7 +77,9 @@ export default function makeRspackConfig({
       chunkModules: true,
     },
     resolve: {
-      modules: ['node_modules'],
+      modules: dependencyPath
+        ? [path.join(dependencyPath, 'node_modules'), 'node_modules']
+        : ['node_modules'],
       conditionNames: ['svelte', '...'],
       extensions: [
         '.web.tsx',

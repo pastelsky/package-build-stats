@@ -90,11 +90,11 @@ function getInstallArgs(
 }
 
 const InstallationUtils = {
-  getInstallPath(packageName: string) {
+  getInstallPath(packageName: string, directory = 'packages') {
     const id = randomUUID().slice(0, 8)
     return path.join(
       config.tmp,
-      'packages',
+      directory,
       sanitize(`build-${packageName}-${id}`),
     )
   },
@@ -103,10 +103,11 @@ const InstallationUtils = {
     packageName: string,
     clientOption?: PackageManager | PackageManager[],
     signal?: AbortSignal,
+    directory = 'packages',
   ) {
     throwIfAborted(signal)
     const startTime = performance.now()
-    const installPath = InstallationUtils.getInstallPath(packageName)
+    const installPath = InstallationUtils.getInstallPath(packageName, directory)
 
     if (process.env.DEBUG_TIMING) {
       console.log(
@@ -162,6 +163,15 @@ const InstallationUtils = {
     }
 
     return installPath
+  },
+
+  async prepareBuildPath(packageName: string, signal?: AbortSignal) {
+    return InstallationUtils.preparePath(
+      packageName,
+      undefined,
+      signal,
+      'artifacts',
+    )
   },
 
   async installPackage(
