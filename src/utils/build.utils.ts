@@ -122,7 +122,7 @@ const BuildUtils = {
     )
 
     let importStatement: string
-    const moduleSpecifier = JSON.stringify(options.importPoint ?? packageName)
+    const moduleSpecifier = JSON.stringify(options.entryPoint ?? packageName)
 
     if (options.esm) {
       if (options.customImports) {
@@ -274,7 +274,7 @@ const BuildUtils = {
       entry['main'] = BuildUtils.createEntryPoint(packageName, installPath, {
         esm: true,
         customImports: options.customImports,
-        importPoint: options.importPoint,
+        entryPoint: options.entryPoint,
       })
     }
 

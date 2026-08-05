@@ -26,21 +26,21 @@ const results = await getPackageStats('moment')
 const results = await getPackageStats('moment@2.24.0')
 ```
 
-##### Discovering and building public import points
+##### Discovering and building package entry points
 
 ```js
-import { getPackageImportPoints, getPackageStats } from 'package-build-stats'
+import { getPackageEntryPoints, getPackageStats } from 'package-build-stats'
 
-const importPoints = await getPackageImportPoints('react-dom@19.2.0')
+const entryPoints = await getPackageEntryPoints('react-dom@19.2.0')
 // ['react-dom', 'react-dom/client', 'react-dom/profiling', ...]
 
 const results = await getPackageStats('react-dom@19.2.0', {
-  importPoint: 'react-dom/client',
+  entryPoint: 'react-dom/client',
 })
 ```
 
-`importPoint` only accepts an exact value returned by
-`getPackageImportPoints()` for that package version. This keeps generated build
+`entryPoint` only accepts an exact value returned by
+`getPackageEntryPoints()` for that package version. This keeps generated build
 entries limited to discovered package imports while respecting `exports`
 encapsulation when it is present.
 
@@ -77,7 +77,7 @@ const results = await getBuiltPackageStats('moment', options)
 | limitConcurrency   | `true` or `false`               | `false`      | When using `yarn` as the client, use the network mutex to limit concurrency                                                                                     |
 | networkConcurrency | `number`                        | `false`      | When using `yarn` or `bun` as client, limit simultaneous installs to this number.                                                                               |
 | customImports      | `Array<string>`                 | `null`       | By default, the default export is used for calculating sizes. Setting this option allows calculation of package stats based on more granular top-level exports. |
-| importPoint        | `string`                        | package root | Public package import to bundle. Must exactly match a value returned by `getPackageImportPoints()`.                                                             |
+| entryPoint         | `string`                        | package root | Package entry point to bundle. Must exactly match a value returned by `getPackageEntryPoints()`.                                                                |
 | minifier           | `terser` or `esbuild`           | `terser`     | ESbuild is faster, albeit with marginally larger file sizes                                                                                                     |
 | installTimeout     | number (ms)                     | 30000        | Timeout for package install                                                                                                                                     |
 

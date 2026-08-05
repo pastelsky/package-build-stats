@@ -42,14 +42,14 @@ export class EntryPointError extends CustomError {
   }
 }
 
-export class InvalidImportPointError extends CustomError<{
-  importPoint: string
+export class InvalidPackageEntryPointError extends CustomError<{
+  entryPoint: string
 }> {
-  constructor(importPoint: string) {
+  constructor(entryPoint: string) {
     super(
-      'InvalidImportPointError',
-      `Import point ${JSON.stringify(importPoint)} is not exported by this package`,
-      { importPoint },
+      'InvalidPackageEntryPointError',
+      `Package entry point ${JSON.stringify(entryPoint)} is not importable`,
+      { entryPoint },
     )
   }
 }

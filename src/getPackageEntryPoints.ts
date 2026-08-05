@@ -2,9 +2,9 @@ import path from 'node:path'
 import type { InstallPackageOptions } from './common.types.js'
 import InstallationUtils from './utils/installation.utils.js'
 import { parsePackageString, throwIfAborted } from './utils/common.utils.js'
-import { getImportPointsFromPackage } from './utils/importPoints.utils.js'
+import { getEntryPointsFromPackage } from './utils/packageEntryPoints.utils.js'
 
-export default async function getPackageImportPoints(
+export default async function getPackageEntryPoints(
   packageString: string,
   options: InstallPackageOptions = {},
 ) {
@@ -24,7 +24,7 @@ export default async function getPackageImportPoints(
     throwIfAborted(options.signal)
 
     const packagePath = path.join(installPath, 'node_modules', packageName)
-    return await getImportPointsFromPackage(
+    return await getEntryPointsFromPackage(
       packageName,
       packagePath,
       options.signal,

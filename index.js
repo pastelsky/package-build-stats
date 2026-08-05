@@ -9,7 +9,7 @@ import {
   getPackageStats,
   getPackageExportSizes,
   getAllPackageExports,
-  getPackageImportPoints,
+  getPackageEntryPoints,
 } from './build/index.js'
 
 const PORT = Number(process.env.PORT ?? 3000)
@@ -144,8 +144,8 @@ const application = await server({ port: PORT }, [
   packageRoute('/exports', (packageString, query) =>
     getAllPackageExports(packageString, { debug: !!query.debug }),
   ),
-  packageRoute('/import-points', (packageString, query) =>
-    getPackageImportPoints(packageString, { debug: !!query.debug }),
+  packageRoute('/entry-points', (packageString, query) =>
+    getPackageEntryPoints(packageString, { debug: !!query.debug }),
   ),
   get('/__debug/memory', async () => json(getMemorySnapshot())),
   get('/__debug/heapdump', async () => {

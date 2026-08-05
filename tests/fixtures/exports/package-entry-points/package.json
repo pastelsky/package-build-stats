@@ -1,5 +1,5 @@
 {
-  "name": "import-points-fixture",
+  "name": "entry-points-fixture",
   "version": "1.0.0",
   "type": "module",
   "sideEffects": false,

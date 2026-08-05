@@ -32,10 +32,10 @@ To build a package and get stats about exports that are exposed out of the packa
 curl 'localhost:3000/exports?p=<package-name>'
 ```
 
-To list public package import points –
+To list package entry points –
 
 ```bash
-curl 'localhost:3000/import-points?p=<package-name>'
+curl 'localhost:3000/entry-points?p=<package-name>'
 ```
 
 To build a package and get stats about size of various exports that are exposed out of the package –

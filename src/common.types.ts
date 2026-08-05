@@ -3,7 +3,7 @@ export type PackageManager = (typeof packageManagers)[number]
 
 type AllOptions = {
   customImports?: Array<string>
-  importPoint?: string
+  entryPoint?: string
   splitCustomImports?: boolean
   debug?: boolean
   minify?: boolean
@@ -21,7 +21,7 @@ type AllOptions = {
 export type BuildPackageOptions = Pick<
   AllOptions,
   | 'customImports'
-  | 'importPoint'
+  | 'entryPoint'
   | 'splitCustomImports'
   | 'debug'
   | 'minify'
@@ -32,7 +32,7 @@ export type BuildPackageOptions = Pick<
 
 export type CreateEntryPointOptions = Pick<
   AllOptions,
-  'esm' | 'customImports' | 'importPoint' | 'entryFilename'
+  'esm' | 'customImports' | 'entryPoint' | 'entryFilename'
 >
 export type InstallPackageOptions = Pick<
   AllOptions,
@@ -53,7 +53,7 @@ export type GetPackageStatsOptions = Pick<
   | 'networkConcurrency'
   | 'debug'
   | 'customImports'
-  | 'importPoint'
+  | 'entryPoint'
   | 'installTimeout'
   | 'minify'
   | 'signal'

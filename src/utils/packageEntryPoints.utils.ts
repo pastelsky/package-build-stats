@@ -1,5 +1,5 @@
 import fs from 'node:fs/promises'
-import { getPackageEntryPoints } from 'pkg-entry-points'
+import { getPackageEntryPoints as enumeratePackageEntryPoints } from 'pkg-entry-points'
 import { throwIfAborted } from './common.utils.js'
 
 function withAbortSignal(signal: AbortSignal) {
@@ -30,19 +30,19 @@ function isBundlableTarget(target: string) {
   )
 }
 
-function toImportPoint(packageName: string, subpath: string) {
+function toEntryPoint(packageName: string, subpath: string) {
   return subpath === '.'
     ? packageName
     : `${packageName}/${subpath.replace(/^\.\//, '')}`
 }
 
-export async function getImportPointsFromPackage(
+export async function getEntryPointsFromPackage(
   packageName: string,
   packagePath: string,
   signal?: AbortSignal,
 ) {
   throwIfAborted(signal)
-  const entryPoints = await getPackageEntryPoints(
+  const entryPoints = await enumeratePackageEntryPoints(
     packagePath,
     signal ? withAbortSignal(signal) : fs,
   )
@@ -52,7 +52,7 @@ export async function getImportPointsFromPackage(
     .filter(([, mappings]) =>
       mappings.some(([, target]) => isBundlableTarget(target)),
     )
-    .map(([subpath]) => toImportPoint(packageName, subpath))
+    .map(([subpath]) => toEntryPoint(packageName, subpath))
     .sort((left, right) => {
       if (left === packageName) return -1
       if (right === packageName) return 1
