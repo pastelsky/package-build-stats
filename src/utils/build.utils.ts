@@ -8,6 +8,7 @@ import isValidNPMName from 'is-valid-npm-name'
 import getDependencySizes from '../getDependencySizeTree.js'
 import makeRspackConfig from '../config/makeRspackConfig.js'
 import {
+  BuildError,
   EntryPointError,
   MissingDependencyError,
   UnexpectedBuildError,
@@ -210,7 +211,7 @@ const BuildUtils = {
     const missingModuleRegex = /Can't resolve '(.+)' in/
 
     const missingModules = errors.map(err => {
-      const matches = err.message.match(missingModuleRegex)
+      const matches = err.message ? err.message.match(missingModuleRegex) : null
 
       if (!matches) {
         return undefined
@@ -225,9 +226,7 @@ const BuildUtils = {
       }
 
       if (!packageNameMatch) {
-        throw new UnexpectedBuildError(
-          'Failed to resolve the missing package name. Regex for this might be out of date.',
-        )
+        return undefined
       }
 
       return packageNameMatch[0]
@@ -293,9 +292,7 @@ const BuildUtils = {
       const missingModules = BuildUtils.parseMissingModules(compilationErrors)
 
       if (!missingModules.length) {
-        throw new UnexpectedBuildError(
-          compilationErrors.map(error => error.message),
-        )
+        throw new BuildError(compilationErrors.map(error => error.message))
       }
 
       if (missingModules.length === 1 && missingModules[0] === packageName) {

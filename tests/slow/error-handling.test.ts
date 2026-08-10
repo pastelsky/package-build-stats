@@ -8,7 +8,7 @@
 import path from 'path'
 import { getPackageStats } from '../../src'
 import {
-  UnexpectedBuildError,
+  BuildError,
   PackageNotFoundError,
   CLIBuildError,
   EntryPointError,
@@ -118,7 +118,7 @@ describe('Custom Imports', () => {
 })
 
 describe('Build Errors', () => {
-  test('should throw UnexpectedBuildError for invalid JavaScript syntax', async () => {
+  test('should throw BuildError for invalid JavaScript syntax', async () => {
     const fixturePath = path.resolve(
       __dirname,
       '../fixtures/errors/invalid-syntax',
@@ -126,11 +126,29 @@ describe('Build Errors', () => {
 
     try {
       await getPackageStats(fixturePath)
-      fail('Should have thrown UnexpectedBuildError')
+      expect.unreachable('Should have thrown BuildError')
     } catch (error) {
-      expect(error).toBeInstanceOf(UnexpectedBuildError)
-      if (error instanceof UnexpectedBuildError) {
-        expect(error.name).toBe('UnexpectedBuildError')
+      expect(error).toBeInstanceOf(BuildError)
+      if (error instanceof BuildError) {
+        expect(error.name).toBe('BuildError')
+        expect(error.originalError).toBeDefined()
+      }
+    }
+  })
+
+  test('should throw BuildError for uncompiled component templates (e.g. raw Vue SFCs)', async () => {
+    const fixturePath = path.resolve(
+      __dirname,
+      '../fixtures/errors/uncompiled-template',
+    )
+
+    try {
+      await getPackageStats(fixturePath)
+      expect.unreachable('Should have thrown BuildError')
+    } catch (error) {
+      expect(error).toBeInstanceOf(BuildError)
+      if (error instanceof BuildError) {
+        expect(error.name).toBe('BuildError')
         expect(error.originalError).toBeDefined()
       }
     }

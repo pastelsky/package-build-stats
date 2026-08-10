@@ -213,4 +213,24 @@ describe('BuildUtils.buildPackage', () => {
       missingModules: ['missing-package'],
     })
   })
+
+  test('parseMissingModules extracts missing packages when all errors are missing module errors', () => {
+    const compilationErrors = [
+      { message: "Can't resolve 'lodash' in '/tmp/project'" },
+      { message: "Can't resolve '@babel/core' in '/tmp/project'" },
+    ]
+
+    const missing = BuildUtils.parseMissingModules(compilationErrors)
+    expect(missing).toEqual(['lodash', '@babel/core'])
+  })
+
+  test('parseMissingModules returns empty array when non-missing-module compilation errors are present', () => {
+    const compilationErrors = [
+      { message: "Module parse failed: Unexpected character '#'" },
+      { message: "Can't resolve 'lodash' in '/tmp/project'" },
+    ]
+
+    const missing = BuildUtils.parseMissingModules(compilationErrors)
+    expect(missing).toEqual([])
+  })
 })
