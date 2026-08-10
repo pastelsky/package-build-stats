@@ -1,0 +1,9 @@
+{
+  "name": "unsupported-platform-fixture",
+  "version": "1.0.0",
+  "description": "Fixture with OS/CPU platform constraints that cannot run on the host platform",
+  "main": "src/index.js",
+  "os": [
+    "nonexistent_os_for_testing_12345"
+  ]
+}

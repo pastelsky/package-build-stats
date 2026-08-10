@@ -11,6 +11,7 @@ import {
   BuildCancelledError,
   InstallError,
   PackageNotFoundError,
+  UnsupportedPackageError,
 } from '../errors/CustomError.js'
 import { exec, ProcessExecutionError, throwIfAborted } from './common.utils.js'
 import config from '../config/config.js'
@@ -105,6 +106,28 @@ function isPackageNotFound(err: ProcessExecutionError): boolean {
     output.includes('404 Not Found') ||
     output.includes('No matching version found')
   )
+}
+
+// Returns true when the error indicates a platform architecture mismatch (os/cpu)
+// or an unresolvable private git repository authentication error.
+function isUnsupportedPackage(err: ProcessExecutionError): boolean {
+  const output = `${err.stderr}\n${err.stdout}`
+
+  const isPlatformMismatch =
+    output.includes('code EBADPLATFORM') ||
+    output.includes('Unsupported platform') ||
+    output.includes('ERR_PNPM_UNSUPPORTED_PLATFORM') ||
+    /unsupported platform/i.test(output) ||
+    /unsupported architecture/i.test(output)
+
+  const isGitAuthError =
+    output.includes('Permission denied (publickey)') ||
+    output.includes('fatal: Could not read from remote repository') ||
+    (output.includes('An unknown git error occurred') &&
+      (output.includes('ls-remote ssh://') ||
+        output.includes('git@github.com')))
+
+  return isPlatformMismatch || isGitAuthError
 }
 
 const InstallationUtils = {
@@ -308,11 +331,15 @@ const InstallationUtils = {
         ...installOptions,
         client: currentClient,
       })
-      if (err instanceof ProcessExecutionError && isPackageNotFound(err)) {
-        throw new PackageNotFoundError(err)
-      } else {
-        throw new InstallError(err)
+      if (err instanceof ProcessExecutionError) {
+        if (isPackageNotFound(err)) {
+          throw new PackageNotFoundError(err)
+        }
+        if (isUnsupportedPackage(err)) {
+          throw new UnsupportedPackageError(err)
+        }
       }
+      throw new InstallError(err)
     }
   },
 

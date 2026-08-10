@@ -12,6 +12,7 @@ import {
   PackageNotFoundError,
   CLIBuildError,
   EntryPointError,
+  UnsupportedPackageError,
 } from '../../src/errors/CustomError'
 
 describe('Missing Dependencies', () => {
@@ -153,9 +154,43 @@ describe('Build Errors', () => {
       }
     }
   })
+
+  test('should successfully process packages containing native binary addons (.node)', async () => {
+    const fixturePath = path.resolve(
+      __dirname,
+      '../fixtures/errors/native-binary',
+    )
+
+    const result = await getPackageStats(fixturePath)
+    expect(result).toHaveProperty('size')
+    expect(result.size).toBeGreaterThan(0)
+    expect(result).toHaveProperty('assets')
+  })
+
+  test('should report standalone .wasm modules as separate asset types', async () => {
+    const fixturePath = path.resolve(__dirname, '../fixtures/errors/wasm-asset')
+
+    const result = await getPackageStats(fixturePath)
+    expect(result).toHaveProperty('assets')
+    const wasmAsset = result.assets.find(a => a.type === 'wasm')
+    expect(wasmAsset).toBeDefined()
+    expect(wasmAsset?.size).toBeGreaterThan(0)
+  })
 })
 
 describe('Installation Errors', () => {
+  test('should throw UnsupportedPackageError for packages with unsupported platform (os/cpu) constraints', async () => {
+    try {
+      await getPackageStats('@esbuild/android-arm@0.28.1')
+      expect.unreachable('Should have thrown UnsupportedPackageError')
+    } catch (error) {
+      expect(error).toBeInstanceOf(UnsupportedPackageError)
+      if (error instanceof UnsupportedPackageError) {
+        expect(error.name).toBe('UnsupportedPackageError')
+      }
+    }
+  }, 30000)
+
   test('should throw PackageNotFoundError for non-existent npm package', async () => {
     const nonExistentPackage =
       'this-package-definitely-does-not-exist-' + Date.now()

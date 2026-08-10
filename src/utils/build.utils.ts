@@ -338,7 +338,8 @@ const BuildUtils = {
         )
       }
 
-      const [, entryName, extension] = matches
+      const [, entryName, rawExtension] = matches
+      const extension = rawExtension.replace(/^\./, '')
 
       return {
         name: entryName,
