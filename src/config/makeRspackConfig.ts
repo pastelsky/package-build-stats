@@ -90,6 +90,8 @@ export default function makeRspackConfig({
         '.css',
         '.sass',
         '.scss',
+        '.less',
+        '.svelte',
       ],
       mainFields: ['browser', 'module', 'main', 'style'],
     },
