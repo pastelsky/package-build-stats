@@ -89,6 +89,24 @@ function getInstallArgs(
   return args
 }
 
+// Returns true when the error indicates the package name or version doesn't
+// exist in the registry. Covers npm, yarn (classic + berry), pnpm, and bun.
+function isPackageNotFound(err: ProcessExecutionError): boolean {
+  const output = `${err.stderr}\n${err.stdout}`
+
+  return (
+    output.includes('code E404') ||
+    output.includes('code ETARGET') ||
+    output.includes("Couldn't find package") ||
+    output.includes('YN0035') ||
+    output.includes('ERR_PNPM_NO_MATCHING_VERSION') ||
+    output.includes('ERR_PNPM_FETCH_404') ||
+    /bun.*package not found/i.test(output) ||
+    output.includes('404 Not Found') ||
+    output.includes('No matching version found')
+  )
+}
+
 const InstallationUtils = {
   getInstallPath(packageName: string) {
     const id = randomUUID().slice(0, 8)
@@ -290,10 +308,7 @@ const InstallationUtils = {
         ...installOptions,
         client: currentClient,
       })
-      if (
-        err instanceof ProcessExecutionError &&
-        `${err.stderr}\n${err.stdout}`.includes('code E404')
-      ) {
+      if (err instanceof ProcessExecutionError && isPackageNotFound(err)) {
         throw new PackageNotFoundError(err)
       } else {
         throw new InstallError(err)

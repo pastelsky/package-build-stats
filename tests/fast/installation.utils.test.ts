@@ -1,59 +1,21 @@
-import fs from 'node:fs/promises'
-import os from 'node:os'
-import path from 'node:path'
 import { vi } from 'vitest'
 
-import { BuildCancelledError } from '../../src/errors/CustomError.js'
+import {
+  BuildCancelledError,
+  InstallError,
+  PackageNotFoundError,
+} from '../../src/errors/CustomError.js'
+import { exec, ProcessExecutionError } from '../../src/utils/common.utils.js'
 import InstallationUtils from '../../src/utils/installation.utils.js'
 
+function makeProcessError(stderr: string, stdout = '') {
+  return new ProcessExecutionError('install failed', stdout, stderr, 1)
+}
+
+// The local-package integration test (npm-pack + real install) lives in
+// tests/slow/local.test.ts – exec is mocked for the whole file below.
+
 describe('InstallationUtils', () => {
-  test('installs a local package whose path contains shell metacharacters', async () => {
-    const temporaryDirectory = await fs.mkdtemp(
-      path.join(os.tmpdir(), 'package-build-stats-install-'),
-    )
-    const packagePath = path.join(temporaryDirectory, 'fixture; not-a-command')
-    const installPath = await InstallationUtils.preparePath('local-fixture')
-
-    try {
-      await fs.mkdir(packagePath)
-      await fs.writeFile(
-        path.join(packagePath, 'package.json'),
-        JSON.stringify({
-          name: 'local-fixture',
-          version: '1.0.0',
-          main: 'index.js',
-        }),
-      )
-      await fs.writeFile(
-        path.join(packagePath, 'index.js'),
-        'module.exports = 42\n',
-      )
-
-      await InstallationUtils.installWithClient(
-        packagePath,
-        installPath,
-        { client: 'npm', isLocal: true, installTimeout: 10_000 },
-        'npm',
-      )
-
-      const installedPackage = JSON.parse(
-        await fs.readFile(
-          path.join(
-            installPath,
-            'node_modules',
-            'local-fixture',
-            'package.json',
-          ),
-          'utf8',
-        ),
-      )
-      expect(installedPackage.name).toBe('local-fixture')
-    } finally {
-      await InstallationUtils.cleanupPath(installPath)
-      await fs.rm(temporaryDirectory, { recursive: true, force: true })
-    }
-  })
-
   test('throws instead of terminating the host for an invalid client', async () => {
     await expect(
       InstallationUtils.installWithClient(
@@ -70,18 +32,129 @@ describe('InstallationUtils', () => {
       .spyOn(InstallationUtils, 'installWithClient')
       .mockRejectedValue(new BuildCancelledError())
 
-    await expect(
-      InstallationUtils.installPackage('example', '/tmp/unused', {
-        client: ['bun', 'npm'],
-      }),
-    ).rejects.toBeInstanceOf(BuildCancelledError)
+    try {
+      await expect(
+        InstallationUtils.installPackage('example', '/tmp/unused', {
+          client: ['bun', 'npm'],
+        }),
+      ).rejects.toBeInstanceOf(BuildCancelledError)
 
-    expect(installWithClient).toHaveBeenCalledTimes(1)
-    expect(installWithClient).toHaveBeenCalledWith(
-      'example',
-      '/tmp/unused',
-      expect.objectContaining({ client: 'bun' }),
-      'bun',
+      expect(installWithClient).toHaveBeenCalledTimes(1)
+      expect(installWithClient).toHaveBeenCalledWith(
+        'example',
+        '/tmp/unused',
+        expect.objectContaining({ client: 'bun' }),
+        'bun',
+      )
+    } finally {
+      installWithClient.mockRestore()
+    }
+  })
+})
+
+// vi.mock is hoisted by Vitest, so exec is replaced for the whole file.
+vi.mock('../../src/utils/common.utils.js', async importOriginal => {
+  const actual =
+    await importOriginal<typeof import('../../src/utils/common.utils.js')>()
+  return {
+    ...actual,
+    exec: vi.fn(),
+  }
+})
+
+describe('installWithClient – package-not-found error classification', () => {
+  afterEach(() => {
+    vi.resetAllMocks()
+  })
+
+  const cases: Array<{
+    pm: 'npm' | 'yarn' | 'pnpm' | 'bun'
+    label: string
+    stderr: string
+    stdout?: string
+  }> = [
+    {
+      pm: 'npm',
+      label: 'npm E404 (unknown package)',
+      stderr:
+        'npm error code E404\nnpm error 404 Not Found - GET https://registry.npmjs.org/no-such-pkg',
+    },
+    {
+      pm: 'npm',
+      label: 'npm ETARGET (version range has no match)',
+      stderr:
+        'npm error code ETARGET\nnpm error notarget No matching version found for lodash@999.0.0',
+    },
+    {
+      pm: 'npm',
+      label: 'npm "No matching version found" text',
+      stderr:
+        'npm ERR! code ETARGET\nnpm ERR! No matching version found for react@0.0.0-nonexistent.',
+    },
+    {
+      pm: 'yarn',
+      label: "yarn classic – Couldn't find package",
+      stderr:
+        'error Couldn\'t find package "no-such-pkg" on the "npm" registry',
+    },
+    {
+      pm: 'yarn',
+      label: 'yarn berry – YN0035',
+      stderr:
+        "YN0035: │ no-such-pkg@npm:^1.0.0 couldn't be resolved to a satisfying range",
+    },
+    {
+      pm: 'pnpm',
+      label: 'pnpm ERR_PNPM_NO_MATCHING_VERSION',
+      stderr:
+        'ERR_PNPM_NO_MATCHING_VERSION  No matching version found for no-such-pkg@999.0.0',
+    },
+    {
+      pm: 'pnpm',
+      label: 'pnpm ERR_PNPM_FETCH_404',
+      stderr:
+        'ERR_PNPM_FETCH_404  GET https://registry.npmjs.org/no-such-pkg: Not Found - 404',
+    },
+    {
+      pm: 'bun',
+      label: 'bun – package not found',
+      stderr: 'error: bun package not found no-such-pkg',
+    },
+    {
+      pm: 'bun',
+      label: 'bun – 404 Not Found',
+      stderr:
+        '404 Not Found\nGET https://registry.npmjs.org/no-such-pkg/-/no-such-pkg-1.0.0.tgz',
+    },
+  ]
+
+  for (const { pm, label, stderr, stdout = '' } of cases) {
+    test(`throws PackageNotFoundError for: ${label}`, async () => {
+      vi.mocked(exec).mockRejectedValue(makeProcessError(stderr, stdout))
+
+      await expect(
+        InstallationUtils.installWithClient(
+          'no-such-pkg@999.0.0',
+          '/tmp/unused-install-path',
+          { client: pm },
+          pm,
+        ),
+      ).rejects.toBeInstanceOf(PackageNotFoundError)
+    })
+  }
+
+  test('throws InstallError for generic (non-404) failures', async () => {
+    vi.mocked(exec).mockRejectedValue(
+      makeProcessError('npm ERR! network timeout', ''),
     )
+
+    await expect(
+      InstallationUtils.installWithClient(
+        'some-pkg',
+        '/tmp/unused-install-path',
+        { client: 'npm' },
+        'npm',
+      ),
+    ).rejects.toBeInstanceOf(InstallError)
   })
 })
