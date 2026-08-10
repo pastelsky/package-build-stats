@@ -4,6 +4,7 @@ import {
   BuildCancelledError,
   InstallError,
   PackageNotFoundError,
+  UnsupportedPackageError,
 } from '../../src/errors/CustomError.js'
 import { exec, ProcessExecutionError } from '../../src/utils/common.utils.js'
 import InstallationUtils from '../../src/utils/installation.utils.js'
@@ -157,4 +158,57 @@ describe('installWithClient – package-not-found error classification', () => {
       ),
     ).rejects.toBeInstanceOf(InstallError)
   })
+})
+
+describe('installWithClient – unsupported package error classification', () => {
+  afterEach(() => {
+    vi.resetAllMocks()
+  })
+
+  const cases: Array<{
+    pm: 'npm' | 'yarn' | 'pnpm' | 'bun'
+    label: string
+    stderr: string
+    stdout?: string
+  }> = [
+    {
+      pm: 'npm',
+      label: 'npm EBADPLATFORM (unsupported OS/CPU)',
+      stderr:
+        'npm error code EBADPLATFORM\nnpm error notsup Unsupported platform for @esbuild/android-arm@0.28.1: wanted {"os":"android","cpu":"arm"} (current: {"os":"darwin","cpu":"arm64"})',
+    },
+    {
+      pm: 'pnpm',
+      label: 'pnpm ERR_PNPM_UNSUPPORTED_PLATFORM',
+      stderr:
+        'ERR_PNPM_UNSUPPORTED_PLATFORM  Unsupported platform for @esbuild/android-arm: wanted {"os":"android"}',
+    },
+    {
+      pm: 'bun',
+      label: 'bun unsupported architecture',
+      stderr:
+        'error: unsupported architecture arm64 for @esbuild/android-arm@0.28.1',
+    },
+    {
+      pm: 'npm',
+      label: 'Git SSH permission denied (publickey)',
+      stderr:
+        'npm error code 128\nnpm error An unknown git error occurred\nnpm error command git --no-replace-objects ls-remote ssh://git@github.com/org/repo.git\nnpm error git@github.com: Permission denied (publickey).',
+    },
+  ]
+
+  for (const { pm, label, stderr, stdout = '' } of cases) {
+    test(`throws UnsupportedPackageError for: ${label}`, async () => {
+      vi.mocked(exec).mockRejectedValue(makeProcessError(stderr, stdout))
+
+      await expect(
+        InstallationUtils.installWithClient(
+          'unsupported-pkg',
+          '/tmp/unused-install-path',
+          { client: pm },
+          pm,
+        ),
+      ).rejects.toBeInstanceOf(UnsupportedPackageError)
+    })
+  }
 })
