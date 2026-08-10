@@ -290,9 +290,15 @@ const InstallationUtils = {
         ...installOptions,
         client: currentClient,
       })
+      const errorOutput =
+        err instanceof ProcessExecutionError
+          ? `${err.stderr}\n${err.stdout}`
+          : ''
       if (
-        err instanceof ProcessExecutionError &&
-        `${err.stderr}\n${err.stdout}`.includes('code E404')
+        errorOutput.includes('code E404') ||
+        errorOutput.includes('code ETARGET') ||
+        errorOutput.includes('No matching version found') ||
+        errorOutput.includes('Not Found')
       ) {
         throw new PackageNotFoundError(err)
       } else {
