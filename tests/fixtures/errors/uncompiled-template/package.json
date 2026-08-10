@@ -1,0 +1,6 @@
+{
+  "name": "uncompiled-template-fixture",
+  "version": "1.0.0",
+  "description": "Fixture with uncompiled HTML/Vue template to trigger BuildError",
+  "main": "src/index.js"
+}
