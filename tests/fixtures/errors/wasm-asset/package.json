@@ -1,0 +1,6 @@
+{
+  "name": "wasm-asset-fixture",
+  "version": "1.0.0",
+  "description": "Fixture importing a standalone .wasm module to verify separate asset tracking",
+  "main": "src/index.js"
+}
