@@ -213,4 +213,27 @@ describe('BuildUtils.buildPackage', () => {
       missingModules: ['missing-package'],
     })
   })
+
+  test('parseMissingModules extracts missing packages across multiple error patterns', () => {
+    const compilationErrors = [
+      { message: "Module parse failed: Unexpected character '#'" },
+      { message: "Can't resolve 'lodash' in '/tmp/project'" },
+      { message: "Cannot find module '@babel/core'" },
+      { message: 'Could not resolve "express"' },
+      { message: 'Failed to resolve import "axios"' },
+    ]
+
+    const missing = BuildUtils.parseMissingModules(compilationErrors)
+    expect(missing).toEqual(['lodash', '@babel/core', 'express', 'axios'])
+  })
+
+  test('parseMissingModules returns empty array for non-missing-module compilation errors', () => {
+    const compilationErrors = [
+      { message: "Module parse failed: Unexpected character '#'" },
+      { message: 'JavaScript parse error: Expression expected' },
+    ]
+
+    const missing = BuildUtils.parseMissingModules(compilationErrors)
+    expect(missing).toEqual([])
+  })
 })

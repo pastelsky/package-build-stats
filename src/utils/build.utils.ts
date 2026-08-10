@@ -8,6 +8,7 @@ import isValidNPMName from 'is-valid-npm-name'
 import getDependencySizes from '../getDependencySizeTree.js'
 import makeRspackConfig from '../config/makeRspackConfig.js'
 import {
+  BuildError,
   EntryPointError,
   MissingDependencyError,
   UnexpectedBuildError,
@@ -207,42 +208,47 @@ const BuildUtils = {
   },
 
   parseMissingModules(errors: ReturnType<typeof getCompilationErrors>) {
-    const missingModuleRegex = /Can't resolve '(.+)' in/
+    const missingModulePatterns = [
+      /Can't resolve '([^']+)'/i,
+      /Cannot find module '([^']+)'/i,
+      /Could not resolve "([^"]+)"/i,
+      /Failed to resolve import "([^"]+)"/i,
+      /Module not found: (?:Error: )?Can't resolve '([^']+)'/i,
+    ]
 
-    const missingModules = errors.map(err => {
-      const matches = err.message.match(missingModuleRegex)
+    const missingModules = errors
+      .map(err => {
+        if (!err || !err.message) return undefined
 
-      if (!matches) {
+        for (const pattern of missingModulePatterns) {
+          const matches = err.message.match(pattern)
+          if (matches && matches[1]) {
+            const missingFilePath = matches[1]
+            if (missingFilePath.startsWith('.')) {
+              return undefined
+            }
+            let packageNameMatch: RegExpMatchArray | null
+            if (missingFilePath.startsWith('@')) {
+              packageNameMatch = missingFilePath.match(/@[^/]+\/[^/]+/)
+            } else {
+              packageNameMatch = missingFilePath.match(/[^/]+/)
+            }
+            if (packageNameMatch) {
+              return packageNameMatch[0]
+            }
+          }
+        }
+
         return undefined
-      }
+      })
+      .filter(notEmpty)
 
-      const missingFilePath = matches[1]
-      let packageNameMatch
-      if (missingFilePath.startsWith('@')) {
-        packageNameMatch = missingFilePath.match(/@[^/]+\/[^/]+/) // @babel/runtime/object/create -> @babel/runtime
-      } else {
-        packageNameMatch = missingFilePath.match(/[^/]+/) // babel-runtime/object/create -> babel-runtime
-      }
-
-      if (!packageNameMatch) {
-        throw new UnexpectedBuildError(
-          'Failed to resolve the missing package name. Regex for this might be out of date.',
-        )
-      }
-
-      return packageNameMatch[0]
-    })
-
-    if (missingModules.some(moduleName => moduleName === undefined)) {
-      return []
+    let uniqueMissingModules = Array.from(new Set(missingModules))
+    if (uniqueMissingModules.length > 1) {
+      uniqueMissingModules = uniqueMissingModules.filter(
+        mod => !mod.startsWith(`${uniqueMissingModules[0]}/`),
+      )
     }
-
-    let uniqueMissingModules = Array.from(new Set(missingModules)).filter(
-      notEmpty,
-    )
-    uniqueMissingModules = uniqueMissingModules.filter(
-      mod => !mod.startsWith(`${uniqueMissingModules[0]}/`),
-    )
 
     return uniqueMissingModules
   },
@@ -293,9 +299,7 @@ const BuildUtils = {
       const missingModules = BuildUtils.parseMissingModules(compilationErrors)
 
       if (!missingModules.length) {
-        throw new UnexpectedBuildError(
-          compilationErrors.map(error => error.message),
-        )
+        throw new BuildError(compilationErrors.map(error => error.message))
       }
 
       if (missingModules.length === 1 && missingModules[0] === packageName) {

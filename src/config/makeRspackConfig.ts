@@ -101,7 +101,7 @@ export default function makeRspackConfig({
     module: {
       rules: [
         {
-          test: /\.tsx?$/,
+          test: /\.(jsx|ts|tsx)$/,
           loader: 'builtin:swc-loader',
           options: {
             detectSyntax: 'auto',
