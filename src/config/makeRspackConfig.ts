@@ -154,6 +154,14 @@ export default function makeRspackConfig({
           ],
         },
         {
+          test: /\.(node|exe|dll|so|dylib)$/,
+          type: 'asset/resource',
+        },
+        {
+          test: /\.wasm$/,
+          type: 'asset/resource',
+        },
+        {
           test: /\.less$/,
           type: 'javascript/auto',
           use: [
@@ -200,8 +208,8 @@ export default function makeRspackConfig({
     },
     output: {
       filename: '[name].bundle.js',
-      assetModuleFilename: '[name].[contenthash:8].bundle[ext]',
-      webassemblyModuleFilename: '[hash].bundle.wasm',
+      assetModuleFilename: '[name].bundle.[ext]',
+      webassemblyModuleFilename: '[name].bundle.wasm',
       path: outputPath,
     },
     externals: ({ request }, callback) =>

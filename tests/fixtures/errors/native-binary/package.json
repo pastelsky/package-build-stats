@@ -1,0 +1,6 @@
+{
+  "name": "native-binary-fixture",
+  "version": "1.0.0",
+  "description": "Fixture importing a prebuilt native binary addon (.node) to verify asset loader handling",
+  "main": "src/index.js"
+}
