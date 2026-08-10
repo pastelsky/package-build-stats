@@ -1,5 +1,12 @@
 # package-build-stats
 
+## 9.2.3
+
+### Patch Changes
+
+- 3407bd8: Map platform architecture mismatches (`EBADPLATFORM`, `Unsupported platform`) and private Git SSH authentication failures (`Permission denied (publickey)`) to `UnsupportedPackageError` (HTTP 422) instead of generic `InstallError` (HTTP 500).
+- a37efea: Add native binary addon asset rules (`.node`, `.exe`, `.dll`, `.so`, `.dylib`, `.wasm`) to Rspack loader configuration. Prevents JavaScript syntax parse errors (`Unexpected character '\u{7f}'` / `Unexpected character '\0'`) when packages ship compiled native binaries.
+
 ## 9.2.2
 
 ### Patch Changes
