@@ -208,47 +208,40 @@ const BuildUtils = {
   },
 
   parseMissingModules(errors: ReturnType<typeof getCompilationErrors>) {
-    const missingModulePatterns = [
-      /Can't resolve '([^']+)'/i,
-      /Cannot find module '([^']+)'/i,
-      /Could not resolve "([^"]+)"/i,
-      /Failed to resolve import "([^"]+)"/i,
-      /Module not found: (?:Error: )?Can't resolve '([^']+)'/i,
-    ]
+    const missingModuleRegex = /Can't resolve '(.+)' in/
 
-    const missingModules = errors
-      .map(err => {
-        if (!err || !err.message) return undefined
+    const missingModules = errors.map(err => {
+      const matches = err.message ? err.message.match(missingModuleRegex) : null
 
-        for (const pattern of missingModulePatterns) {
-          const matches = err.message.match(pattern)
-          if (matches && matches[1]) {
-            const missingFilePath = matches[1]
-            if (missingFilePath.startsWith('.')) {
-              return undefined
-            }
-            let packageNameMatch: RegExpMatchArray | null
-            if (missingFilePath.startsWith('@')) {
-              packageNameMatch = missingFilePath.match(/@[^/]+\/[^/]+/)
-            } else {
-              packageNameMatch = missingFilePath.match(/[^/]+/)
-            }
-            if (packageNameMatch) {
-              return packageNameMatch[0]
-            }
-          }
-        }
-
+      if (!matches) {
         return undefined
-      })
-      .filter(notEmpty)
+      }
 
-    let uniqueMissingModules = Array.from(new Set(missingModules))
-    if (uniqueMissingModules.length > 1) {
-      uniqueMissingModules = uniqueMissingModules.filter(
-        mod => !mod.startsWith(`${uniqueMissingModules[0]}/`),
-      )
+      const missingFilePath = matches[1]
+      let packageNameMatch
+      if (missingFilePath.startsWith('@')) {
+        packageNameMatch = missingFilePath.match(/@[^/]+\/[^/]+/) // @babel/runtime/object/create -> @babel/runtime
+      } else {
+        packageNameMatch = missingFilePath.match(/[^/]+/) // babel-runtime/object/create -> babel-runtime
+      }
+
+      if (!packageNameMatch) {
+        return undefined
+      }
+
+      return packageNameMatch[0]
+    })
+
+    if (missingModules.some(moduleName => moduleName === undefined)) {
+      return []
     }
+
+    let uniqueMissingModules = Array.from(new Set(missingModules)).filter(
+      notEmpty,
+    )
+    uniqueMissingModules = uniqueMissingModules.filter(
+      mod => !mod.startsWith(`${uniqueMissingModules[0]}/`),
+    )
 
     return uniqueMissingModules
   },
