@@ -8607,6 +8607,7 @@ __metadata:
     p-queue: "npm:^9.3.1"
     p-series: "npm:^2.1.0"
     pify: "npm:^6.1.0"
+    pkg-entry-points: "npm:^1.1.2"
     postcss: "npm:^8.4.0"
     postcss-loader: "npm:^8.1.0"
     prettier: "npm:^3.9.5"
@@ -8864,6 +8865,13 @@ __metadata:
   dependencies:
     find-up-simple: "npm:^1.0.0"
   checksum: 10c0/244c6af67540b7eeab823c56f61a6ca414fe48108a484bcb3b0743acc0dfaf106705555c353d65608ccd8ac3d9f696110e9b6bf55ef08f5f6a8d535a72a418e8
+  languageName: node
+  linkType: hard
+
+"pkg-entry-points@npm:^1.1.2":
+  version: 1.1.2
+  resolution: "pkg-entry-points@npm:1.1.2"
+  checksum: 10c0/e796c4beb0a750f37637761f9c398a108280c88c1ab540b9e8a768d07a4ed2d642cafce839d1b31e4b023661e0fd03c7ec3ad4cb6be26dabff0d571afeebe5e3
   languageName: node
   linkType: hard
 

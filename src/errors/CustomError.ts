@@ -42,6 +42,18 @@ export class EntryPointError extends CustomError {
   }
 }
 
+export class InvalidPackageEntryPointError extends CustomError<{
+  entryPoint: string
+}> {
+  constructor(entryPoint: string) {
+    super(
+      'InvalidPackageEntryPointError',
+      `Package entry point ${JSON.stringify(entryPoint)} is not importable`,
+      { entryPoint },
+    )
+  }
+}
+
 export class InstallError extends CustomError {
   constructor(originalError: unknown, extra?: unknown) {
     super('InstallError', originalError, extra)

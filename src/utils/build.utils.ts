@@ -123,26 +123,27 @@ const BuildUtils = {
     )
 
     let importStatement: string
+    const moduleSpecifier = JSON.stringify(options.entryPoint ?? packageName)
 
     if (options.esm) {
       if (options.customImports) {
         importStatement = `
-          import { ${options.customImports.join(', ')} } from '${packageName}'; 
+          import { ${options.customImports.join(', ')} } from ${moduleSpecifier};
           console.log(${options.customImports.join(', ')})
      `
       } else {
-        importStatement = `import * as p from '${packageName}'; console.log(p)`
+        importStatement = `import * as p from ${moduleSpecifier}; console.log(p)`
       }
     } else {
       if (options.customImports) {
         importStatement = `
         const { ${options.customImports.join(
           ', ',
-        )} } = require('${packageName}'); 
+        )} } = require(${moduleSpecifier});
         console.log(${options.customImports.join(', ')})
         `
       } else {
-        importStatement = `const p = require('${packageName}'); console.log(p)`
+        importStatement = `const p = require(${moduleSpecifier}); console.log(p)`
       }
     }
 
@@ -272,6 +273,7 @@ const BuildUtils = {
       entry['main'] = BuildUtils.createEntryPoint(packageName, installPath, {
         esm: true,
         customImports: options.customImports,
+        entryPoint: options.entryPoint,
       })
     }
 
