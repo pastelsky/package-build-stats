@@ -42,6 +42,8 @@ type Compiler = NonNullable<ReturnType<typeof rspack>>
 type BuildPackageArgs = {
   name: string
   installPath: string
+  // Shared installations are read-only; resolve dependencies from them while
+  // writing generated entries and bundles under the per-analysis installPath.
   dependencyPath?: string
   externals: Externals
   options: BuildPackageOptions
