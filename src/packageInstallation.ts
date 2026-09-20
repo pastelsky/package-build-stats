@@ -19,7 +19,7 @@ export interface PackageInstallation {
 }
 
 type RemotePackageInstallation = PackageInstallation & {
-  subscriptionId?: string
+  subscriptionId: string
 }
 
 export type PreparedPackage = PackageInstallation & {
@@ -43,7 +43,6 @@ function serializableOptions(options: InstallPackageOptions) {
     limitConcurrency: options.limitConcurrency,
     networkConcurrency: options.networkConcurrency,
     additionalPackages: options.additionalPackages,
-    isLocal: options.isLocal,
     installTimeout: options.installTimeout,
     debug: options.debug,
   }
@@ -78,22 +77,23 @@ function throwServiceError(payload: unknown): never {
   throw new InstallError(error?.originalError ?? payload, error?.extra)
 }
 
-function isPackageInstallation(value: unknown): value is PackageInstallation {
-  const installation = value as Partial<PackageInstallation>
+function isRemotePackageInstallation(
+  value: unknown,
+): value is RemotePackageInstallation {
+  const installation = value as Partial<RemotePackageInstallation>
   return (
     typeof installation?.packageString === 'string' &&
     typeof installation.packageName === 'string' &&
     typeof installation.installPath === 'string' &&
-    typeof installation.packagePath === 'string'
+    typeof installation.packagePath === 'string' &&
+    typeof installation.subscriptionId === 'string'
   )
 }
 
 async function unsubscribeRemoteInstallation(
   service: InstallationServiceOptions,
-  subscriptionId?: string,
+  subscriptionId: string,
 ) {
-  if (!subscriptionId) return
-
   try {
     const response = await requestInstallationService(
       service,
@@ -136,7 +136,7 @@ async function getRemoteInstallation(
     throw new InstallationServiceUnavailableError(payload)
   }
   if (!response.ok) throwServiceError(payload)
-  if (!isPackageInstallation(payload)) {
+  if (!isRemotePackageInstallation(payload)) {
     throw new InstallationServiceUnavailableError(
       new Error('Installation service returned an invalid response'),
     )
@@ -186,57 +186,47 @@ export async function disposePackage(installation: PackageInstallation) {
   await InstallationUtils.cleanupPath(installation.installPath)
 }
 
-/** Prepares an installation and an isolated directory for generated artifacts. */
-export async function preparePackage(
+async function prepareRemotePackage(
   packageString: string,
   options: InstallPackageOptions = {},
   needsBuildPath = true,
 ): Promise<PreparedPackage> {
-  throwIfAborted(options.signal)
-  if (options.installationService) {
-    try {
-      const installation = await getRemoteInstallation(packageString, options)
+  const service = options.installationService!
+  const installation = await getRemoteInstallation(packageString, options)
 
-      try {
-        const buildPath = needsBuildPath
-          ? await InstallationUtils.prepareBuildPath(
-              installation.packageName,
-              options.signal,
-            )
-          : installation.installPath
-        return {
-          ...installation,
-          buildPath,
-          async cleanup(retainLocalFiles = false) {
-            try {
-              if (needsBuildPath && !retainLocalFiles) {
-                await InstallationUtils.cleanupPath(buildPath)
-              }
-            } finally {
-              await unsubscribeRemoteInstallation(
-                options.installationService!,
-                installation.subscriptionId,
-              )
-            }
-          },
-        }
-      } catch (error) {
-        await unsubscribeRemoteInstallation(
-          options.installationService,
-          installation.subscriptionId,
+  try {
+    const buildPath = needsBuildPath
+      ? await InstallationUtils.prepareBuildPath(
+          installation.packageName,
+          options.signal,
         )
-        throw error
-      }
-    } catch (error) {
-      if (
-        !(error instanceof InstallationServiceUnavailableError) ||
-        options.installationService.fallbackToLocal === false
-      ) {
-        throw error
-      }
+      : installation.installPath
+    return {
+      ...installation,
+      buildPath,
+      async cleanup(retainLocalFiles = false) {
+        try {
+          if (needsBuildPath && !retainLocalFiles) {
+            await InstallationUtils.cleanupPath(buildPath)
+          }
+        } finally {
+          await unsubscribeRemoteInstallation(
+            service,
+            installation.subscriptionId,
+          )
+        }
+      },
     }
+  } catch (error) {
+    await unsubscribeRemoteInstallation(service, installation.subscriptionId)
+    throw error
   }
+}
 
+async function prepareLocalPackage(
+  packageString: string,
+  options: InstallPackageOptions,
+): Promise<PreparedPackage> {
   const installation = await installPackage(packageString, options)
   return {
     ...installation,
@@ -244,5 +234,30 @@ export async function preparePackage(
     async cleanup(retainLocalFiles = false) {
       if (!retainLocalFiles) await disposePackage(installation)
     },
+  }
+}
+
+/** Prepares an installation and an isolated directory for generated artifacts. */
+export async function preparePackage(
+  packageString: string,
+  options: InstallPackageOptions = {},
+  needsBuildPath = true,
+): Promise<PreparedPackage> {
+  throwIfAborted(options.signal)
+  if (!options.installationService) {
+    return prepareLocalPackage(packageString, options)
+  }
+
+  try {
+    return await prepareRemotePackage(packageString, options, needsBuildPath)
+  } catch (error) {
+    if (
+      !(error instanceof InstallationServiceUnavailableError) ||
+      options.installationService.fallbackToLocal === false
+    ) {
+      throw error
+    }
+
+    return prepareLocalPackage(packageString, options)
   }
 }
