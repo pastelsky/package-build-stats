@@ -20,7 +20,15 @@ describe('package installation', () => {
     const installation = await installPackage(fixturePath)
     const localInstall = vi.spyOn(InstallationUtils, 'installPackage')
     const buildPath = vi.spyOn(InstallationUtils, 'prepareBuildPath')
-    const fetchMock = vi.fn(async () => Response.json(installation))
+    let subscriptionNumber = 0
+    const fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
+      if (init?.method === 'DELETE') return new Response(null, { status: 204 })
+      expect(url).toBe('http://installation-service.test/installations')
+      return Response.json({
+        ...installation,
+        subscriptionId: `subscription-${++subscriptionNumber}`,
+      })
+    })
     vi.stubGlobal('fetch', fetchMock)
 
     try {
@@ -41,7 +49,9 @@ describe('package installation', () => {
         'http://installation-service.test/installations',
         expect.objectContaining({ method: 'POST' }),
       )
-      expect(fetchMock).toHaveBeenCalledTimes(3)
+      expect(
+        fetchMock.mock.calls.filter(([, init]) => init?.method === 'DELETE'),
+      ).toHaveLength(3)
       expect(buildPath).toHaveBeenCalledTimes(2)
       const artifactPaths = await Promise.all(
         buildPath.mock.results.map(result => result.value),

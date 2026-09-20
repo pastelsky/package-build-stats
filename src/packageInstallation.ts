@@ -18,6 +18,10 @@ export interface PackageInstallation {
   packagePath: string
 }
 
+type RemotePackageInstallation = PackageInstallation & {
+  subscriptionId?: string
+}
+
 export type PreparedPackage = PackageInstallation & {
   buildPath: string
   cleanup(retainLocalFiles?: boolean): Promise<void>
@@ -84,10 +88,29 @@ function isPackageInstallation(value: unknown): value is PackageInstallation {
   )
 }
 
+async function unsubscribeRemoteInstallation(
+  service: InstallationServiceOptions,
+  subscriptionId?: string,
+) {
+  if (!subscriptionId) return
+
+  try {
+    const response = await requestInstallationService(
+      service,
+      `/installations/${encodeURIComponent(subscriptionId)}`,
+      { method: 'DELETE' },
+    )
+    if (!response.ok) throw new Error(`Unexpected status ${response.status}`)
+  } catch {
+    // The installation service retains idle installations and will clean up
+    // abandoned subscriptions after its lease window.
+  }
+}
+
 async function getRemoteInstallation(
   packageString: string,
   options: InstallPackageOptions,
-): Promise<PackageInstallation> {
+): Promise<RemotePackageInstallation> {
   const service = options.installationService!
   const response = await requestInstallationService(
     service,
@@ -173,20 +196,36 @@ export async function preparePackage(
   if (options.installationService) {
     try {
       const installation = await getRemoteInstallation(packageString, options)
-      const buildPath = needsBuildPath
-        ? await InstallationUtils.prepareBuildPath(
-            installation.packageName,
-            options.signal,
-          )
-        : installation.installPath
-      return {
-        ...installation,
-        buildPath,
-        async cleanup(retainLocalFiles = false) {
-          if (needsBuildPath && !retainLocalFiles) {
-            await InstallationUtils.cleanupPath(buildPath)
-          }
-        },
+
+      try {
+        const buildPath = needsBuildPath
+          ? await InstallationUtils.prepareBuildPath(
+              installation.packageName,
+              options.signal,
+            )
+          : installation.installPath
+        return {
+          ...installation,
+          buildPath,
+          async cleanup(retainLocalFiles = false) {
+            try {
+              if (needsBuildPath && !retainLocalFiles) {
+                await InstallationUtils.cleanupPath(buildPath)
+              }
+            } finally {
+              await unsubscribeRemoteInstallation(
+                options.installationService!,
+                installation.subscriptionId,
+              )
+            }
+          },
+        }
+      } catch (error) {
+        await unsubscribeRemoteInstallation(
+          options.installationService,
+          installation.subscriptionId,
+        )
+        throw error
       }
     } catch (error) {
       if (
