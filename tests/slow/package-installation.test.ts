@@ -1,6 +1,10 @@
 import path from 'node:path'
 import { afterEach, describe, expect, test, vi } from 'vitest'
-import { getPackageExportSizes, getPackageStats } from '../../src/index.js'
+import {
+  getAllPackageExports,
+  getPackageExportSizes,
+  getPackageStats,
+} from '../../src/index.js'
 import { disposePackage, installPackage } from '../../src/installation.js'
 import InstallationUtils from '../../src/utils/installation.utils.js'
 
@@ -12,7 +16,7 @@ describe('package installation', () => {
     vi.unstubAllGlobals()
   })
 
-  test('builds against a service installation in an isolated artifact directory', async () => {
+  test('shares a service installation across all analysis APIs', async () => {
     const installation = await installPackage(fixturePath)
     const localInstall = vi.spyOn(InstallationUtils, 'installPackage')
     const buildPath = vi.spyOn(InstallationUtils, 'prepareBuildPath')
@@ -23,19 +27,21 @@ describe('package installation', () => {
       const options = {
         installationService: { url: 'http://installation-service.test' },
       }
-      const [stats, exportSizes] = await Promise.all([
+      const [stats, exports, exportSizes] = await Promise.all([
         getPackageStats(fixturePath, options),
+        getAllPackageExports(fixturePath, options),
         getPackageExportSizes(fixturePath, options),
       ])
 
       expect(stats.size).toBeGreaterThan(0)
+      expect(Object.keys(exports).length).toBeGreaterThan(0)
       expect(exportSizes.assets.length).toBeGreaterThan(0)
       expect(localInstall).not.toHaveBeenCalled()
       expect(fetchMock).toHaveBeenCalledWith(
         'http://installation-service.test/installations',
         expect.objectContaining({ method: 'POST' }),
       )
-      expect(fetchMock).toHaveBeenCalledTimes(2)
+      expect(fetchMock).toHaveBeenCalledTimes(3)
       expect(buildPath).toHaveBeenCalledTimes(2)
       const artifactPaths = await Promise.all(
         buildPath.mock.results.map(result => result.value),
