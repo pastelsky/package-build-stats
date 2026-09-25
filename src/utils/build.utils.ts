@@ -25,6 +25,7 @@ type CompilePackageArgs = {
   name: string
   externals: Externals
   entry: Entry
+  dependencyPath: string
   debug?: boolean
   minify?: boolean
   outputPath: string
@@ -41,6 +42,9 @@ type Compiler = NonNullable<ReturnType<typeof rspack>>
 type BuildPackageArgs = {
   name: string
   installPath: string
+  // Shared installations are read-only; resolve dependencies from them while
+  // writing generated entries and bundles under the per-analysis installPath.
+  dependencyPath?: string
   externals: Externals
   options: BuildPackageOptions
 }
@@ -157,6 +161,7 @@ const BuildUtils = {
   compilePackage({
     name,
     entry,
+    dependencyPath,
     externals,
     debug,
     minify,
@@ -170,6 +175,7 @@ const BuildUtils = {
       packageName: name,
       entry,
       externals,
+      dependencyPath,
       debug,
       minify,
       outputPath,
@@ -249,11 +255,12 @@ const BuildUtils = {
   async buildPackage({
     name: packageName,
     installPath,
+    dependencyPath = installPath,
     externals,
     options,
   }: BuildPackageArgs) {
     throwIfAborted(options.signal)
-    // Package builds run concurrently, so each install owns its build output.
+    // Concurrent analyses share dependencies but own separate artifact paths.
     const outputPath = path.join(installPath, 'build')
     let entry: any = {}
 
@@ -279,6 +286,7 @@ const BuildUtils = {
       name: packageName,
       entry,
       externals,
+      dependencyPath,
       debug: options.debug,
       minify: options.minify,
       outputPath,
@@ -387,6 +395,7 @@ const BuildUtils = {
     name,
     externals,
     installPath,
+    dependencyPath,
     options,
   }: BuildPackageArgs): Promise<BuildPackageResultWithIgnored> {
     throwIfAborted(options.signal)
@@ -398,6 +407,7 @@ const BuildUtils = {
         name,
         externals,
         installPath,
+        dependencyPath,
         options,
       })
       Telemetry.buildPackage(name, true, buildStartTime, {
@@ -424,6 +434,7 @@ const BuildUtils = {
           name,
           externals: newExternals,
           installPath,
+          dependencyPath,
           options,
         })
 
