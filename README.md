@@ -4,7 +4,7 @@ This is the function that powers the core of building, minifying and gzipping of
 
 ## Requirements
 
-`package-build-stats` supports maintained Node.js LTS releases: Node.js 22 or newer is required, and Node.js 24 is the recommended runtime.
+`package-build-stats` supports maintained Node.js LTS releases: Node.js 22.12 or newer is required, and Node.js 24 is the recommended runtime.
 
 ## Usage
 
