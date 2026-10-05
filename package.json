@@ -19,6 +19,18 @@
   ],
   "main": "build/index.js",
   "types": "build/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./build/index.d.ts",
+      "default": "./build/index.js"
+    },
+    "./installation": {
+      "types": "./build/installation.d.ts",
+      "default": "./build/installation.js"
+    },
+    "./package.json": "./package.json",
+    "./*": "./*"
+  },
   "scripts": {
     "start": "node index.js",
     "dev": "DEBUG=bp* node --watch index.js",

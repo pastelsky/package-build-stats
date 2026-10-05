@@ -1,6 +1,22 @@
 export const packageManagers = ['npm', 'yarn', 'pnpm', 'bun'] as const
 export type PackageManager = (typeof packageManagers)[number]
 
+export type PackageInstallation = {
+  packageString: string
+  packageName: string
+  installPath: string
+  packagePath: string
+}
+
+export type InstallationLease = PackageInstallation & {
+  release(): Promise<void>
+}
+
+export type InstallationProvider = (
+  packageString: string,
+  options: InstallPackageOptions,
+) => Promise<InstallationLease>
+
 type AllOptions = {
   customImports?: Array<string>
   splitCustomImports?: boolean
@@ -15,6 +31,7 @@ type AllOptions = {
   isLocal?: boolean
   installTimeout?: number
   signal?: AbortSignal
+  installationProvider?: InstallationProvider
 }
 
 export type BuildPackageOptions = Pick<
@@ -38,6 +55,7 @@ export type InstallPackageOptions = Pick<
   | 'installTimeout'
   | 'debug'
   | 'signal'
+  | 'installationProvider'
 >
 
 export type GetPackageStatsOptions = Pick<
@@ -50,6 +68,7 @@ export type GetPackageStatsOptions = Pick<
   | 'installTimeout'
   | 'minify'
   | 'signal'
+  | 'installationProvider'
 >
 
 export type Externals = {
