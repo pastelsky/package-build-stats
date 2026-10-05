@@ -1,5 +1,13 @@
 # package-build-stats
 
+## 9.3.0
+
+### Minor Changes
+
+- 126d498: Allow analysis functions to acquire and release installations through an optional
+  provider. Standalone usage still installs locally; provider failures propagate
+  instead of silently starting another installation.
+
 ## 9.2.3
 
 ### Patch Changes
