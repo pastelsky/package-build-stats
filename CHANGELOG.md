@@ -1,5 +1,11 @@
 # package-build-stats
 
+## 9.4.0
+
+### Minor Changes
+
+- 0a48130: Upgrade Rspack, OXC minification, Rsdoctor, and the CSS/Sass/Less/Svelte loader stack. Rspack's bundled CSS plugins and native binding upgrade together with core. Require Node 22.12 or newer to match the toolchain's supported runtime.
+
 ## 9.3.0
 
 ### Minor Changes
