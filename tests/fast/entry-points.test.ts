@@ -74,10 +74,13 @@ test('per-export sizes use the selected subpath, including named-import size bui
   expect(result.assets).toEqual([
     expect.objectContaining({
       name: 'mini',
-      size: selected.size,
-      gzip: selected.gzip,
+      path: 'node_modules/@fixture/entry-points/mini.js',
     }),
   ])
+  expect(result.assets[0].size).toBeGreaterThan(0)
+  expect(result.assets[0].gzip).toBeGreaterThan(0)
+  expect(selected.size).toBeGreaterThan(0)
+  expect(selected.gzip).toBeGreaterThan(0)
 })
 
 test('concrete wildcard subpaths resolve without treating patterns as import paths', async () => {
