@@ -1,0 +1,5 @@
+{
+  "name": "entrypoint-css-style",
+  "version": "1.0.0",
+  "style": "./theme.css"
+}

@@ -11,15 +11,15 @@ describe('Bundle Size Calculation', () => {
     const fixturePath = path.resolve(__dirname, '../fixtures/sizes/small')
     const result = await getPackageStats(fixturePath)
 
-    // Assert size and gzip are within expected ranges (non-deterministic)
-    expect(result.size).toBeGreaterThanOrEqual(245)
+    // Temporary paths affect Rspack module IDs: 1–3 digits yield 243–247 bytes.
+    expect(result.size).toBeGreaterThanOrEqual(243)
     expect(result.size).toBeLessThanOrEqual(250)
     expect(result.gzip).toBeGreaterThan(0)
     // Note: gzip can sometimes be larger than uncompressed size for very small files
 
     result.assets.forEach(asset => {
       expect(asset.gzip).toBeGreaterThan(0)
-      expect(asset.size).toBeGreaterThanOrEqual(245)
+      expect(asset.size).toBeGreaterThanOrEqual(243)
       expect(asset.size).toBeLessThanOrEqual(250)
     })
 
@@ -317,15 +317,15 @@ describe('Gzip Compression', () => {
     const fixturePath = path.resolve(__dirname, '../fixtures/sizes/small')
     const result = await getPackageStats(fixturePath)
 
-    // Assert ranges
-    expect(result.size).toBeGreaterThanOrEqual(245)
+    // Temporary paths affect Rspack module IDs: 1–3 digits yield 243–247 bytes.
+    expect(result.size).toBeGreaterThanOrEqual(243)
     expect(result.size).toBeLessThanOrEqual(250)
     expect(result.gzip).toBeGreaterThan(0)
     expect(result.gzip).toBeLessThan(result.size)
 
     result.assets.forEach(asset => {
       expect(asset.gzip).toBeGreaterThan(0)
-      expect(asset.size).toBeGreaterThanOrEqual(245)
+      expect(asset.size).toBeGreaterThanOrEqual(243)
       expect(asset.size).toBeLessThanOrEqual(250)
     })
 
