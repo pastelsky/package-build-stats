@@ -1,9 +1,14 @@
 import path from 'node:path'
 import type {
   InstallPackageOptions,
+  GetPackageExportsOptions,
   PackageInstallation,
 } from './common.types.js'
-import { parsePackageString, throwIfAborted } from './utils/common.utils.js'
+import {
+  getPackageImportPath,
+  parsePackageString,
+  throwIfAborted,
+} from './utils/common.utils.js'
 import InstallationUtils from './utils/installation.utils.js'
 
 export type PreparedPackage = PackageInstallation & {
@@ -55,10 +60,14 @@ export async function disposePackage(installation: PackageInstallation) {
 /** Prepares an installation and an isolated directory for generated artifacts. */
 export async function preparePackage(
   packageString: string,
-  options: InstallPackageOptions = {},
+  options: GetPackageExportsOptions = {},
   needsBuildPath = true,
 ): Promise<PreparedPackage> {
   throwIfAborted(options.signal)
+  getPackageImportPath(
+    parsePackageString(packageString).name,
+    options.entryPoint,
+  )
   if (!options.installationProvider) {
     const installation = await installPackage(packageString, options)
     return {

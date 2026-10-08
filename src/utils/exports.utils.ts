@@ -7,39 +7,12 @@
 
 import { parseSync } from 'oxc-parser'
 import type { StaticExport, StaticExportEntry } from 'oxc-parser'
-import { ResolverFactory } from 'oxc-resolver'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { performance } from 'node:perf_hooks'
 import Telemetry from './telemetry.utils.js'
-import { throwIfAborted } from './common.utils.js'
-
-// Initialize resolver with ESM-first configuration
-// - main_fields: ["module", "main"] - prioritize ESM entry points
-// - condition_names: ["import", "default", "require"] - ESM-first export conditions
-//   NOTE: We intentionally exclude "node" because Node.js conditional exports resolution
-//   uses the PACKAGE's exports field order (not our conditionNames order) to determine
-//   priority. Packages like Vue have "node" before "import" in their exports, so including
-//   "node" would resolve to CJS files instead of ESM. We keep "require" as a fallback for
-//   packages that only export via "require" condition.
-// - extensions: all common JS/TS extensions
-// - symlinks: false - keep paths as-is without resolving symlinks (matches enhanced-resolve behavior)
-const resolver = new ResolverFactory({
-  extensions: [
-    '.mjs',
-    '.js',
-    '.mts',
-    '.ts',
-    '.jsx',
-    '.tsx',
-    '.cjs',
-    '.cts',
-    '.json',
-  ],
-  mainFields: ['module', 'main'], // ESM-first: prioritize "module" field over "main"
-  conditionNames: ['import', 'default', 'require'], // ESM-first: exclude "node" which resolves to CJS
-  symlinks: false, // Don't resolve symlinks to match enhanced-resolve behavior
-})
+import { getPackageImportPath, throwIfAborted } from './common.utils.js'
+import { resolvePackageModule } from '../config/packageResolution.js'
 
 /**
  * Represents a named export with its optional source module
@@ -106,11 +79,11 @@ async function resolveModule(
   signal?: AbortSignal,
 ): Promise<string> {
   throwIfAborted(signal)
-  const result = resolver.sync(context, lookupPath)
-  if (!result.path) {
+  const resolvedPath = resolvePackageModule(context, lookupPath)
+  if (!resolvedPath) {
     throw new Error(`Cannot resolve module '${lookupPath}' from '${context}'`)
   }
-  return result.path
+  return resolvedPath
 }
 
 type ResolvedExports = {
@@ -222,6 +195,7 @@ export async function getAllExports(
   lookupPath: string,
   installPath?: string, // Base path for calculating relative paths (optional)
   signal?: AbortSignal,
+  entryPoint = '.',
 ) {
   const startTime = performance.now()
   const visited = new Set<string>()
@@ -232,19 +206,19 @@ export async function getAllExports(
     const packageJsonPath = path.join(context, 'package.json')
     const packageJson = JSON.parse(await fs.readFile(packageJsonPath, 'utf8'))
     throwIfAborted(signal)
-    // Prefer module field for ESM, fallback to main, then default
-    let entryPoint = packageJson.module || packageJson.main || './index.js'
-
-    // Normalize entry point to start with ./
-    if (!entryPoint.startsWith('./') && !entryPoint.startsWith('../')) {
-      entryPoint = './' + entryPoint
-    }
+    const importPath = getPackageImportPath(lookupPath, entryPoint)
+    // Public exports must be resolved as a package request, not a file path.
+    // Self-reference works for local fixtures too, without installing them.
+    const request =
+      packageJson.exports !== undefined || entryPoint !== '.'
+        ? importPath
+        : './'
 
     // Resolve the entry point relative to context
     // Pass installPath as rootContext for calculating relative paths
     const results = await walkExportsRecursive(
       context,
-      entryPoint,
+      request,
       visited,
       installPath,
       true,

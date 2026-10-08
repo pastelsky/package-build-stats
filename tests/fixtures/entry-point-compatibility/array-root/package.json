@@ -1,0 +1,10 @@
+{
+  "name": "entrypoint-array-root",
+  "version": "1.0.0",
+  "exports": [
+    {
+      "types": "./types.d.ts"
+    },
+    "./runtime.mjs"
+  ]
+}

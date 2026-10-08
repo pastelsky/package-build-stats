@@ -32,6 +32,13 @@ To build a package and get stats about exports that are exposed out of the packa
 curl 'localhost:3000/exports?p=<package-name>'
 ```
 
+To list public browser entry points and build a selected entry –
+
+```bash
+curl 'localhost:3000/entry-points?p=react-dom'
+curl 'localhost:3000/size?p=react-dom&entryPoint=./client'
+```
+
 To build a package and get stats about size of various exports that are exposed out of the package –
 
 ```bash

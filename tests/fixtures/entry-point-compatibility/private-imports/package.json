@@ -1,0 +1,20 @@
+{
+  "name": "entrypoint-private-imports",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./client.js",
+    "./server": {
+      "node": "./node.js",
+      "browser": "./server.js",
+      "default": "./node.js"
+    }
+  },
+  "imports": {
+    "#environment": {
+      "node": "./node.js",
+      "browser": "./browser.js",
+      "default": "./node.js"
+    }
+  }
+}

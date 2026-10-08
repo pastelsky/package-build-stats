@@ -1,0 +1,6 @@
+{
+  "name": "legacy-entry-points",
+  "version": "1.0.0",
+  "type": "module",
+  "module": "./index.mjs"
+}

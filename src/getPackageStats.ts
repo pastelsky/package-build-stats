@@ -83,6 +83,7 @@ export default async function getPackageStats(
           debug: options.debug,
           minify: options.minify !== false,
           customImports: options.customImports,
+          entryPoint: options.entryPoint,
           includeDependencySizes: true,
           signal: options.signal,
         },

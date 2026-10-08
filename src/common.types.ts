@@ -18,6 +18,8 @@ export type InstallationProvider = (
 ) => Promise<InstallationLease>
 
 type AllOptions = {
+  /** Public package subpath, e.g. './mini'; '.' (the root) is the default. */
+  entryPoint?: string
   customImports?: Array<string>
   splitCustomImports?: boolean
   debug?: boolean
@@ -36,14 +38,19 @@ type AllOptions = {
 
 export type BuildPackageOptions = Pick<
   AllOptions,
-  'customImports' | 'splitCustomImports' | 'debug' | 'minify' | 'signal'
+  | 'entryPoint'
+  | 'customImports'
+  | 'splitCustomImports'
+  | 'debug'
+  | 'minify'
+  | 'signal'
 > & {
   includeDependencySizes: boolean
 }
 
 export type CreateEntryPointOptions = Pick<
   AllOptions,
-  'esm' | 'customImports' | 'entryFilename'
+  'esm' | 'entryPoint' | 'customImports' | 'entryFilename'
 >
 export type InstallPackageOptions = Pick<
   AllOptions,
@@ -69,7 +76,11 @@ export type GetPackageStatsOptions = Pick<
   | 'minify'
   | 'signal'
   | 'installationProvider'
+  | 'entryPoint'
 >
+
+export type GetPackageExportsOptions = InstallPackageOptions &
+  Pick<AllOptions, 'entryPoint'>
 
 export type Externals = {
   externalPackages: Array<string>

@@ -1,0 +1,11 @@
+{
+  "name": "entrypoint-pattern-specificity",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    "./features/*": "./features/*.js",
+    "./features/special": "./special.js",
+    "./features/private/*": null,
+    "./pair/*": "./pair/*/*.js"
+  }
+}

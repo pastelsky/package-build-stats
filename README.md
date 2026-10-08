@@ -26,6 +26,22 @@ const results = await getPackageStats('moment')
 const results = await getPackageStats('moment@2.24.0')
 ```
 
+##### Discovering and building package entry points
+
+```js
+import { getPackageEntryPoints, getPackageStats } from 'package-build-stats'
+
+const entryPoints = await getPackageEntryPoints('react-dom@19.2.0')
+// Browser-importable paths: '.', './client', './profiling', ...
+const results = await getPackageStats('react-dom@19.2.0', {
+  entryPoint: './client',
+})
+```
+
+Use a path returned by discovery for the same package version. Omitting
+`entryPoint` keeps the root import; named-export and per-export size analysis
+accept the same option. Private, blocked and non-browser paths are excluded.
+
 ##### Building local packages (beta)
 
 ```js
@@ -59,6 +75,7 @@ const results = await getBuiltPackageStats('moment', options)
 | limitConcurrency   | `true` or `false`               | `false`  | When using `yarn` as the client, use the network mutex to limit concurrency                                                                                     |
 | networkConcurrency | `number`                        | `false`  | When using `yarn` or `bun` as client, limit simultaneous installs to this number.                                                                               |
 | customImports      | `Array<string>`                 | `null`   | By default, the default export is used for calculating sizes. Setting this option allows calculation of package stats based on more granular top-level exports. |
+| entryPoint         | `string`                        | `.`      | Public package-relative import path, such as `./client`, returned by `getPackageEntryPoints()`.                                                                 |
 | minifier           | `terser` or `esbuild`           | `terser` | ESbuild is faster, albeit with marginally larger file sizes                                                                                                     |
 | installTimeout     | number (ms)                     | 30000    | Timeout for package install                                                                                                                                     |
 

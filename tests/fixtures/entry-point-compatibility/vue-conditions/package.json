@@ -1,0 +1,15 @@
+{
+  "name": "entrypoint-vue-conditions",
+  "version": "1.0.0",
+  "main": "./index.cjs",
+  "module": "./runtime.mjs",
+  "exports": {
+    ".": {
+      "import": {
+        "node": "./node.mjs",
+        "default": "./runtime.mjs"
+      },
+      "require": "./index.cjs"
+    }
+  }
+}

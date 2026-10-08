@@ -1,0 +1,36 @@
+{
+  "name": "@fixture/entry-points",
+  "version": "1.0.0",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./not-the-public-entry.js",
+  "exports": {
+    ".": "./index.js",
+    "./mini": {
+      "node": "./server.js",
+      "browser": "./mini.js",
+      "import": "./server.js"
+    },
+    "./features/*": "./*.js",
+    "./features/server": null,
+    "./blocked": null,
+    "./package.json": "./package.json",
+    "./types": {
+      "types": "./types.d.ts"
+    },
+    "./server-only": {
+      "node": "./server.js"
+    },
+    "./runtime-specific": {
+      "react-server": "./server.js"
+    },
+    "./runtime-fallback": {
+      "react-server": "./server.js",
+      "default": "./mini.js"
+    },
+    "./typed": "./typed.mts"
+  },
+  "imports": {
+    "#internal": "./server.js"
+  }
+}

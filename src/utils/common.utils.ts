@@ -293,3 +293,20 @@ export function parsePackageString(packageString: string): ParsePackageResult {
     return parseUnscopedPackageString(normalPackageString)
   }
 }
+
+export function getPackageImportPath(packageName: string, entryPoint = '.') {
+  if (entryPoint === '.') return packageName
+
+  const segments = entryPoint.slice(2).split('/')
+  if (
+    !entryPoint.startsWith('./') ||
+    segments.some(segment => !segment || segment === '.' || segment === '..') ||
+    /[\\\s?#*%\p{Cc}]/u.test(entryPoint)
+  ) {
+    throw new TypeError(
+      'entryPoint must be a concrete package subpath such as ./mini',
+    )
+  }
+
+  return `${packageName}/${entryPoint.slice(2)}`
+}
