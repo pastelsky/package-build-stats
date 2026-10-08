@@ -1,21 +1,21 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
-import escapeRegex from 'escape-string-regexp'
+import { getPackageEntryPoints as discoverEntryPoints } from 'pkg-entry-points'
 import type { InstallPackageOptions } from './common.types.js'
-import { resolvePackageModule } from './config/packageResolution.js'
+import {
+  packageExtensions,
+  resolvePackageModule,
+} from './config/packageResolution.js'
 import { preparePackage } from './packageInstallation.js'
 import { getPackageImportPath, throwIfAborted } from './utils/common.utils.js'
 
-function exportTargets(value: unknown): string[] {
-  if (typeof value === 'string') return [value]
-  if (!value || typeof value !== 'object') return []
-  return Object.values(value).flatMap(exportTargets)
-}
+const buildableExtensions = new Set(
+  packageExtensions.filter(extension => extension !== '.json'),
+)
 
 function runnableTarget(file: string) {
   return (
-    /\.(?:[cm]?js|jsx|tsx?|css|sass|scss|less|svelte)$/.test(file) &&
-    !/\.d\.[cm]?ts$/.test(file)
+    buildableExtensions.has(path.extname(file)) && !/\.d\.[cm]?ts$/.test(file)
   )
 }
 
@@ -30,44 +30,19 @@ export async function getPackageEntryPoints(
     const manifest = JSON.parse(
       await fs.readFile(path.join(packagePath, 'package.json'), 'utf8'),
     )
-    const exports: unknown = manifest.exports
-    const subpaths =
-      exports && typeof exports === 'object' && !Array.isArray(exports)
-        ? Object.entries(exports).filter(([key]) => key.startsWith('.'))
-        : []
-    const declarations = subpaths.length ? subpaths : [['.', exports] as const]
-    const candidates = new Set<string>()
-    const hasPatterns = declarations.some(([key]) => key.includes('*'))
-    const files = hasPatterns
-      ? (await fs.readdir(packagePath, { recursive: true })).map(
-          file => `./${file.split(path.sep).join('/')}`,
-        )
-      : []
-
-    for (const [key, target] of declarations) {
-      throwIfAborted(options.signal)
-      if (!key.includes('*')) {
-        candidates.add(key)
-        continue
-      }
-      for (const pattern of exportTargets(target)) {
-        if (!pattern.startsWith('./') || !pattern.includes('*')) continue
-        const parts = pattern.split('*').map(escapeRegex)
-        const matcher = new RegExp(
-          `^${parts[0]}(.*)${parts.slice(1).join('\\1')}$`,
-        )
-        for (const file of files) {
-          const match = matcher.exec(file)
-          if (match) candidates.add(key.replace('*', match[1]))
-        }
-      }
-    }
+    throwIfAborted(options.signal)
+    const entries = await discoverEntryPoints(packagePath)
+    throwIfAborted(options.signal)
+    const candidates = new Set(Object.keys(entries))
+    // The library infers legacy roots from main, while our bundler also uses
+    // browser/module/style. Let the actual resolver decide whether '.' exists.
+    if (manifest.exports === undefined) candidates.add('.')
 
     return [...candidates]
       .filter(entryPoint => {
         throwIfAborted(options.signal)
         const request =
-          exports === undefined && entryPoint === '.'
+          manifest.exports === undefined && entryPoint === '.'
             ? './'
             : getPackageImportPath(packageName, entryPoint)
         const target = resolvePackageModule(packagePath, request)

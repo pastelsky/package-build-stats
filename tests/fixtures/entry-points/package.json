@@ -20,7 +20,8 @@
     },
     "./server-only": {
       "node": "./server.js"
-    }
+    },
+    "./typed": "./typed.mts"
   },
   "imports": {
     "#internal": "./server.js"

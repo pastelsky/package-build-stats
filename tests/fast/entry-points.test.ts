@@ -30,6 +30,11 @@ beforeAll(async () => {
     path.join(installPath, 'node_modules', 'subpath-only'),
     { recursive: true },
   )
+  await cp(
+    fileURLToPath(new URL('../fixtures/legacy-entry-points', import.meta.url)),
+    path.join(installPath, 'node_modules', 'legacy-entry-points'),
+    { recursive: true },
+  )
   installationProvider = async () => ({
     packageName,
     packageString,
@@ -52,6 +57,7 @@ test('entry-point discovery lists concrete browser paths, not private, blocked, 
     './features/index',
     './features/mini',
     './mini',
+    './typed',
   ])
   await Promise.all(
     entryPoints.map(async entryPoint => {
@@ -62,6 +68,36 @@ test('entry-point discovery lists concrete browser paths, not private, blocked, 
       expect(Object.keys(exports).length).toBeGreaterThan(0)
     }),
   )
+})
+
+test('legacy module-only roots and deep import files can both be discovered and built', async () => {
+  const provider: InstallationProvider = async () => ({
+    packageName: 'legacy-entry-points',
+    packageString: 'legacy-entry-points@1.0.0',
+    packagePath: path.join(installPath, 'node_modules', 'legacy-entry-points'),
+    installPath,
+    async release() {},
+  })
+  const specifier = 'legacy-entry-points@1.0.0'
+  expect(
+    await getPackageEntryPoints(specifier, { installationProvider: provider }),
+  ).toEqual(['.', './index.mjs', './nested/client.js'])
+  for (const entryPoint of ['.', './nested/client.js']) {
+    // oxlint-disable-next-line no-await-in-loop
+    const stats = await getPackageStats(specifier, {
+      installationProvider: provider,
+      entryPoint,
+    })
+    expect(stats.size).toBeGreaterThan(0)
+  }
+})
+
+test('a discovered TypeScript module entry can be bundled with the same extension support', async () => {
+  const stats = await getPackageStats(packageString, {
+    installationProvider,
+    entryPoint: './typed',
+  })
+  expect(stats.size).toBeGreaterThan(0)
 })
 
 test('root and subpath sizes measure different public imports of a scoped package', async () => {
