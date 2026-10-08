@@ -2,12 +2,14 @@ import { cp, mkdir, mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { afterAll, beforeAll, expect, test } from 'vitest'
+import fs from 'node:fs/promises'
+import { afterAll, beforeAll, expect, test, vi } from 'vitest'
 import {
   getAllPackageExports,
   getPackageExportSizes,
   getPackageStats,
   getPackageEntryPoints,
+  BuildCancelledError,
 } from '../../src/index.js'
 import type { InstallationProvider } from '../../src/common.types.js'
 
@@ -57,6 +59,7 @@ test('entry-point discovery lists concrete browser paths, not private, blocked, 
     './features/index',
     './features/mini',
     './mini',
+    './runtime-fallback',
     './typed',
   ])
   await Promise.all(
@@ -68,6 +71,36 @@ test('entry-point discovery lists concrete browser paths, not private, blocked, 
       expect(Object.keys(exports).length).toBeGreaterThan(0)
     }),
   )
+})
+
+test('cancelling directory enumeration releases the shared lease and leaves it reusable', async () => {
+  const controller = new AbortController()
+  const release = vi.fn(async () => {})
+  const provider: InstallationProvider = async (...args) => ({
+    ...(await installationProvider(...args)),
+    release,
+  })
+  const readDirectory = vi
+    .spyOn(fs, 'readdir')
+    .mockImplementationOnce(async () => {
+      controller.abort()
+      return []
+    })
+  try {
+    await expect(
+      getPackageEntryPoints(packageString, {
+        installationProvider: provider,
+        signal: controller.signal,
+      }),
+    ).rejects.toBeInstanceOf(BuildCancelledError)
+    expect(release).toHaveBeenCalledTimes(1)
+  } finally {
+    readDirectory.mockRestore()
+  }
+  await expect(
+    getPackageEntryPoints(packageString, { installationProvider: provider }),
+  ).resolves.toContain('./mini')
+  expect(release).toHaveBeenCalledTimes(2)
 })
 
 test('legacy module-only roots and deep import files can both be discovered and built', async () => {
@@ -170,7 +203,12 @@ test('packages without a public root can still measure their public subpaths', a
   ).rejects.toThrow()
 })
 
-test.each(['./missing', './blocked', './features/server'])(
+test.each([
+  './missing',
+  './blocked',
+  './features/server',
+  './runtime-specific',
+])(
   'unavailable entry %s fails instead of returning an empty or root bundle',
   async entryPoint => {
     const options = { installationProvider, entryPoint }
@@ -188,6 +226,7 @@ test.each([
   './features/*',
   '#internal',
   './mini?query',
+  './mini"; process.exit(1); //',
 ])('invalid or private entry %s is rejected', async entryPoint => {
   await expect(
     getPackageStats(packageString, { installationProvider, entryPoint }),

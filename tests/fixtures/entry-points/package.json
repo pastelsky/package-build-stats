@@ -21,6 +21,13 @@
     "./server-only": {
       "node": "./server.js"
     },
+    "./runtime-specific": {
+      "react-server": "./server.js"
+    },
+    "./runtime-fallback": {
+      "react-server": "./server.js",
+      "default": "./mini.js"
+    },
     "./typed": "./typed.mts"
   },
   "imports": {

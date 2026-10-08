@@ -19,6 +19,23 @@ function runnableTarget(file: string) {
   )
 }
 
+// Stop wildcard/legacy directory walks between filesystem operations, not only
+// after the entire scan. The library accepts this filesystem adapter directly.
+function cancellableFilesystem(signal: AbortSignal) {
+  return new Proxy(fs, {
+    get(target, property, receiver) {
+      const operation = Reflect.get(target, property, receiver)
+      if (typeof operation !== 'function') return operation
+      return async (...args: unknown[]) => {
+        throwIfAborted(signal)
+        const result = await Reflect.apply(operation, target, args)
+        throwIfAborted(signal)
+        return result
+      }
+    },
+  })
+}
+
 /** Lists concrete public browser import paths, without compiling bundles. */
 export async function getPackageEntryPoints(
   packageString: string,
@@ -31,7 +48,10 @@ export async function getPackageEntryPoints(
       await fs.readFile(path.join(packagePath, 'package.json'), 'utf8'),
     )
     throwIfAborted(options.signal)
-    const entries = await discoverEntryPoints(packagePath)
+    const entries = await discoverEntryPoints(
+      packagePath,
+      options.signal ? cancellableFilesystem(options.signal) : fs,
+    )
     throwIfAborted(options.signal)
     const candidates = new Set(Object.keys(entries))
     // The library infers legacy roots from main, while our bundler also uses
