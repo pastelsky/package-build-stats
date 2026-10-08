@@ -7,35 +7,12 @@
 
 import { parseSync } from 'oxc-parser'
 import type { StaticExport, StaticExportEntry } from 'oxc-parser'
-import { ResolverFactory } from 'oxc-resolver'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { performance } from 'node:perf_hooks'
 import Telemetry from './telemetry.utils.js'
 import { getPackageImportPath, throwIfAborted } from './common.utils.js'
-import {
-  browserImportConditions,
-  packageMainFields,
-} from '../config/packageResolution.js'
-
-// Do not include Node or require conditions when discovering browser ESM exports.
-const resolver = new ResolverFactory({
-  extensions: [
-    '.mjs',
-    '.js',
-    '.mts',
-    '.ts',
-    '.jsx',
-    '.tsx',
-    '.cjs',
-    '.cts',
-    '.json',
-  ],
-  mainFields: packageMainFields,
-  conditionNames: browserImportConditions,
-  aliasFields: ['browser'],
-  symlinks: false, // Don't resolve symlinks to match enhanced-resolve behavior
-})
+import { resolvePackageModule } from '../config/packageResolution.js'
 
 /**
  * Represents a named export with its optional source module
@@ -102,11 +79,11 @@ async function resolveModule(
   signal?: AbortSignal,
 ): Promise<string> {
   throwIfAborted(signal)
-  const result = resolver.sync(context, lookupPath)
-  if (!result.path) {
+  const resolvedPath = resolvePackageModule(context, lookupPath)
+  if (!resolvedPath) {
     throw new Error(`Cannot resolve module '${lookupPath}' from '${context}'`)
   }
-  return result.path
+  return resolvedPath
 }
 
 type ResolvedExports = {

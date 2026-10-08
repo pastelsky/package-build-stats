@@ -7,6 +7,7 @@ import {
   getAllPackageExports,
   getPackageExportSizes,
   getPackageStats,
+  getPackageEntryPoints,
 } from '../../src/index.js'
 import type { InstallationProvider } from '../../src/common.types.js'
 
@@ -40,6 +41,27 @@ beforeAll(async () => {
 
 afterAll(async () => {
   if (installPath) await rm(installPath, { recursive: true, force: true })
+})
+
+test('entry-point discovery lists concrete browser paths, not private, blocked, metadata or type-only entries', async () => {
+  const entryPoints = await getPackageEntryPoints(packageString, {
+    installationProvider,
+  })
+  expect(entryPoints).toEqual([
+    '.',
+    './features/index',
+    './features/mini',
+    './mini',
+  ])
+  await Promise.all(
+    entryPoints.map(async entryPoint => {
+      const exports = await getAllPackageExports(packageString, {
+        installationProvider,
+        entryPoint,
+      })
+      expect(Object.keys(exports).length).toBeGreaterThan(0)
+    }),
+  )
 })
 
 test('root and subpath sizes measure different public imports of a scoped package', async () => {
@@ -100,6 +122,9 @@ test('packages without a public root can still measure their public subpaths', a
     async release() {},
   })
   const options = { installationProvider: provider, entryPoint: './client' }
+  expect(await getPackageEntryPoints('subpath-only@1.0.0', options)).toEqual([
+    './client',
+  ])
   const stats = await getPackageStats('subpath-only@1.0.0', options)
   const exports = await getAllPackageExports('subpath-only@1.0.0', options)
   expect(stats.size).toBeGreaterThan(0)

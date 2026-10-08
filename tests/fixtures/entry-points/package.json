@@ -13,7 +13,14 @@
     },
     "./features/*": "./*.js",
     "./features/server": null,
-    "./blocked": null
+    "./blocked": null,
+    "./package.json": "./package.json",
+    "./types": {
+      "types": "./types.d.ts"
+    },
+    "./server-only": {
+      "node": "./server.js"
+    }
   },
   "imports": {
     "#internal": "./server.js"
