@@ -19,7 +19,7 @@ import type {
   CreateEntryPointOptions,
 } from '../common.types.js'
 import Telemetry from './telemetry.utils.js'
-import { throwIfAborted } from './common.utils.js'
+import { getPackageImportPath, throwIfAborted } from './common.utils.js'
 
 type CompilePackageArgs = {
   name: string
@@ -126,27 +126,28 @@ const BuildUtils = {
       options.entryFilename || 'index.js',
     )
 
+    const importPath = JSON.stringify(
+      getPackageImportPath(packageName, options.entryPoint),
+    )
     let importStatement: string
 
     if (options.esm) {
       if (options.customImports) {
         importStatement = `
-          import { ${options.customImports.join(', ')} } from '${packageName}'; 
+          import { ${options.customImports.join(', ')} } from ${importPath};
           console.log(${options.customImports.join(', ')})
      `
       } else {
-        importStatement = `import * as p from '${packageName}'; console.log(p)`
+        importStatement = `import * as p from ${importPath}; console.log(p)`
       }
     } else {
       if (options.customImports) {
         importStatement = `
-        const { ${options.customImports.join(
-          ', ',
-        )} } = require('${packageName}'); 
+        const { ${options.customImports.join(', ')} } = require(${importPath});
         console.log(${options.customImports.join(', ')})
         `
       } else {
-        importStatement = `const p = require('${packageName}'); console.log(p)`
+        importStatement = `const p = require(${importPath}); console.log(p)`
       }
     }
 
@@ -271,6 +272,7 @@ const BuildUtils = {
       options.customImports.forEach(importt => {
         entry[importt] = BuildUtils.createEntryPoint(packageName, installPath, {
           customImports: [importt],
+          entryPoint: options.entryPoint,
           entryFilename: importt,
           esm: true,
         })
@@ -279,6 +281,7 @@ const BuildUtils = {
       entry['main'] = BuildUtils.createEntryPoint(packageName, installPath, {
         esm: true,
         customImports: options.customImports,
+        entryPoint: options.entryPoint,
       })
     }
 
@@ -303,7 +306,11 @@ const BuildUtils = {
         throw new BuildError(compilationErrors.map(error => error.message))
       }
 
-      if (missingModules.length === 1 && missingModules[0] === packageName) {
+      if (
+        missingModules.includes(
+          getPackageImportPath(packageName, options.entryPoint),
+        )
+      ) {
         throw new EntryPointError(compilationErrors.map(err => err.message))
       }
 

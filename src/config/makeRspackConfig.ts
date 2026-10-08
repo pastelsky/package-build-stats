@@ -7,6 +7,10 @@ import { createRequire } from 'node:module'
 import path from 'node:path'
 
 import OxcJsMinimizerRspackPlugin from './OxcJsMinimizerRspackPlugin.js'
+import {
+  browserImportConditions,
+  packageMainFields,
+} from './packageResolution.js'
 
 const require = createRequire(import.meta.url)
 
@@ -81,6 +85,9 @@ export default function makeRspackConfig({
         ? [path.join(dependencyPath, 'node_modules'), 'node_modules']
         : ['node_modules'],
       conditionNames: ['svelte', '...'],
+      byDependency: {
+        esm: { conditionNames: browserImportConditions },
+      },
       extensions: [
         '.web.tsx',
         '.web.ts',
@@ -98,7 +105,7 @@ export default function makeRspackConfig({
         '.less',
         '.svelte',
       ],
-      mainFields: ['browser', 'module', 'main', 'style'],
+      mainFields: packageMainFields,
     },
     resolveLoader: {
       alias: {

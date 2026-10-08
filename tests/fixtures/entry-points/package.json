@@ -1,0 +1,21 @@
+{
+  "name": "@fixture/entry-points",
+  "version": "1.0.0",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./not-the-public-entry.js",
+  "exports": {
+    ".": "./index.js",
+    "./mini": {
+      "node": "./server.js",
+      "browser": "./mini.js",
+      "import": "./server.js"
+    },
+    "./features/*": "./*.js",
+    "./features/server": null,
+    "./blocked": null
+  },
+  "imports": {
+    "#internal": "./server.js"
+  }
+}

@@ -10,13 +10,13 @@ import { getAllExports } from './utils/exports.utils.js'
 import BuildUtils from './utils/build.utils.js'
 import type {
   GetPackageStatsOptions,
-  InstallPackageOptions,
+  GetPackageExportsOptions,
 } from './common.types.js'
 import { preparePackage, type PreparedPackage } from './packageInstallation.js'
 
 export async function getAllPackageExports(
   packageString: string,
-  options: InstallPackageOptions = {},
+  options: GetPackageExportsOptions = {},
 ) {
   const startTime = performance.now()
   let preparedPackage: PreparedPackage | undefined
@@ -31,6 +31,7 @@ export async function getAllPackageExports(
       packageName,
       installPath, // Pass installPath as base for relative path calculation
       options.signal,
+      options.entryPoint,
     )
     Telemetry.packageExports(packageString, startTime, true)
     return results
@@ -66,6 +67,7 @@ export async function getPackageExportSizes(
       packageName,
       installPath, // Pass installPath as base for relative path calculation
       options.signal,
+      options.entryPoint,
     )
     throwIfAborted(options.signal)
     timings.getAllExports = performance.now() - getAllExportsStart
@@ -110,6 +112,7 @@ export async function getPackageExportSizes(
         externals,
         options: {
           customImports: chunk,
+          entryPoint: options.entryPoint,
           splitCustomImports: true,
           includeDependencySizes: false,
           signal: options.signal,
