@@ -1,5 +1,13 @@
 # package-build-stats
 
+## 9.5.1
+
+### Patch Changes
+
+- bb4a38b: Keep isolated build output under the existing packages workspace tree so host cleanup can reclaim directories abandoned by terminated workers.
+
+  Allow `BUILD_TMP_DIR` to select the scratch root for isolated environments and host cleanup verification.
+
 ## 9.5.0
 
 ### Minor Changes
