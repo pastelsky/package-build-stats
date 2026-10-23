@@ -19,6 +19,23 @@ import { packageManagers } from '../common.types.js'
 import type { InstallPackageOptions, PackageManager } from '../common.types.js'
 import Telemetry from './telemetry.utils.js'
 
+// A different package manager cannot recover exhausted disk blocks or inodes.
+function isOutOfSpace(error: unknown): boolean {
+  if (error instanceof InstallError) return isOutOfSpace(error.originalError)
+  if (error instanceof Error && 'code' in error && error.code === 'ENOSPC')
+    return true
+
+  const messages =
+    error instanceof ProcessExecutionError
+      ? [error.message, error.stdout, error.stderr]
+      : [error instanceof Error ? error.message : error]
+  return messages.some(
+    message =>
+      typeof message === 'string' &&
+      /\bENOSPC\b|no space left on device/i.test(message),
+  )
+}
+
 const cachePath = path.join(config.tmp, 'cache')
 
 async function packLocalPackage(
@@ -257,7 +274,7 @@ const InstallationUtils = {
         }
         return
       } catch (error) {
-        if (error instanceof BuildCancelledError) {
+        if (error instanceof BuildCancelledError || isOutOfSpace(error)) {
           throw error
         }
         lastError = error
