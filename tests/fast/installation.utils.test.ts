@@ -28,6 +28,44 @@ describe('InstallationUtils', () => {
     ).rejects.toThrow('Unsupported package manager: invalid')
   })
 
+  test.each([
+    Object.assign(new Error('write failed'), { code: 'ENOSPC' }),
+    makeProcessError('ENOSPC writing package'),
+    makeProcessError('', 'no space left on device'),
+    new InstallError('ENOSPC: could not extract tarball'),
+  ])(
+    'does not try another package manager after disk exhaustion: %s',
+    async original => {
+      const error = new InstallError(original)
+      const install = vi
+        .spyOn(InstallationUtils, 'installWithClient')
+        .mockRejectedValue(error)
+      try {
+        await expect(
+          InstallationUtils.installPackage('example', '/tmp/unused', {}),
+        ).rejects.toBe(error)
+        expect(install).toHaveBeenCalledTimes(1)
+      } finally {
+        install.mockRestore()
+      }
+    },
+  )
+
+  test('still falls back from Bun to npm for an ordinary install failure', async () => {
+    const install = vi
+      .spyOn(InstallationUtils, 'installWithClient')
+      .mockRejectedValueOnce(
+        new InstallError(new Error('unsupported lockfile')),
+      )
+      .mockResolvedValueOnce(undefined)
+    try {
+      await InstallationUtils.installPackage('example', '/tmp/unused', {})
+      expect(install.mock.calls.map(call => call[3])).toEqual(['bun', 'npm'])
+    } finally {
+      install.mockRestore()
+    }
+  })
+
   test('does not try a fallback package manager after cancellation', async () => {
     const installWithClient = vi
       .spyOn(InstallationUtils, 'installWithClient')
