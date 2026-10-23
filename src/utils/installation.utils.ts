@@ -55,13 +55,17 @@ const installFlags = {
   yarn: flags(
     '--ignore-flags --ignore-engines --skip-integrity-check --exact --json --no-progress --silent --no-lockfile --no-bin-links --ignore-optional',
   ),
-  npm: flags(
-    `--cache=${cachePath} --no-package-lock --no-shrinkwrap --legacy-peer-deps --no-optional --no-bin-links --progress=false --loglevel=error --ignore-scripts --save-exact --production --json`,
-  ),
+  npm: [
+    `--cache=${cachePath}`,
+    ...flags(
+      '--no-package-lock --no-shrinkwrap --legacy-peer-deps --no-optional --no-bin-links --progress=false --loglevel=error --ignore-scripts --save-exact --production --json',
+    ),
+  ],
   pnpm: flags('--no-optional --loglevel=error --ignore-scripts --save-exact'),
-  bun: flags(
-    `--cache-dir=${path.join(cachePath, 'bun')} --no-save --production --ignore-scripts --no-progress --silent`,
-  ),
+  bun: [
+    `--cache-dir=${path.join(cachePath, 'bun')}`,
+    ...flags('--no-save --production --ignore-scripts --no-progress --silent'),
+  ],
 } satisfies Record<PackageManager, string[]>
 
 function getInstallArgs(
