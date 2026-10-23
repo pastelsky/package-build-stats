@@ -51,6 +51,8 @@ jobs:
 
       - name: Run slow integration tests
         run: corepack yarn test:slow
+        env:
+          BUILD_TMP_DIR: '${{ runner.temp }}/package-build-stats scratch'
 
       - name: Run tests with coverage (Node 24 only)
         if: matrix.node-version == '24.x'

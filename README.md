@@ -99,3 +99,12 @@ For a list of all events, see [this](src/utils/telemetry.utils.ts).
 ## Contributing
 
 See [contributing guide.](CONTRIBUTING.md)
+
+## Temporary files
+
+`BUILD_TMP_DIR` sets the scratch root at process startup (default `/tmp/tmp-build`).
+Temporary installations and isolated analysis output live under `packages`;
+npm and Bun caches live under `cache`. Shared installations supplied by an
+installation provider remain read-only to analysis. Each analysis has its own
+workspace, removed on completion unless debugging retains it. Host cleanup must
+cover abandoned workspaces when a worker terminates before cleanup can run.

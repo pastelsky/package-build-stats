@@ -55,13 +55,17 @@ const installFlags = {
   yarn: flags(
     '--ignore-flags --ignore-engines --skip-integrity-check --exact --json --no-progress --silent --no-lockfile --no-bin-links --ignore-optional',
   ),
-  npm: flags(
-    `--cache=${cachePath} --no-package-lock --no-shrinkwrap --legacy-peer-deps --no-optional --no-bin-links --progress=false --loglevel=error --ignore-scripts --save-exact --production --json`,
-  ),
+  npm: [
+    `--cache=${cachePath}`,
+    ...flags(
+      '--no-package-lock --no-shrinkwrap --legacy-peer-deps --no-optional --no-bin-links --progress=false --loglevel=error --ignore-scripts --save-exact --production --json',
+    ),
+  ],
   pnpm: flags('--no-optional --loglevel=error --ignore-scripts --save-exact'),
-  bun: flags(
-    `--cache-dir=${path.join(cachePath, 'bun')} --no-save --production --ignore-scripts --no-progress --silent`,
-  ),
+  bun: [
+    `--cache-dir=${path.join(cachePath, 'bun')}`,
+    ...flags('--no-save --production --ignore-scripts --no-progress --silent'),
+  ],
 } satisfies Record<PackageManager, string[]>
 
 function getInstallArgs(
@@ -131,11 +135,11 @@ function isUnsupportedPackage(err: ProcessExecutionError): boolean {
 }
 
 const InstallationUtils = {
-  getInstallPath(packageName: string, directory = 'packages') {
+  getInstallPath(packageName: string) {
     const id = randomUUID().slice(0, 8)
     return path.join(
       config.tmp,
-      directory,
+      'packages',
       sanitize(`build-${packageName}-${id}`),
     )
   },
@@ -144,11 +148,10 @@ const InstallationUtils = {
     packageName: string,
     clientOption?: PackageManager | PackageManager[],
     signal?: AbortSignal,
-    directory = 'packages',
   ) {
     throwIfAborted(signal)
     const startTime = performance.now()
-    const installPath = InstallationUtils.getInstallPath(packageName, directory)
+    const installPath = InstallationUtils.getInstallPath(packageName)
 
     if (process.env.DEBUG_TIMING) {
       console.log(
@@ -207,12 +210,9 @@ const InstallationUtils = {
   },
 
   async prepareBuildPath(packageName: string, signal?: AbortSignal) {
-    return InstallationUtils.preparePath(
-      packageName,
-      undefined,
-      signal,
-      'artifacts',
-    )
+    // Keep isolated build output in the same tree as other temporary workspaces
+    // so host recovery can reclaim it if the worker exits before finally runs.
+    return InstallationUtils.preparePath(packageName, undefined, signal)
   },
 
   async installPackage(
