@@ -9,6 +9,7 @@ import {
 } from '../../src/index.js'
 import { disposePackage, installPackage } from '../../src/installation.js'
 import InstallationUtils from '../../src/utils/installation.utils.js'
+import config from '../../src/config/config.js'
 import type { PackageInstallation } from '../../src/common.types.js'
 
 const fixturePath = path.resolve(__dirname, '../fixtures/exports/multi-exports')
@@ -62,6 +63,16 @@ describe('package installation', () => {
           buildPath.mock.results.map(result => result.value),
         )
         expect(new Set(artifactPaths).size).toBe(3)
+        await Promise.all(
+          artifactPaths.map(async artifactPath => {
+            expect(path.dirname(artifactPath)).toBe(
+              path.join(config.tmp, 'packages'),
+            )
+            await expect(fs.access(artifactPath)).rejects.toMatchObject({
+              code: 'ENOENT',
+            })
+          }),
+        )
         const installation = await installationPromise!
         expect(artifactPaths).not.toContain(installation.installPath)
         await expect(

@@ -131,11 +131,11 @@ function isUnsupportedPackage(err: ProcessExecutionError): boolean {
 }
 
 const InstallationUtils = {
-  getInstallPath(packageName: string, directory = 'packages') {
+  getInstallPath(packageName: string) {
     const id = randomUUID().slice(0, 8)
     return path.join(
       config.tmp,
-      directory,
+      'packages',
       sanitize(`build-${packageName}-${id}`),
     )
   },
@@ -144,11 +144,10 @@ const InstallationUtils = {
     packageName: string,
     clientOption?: PackageManager | PackageManager[],
     signal?: AbortSignal,
-    directory = 'packages',
   ) {
     throwIfAborted(signal)
     const startTime = performance.now()
-    const installPath = InstallationUtils.getInstallPath(packageName, directory)
+    const installPath = InstallationUtils.getInstallPath(packageName)
 
     if (process.env.DEBUG_TIMING) {
       console.log(
@@ -207,12 +206,9 @@ const InstallationUtils = {
   },
 
   async prepareBuildPath(packageName: string, signal?: AbortSignal) {
-    return InstallationUtils.preparePath(
-      packageName,
-      undefined,
-      signal,
-      'artifacts',
-    )
+    // Keep isolated build output in the same tree as other temporary workspaces
+    // so host recovery can reclaim it if the worker exits before finally runs.
+    return InstallationUtils.preparePath(packageName, undefined, signal)
   },
 
   async installPackage(
