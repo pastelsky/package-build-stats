@@ -107,8 +107,7 @@ export default async function getPackageStats(
       )
     }
 
-    const totalTime = performance.now() - startTime
-    Telemetry.packageStats(packageString, true, totalTime, options)
+    Telemetry.packageStats(packageString, true, startTime, options)
 
     return {
       ...pacakgeJSONDetails,
@@ -117,13 +116,7 @@ export default async function getPackageStats(
       gzip: mainAsset.gzip,
     }
   } catch (e) {
-    Telemetry.packageStats(
-      packageString,
-      false,
-      performance.now() - startTime,
-      options,
-      e,
-    )
+    Telemetry.packageStats(packageString, false, startTime, options, e)
     throw e
   } finally {
     await preparedPackage?.cleanup(options.debug)
