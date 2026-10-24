@@ -1,5 +1,12 @@
 # package-build-stats
 
+## 9.5.2
+
+### Patch Changes
+
+- 7ae6688: Stop package-manager fallback on ENOSPC or no-space-left errors. Trying another installer cannot recover exhausted disk space or inodes.
+- affbab2: Omit optional dependencies when installing packages with Bun, matching the existing npm, Yarn and pnpm installation policy.
+
 ## 9.5.1
 
 ### Patch Changes
