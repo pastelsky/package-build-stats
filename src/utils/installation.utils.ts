@@ -1,4 +1,6 @@
 import { rimraf } from 'rimraf'
+import { execFile } from 'node:child_process'
+import { promisify } from 'node:util'
 import { randomUUID } from 'node:crypto'
 import fs from 'node:fs/promises'
 import path from 'node:path'
@@ -37,6 +39,29 @@ function isOutOfSpace(error: unknown): boolean {
 }
 
 const cachePath = path.join(config.tmp, 'cache')
+
+const executeFile = promisify(execFile)
+
+async function removeWorkspace(installPath: string) {
+  if (
+    path.resolve(installPath) === path.parse(path.resolve(installPath)).root
+  ) {
+    throw new Error('Refusing to remove a filesystem root')
+  }
+
+  if (process.platform === 'linux') {
+    try {
+      // Lower only deletion's I/O priority; builds and installs keep theirs.
+      await executeFile('ionice', ['-c', '3', 'rm', '-rf', '--', installPath])
+      return
+    } catch (error) {
+      // Keep cleanup portable on hosts without util-linux's ionice command.
+      if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error
+    }
+  }
+
+  await rimraf(installPath)
+}
 
 async function packLocalPackage(
   packagePath: string,
@@ -374,7 +399,7 @@ const InstallationUtils = {
 
   async cleanupPath(installPath: string) {
     try {
-      await rimraf(installPath)
+      await removeWorkspace(installPath)
     } catch (err) {
       console.error('cleaning up path ', installPath, ' failed due to ', err)
     }
