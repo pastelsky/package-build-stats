@@ -1,5 +1,11 @@
 # package-build-stats
 
+## 9.5.3
+
+### Patch Changes
+
+- e20bfa5: Run Linux workspace deletion at idle I/O priority when ionice is available, keeping active builds and installs at their normal priority. Preserve portable cleanup on other hosts.
+
 ## 9.5.2
 
 ### Patch Changes
