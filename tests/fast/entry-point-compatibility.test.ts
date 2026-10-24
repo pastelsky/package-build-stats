@@ -2,7 +2,9 @@ import { cp, mkdir, mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { afterAll, beforeAll, expect, test } from 'vitest'
+import { afterAll, beforeAll, expect, test, vi } from 'vitest'
+import { performance } from 'node:perf_hooks'
+import Telemetry from '../../src/utils/telemetry.utils.js'
 import {
   getPackageEntryPoints,
   getAllPackageExports,
@@ -90,6 +92,40 @@ test.each(cases)(
       expect(stats.assets).toEqual(
         expect.arrayContaining([expect.objectContaining({ type: 'css' })]),
       )
+    }
+  },
+)
+
+// The helper accepts a start timestamp, not an already elapsed duration.
+test.each([false, true])(
+  'stats telemetry uses its start timestamp (failure=%s)',
+  async fail => {
+    const telemetry = vi.spyOn(Telemetry, 'packageStats')
+    const started = performance.now()
+    try {
+      const result = getPackageStats('entrypoint-array-root@1.0.0', {
+        installationProvider: async () => {
+          if (fail) throw new Error('installation failed')
+          return {
+            packageName: 'entrypoint-array-root',
+            packageString: 'entrypoint-array-root@1.0.0',
+            installPath,
+            packagePath: path.join(
+              installPath,
+              'node_modules/entrypoint-array-root',
+            ),
+            async release() {},
+          }
+        },
+      })
+      if (fail) await expect(result).rejects.toThrow('installation failed')
+      else await result
+      const call = telemetry.mock.calls[0]
+      expect(call[1]).toBe(!fail)
+      expect(call[2]).toBeGreaterThanOrEqual(started)
+      expect(call[2]).toBeLessThanOrEqual(performance.now())
+    } finally {
+      telemetry.mockRestore()
     }
   },
 )
