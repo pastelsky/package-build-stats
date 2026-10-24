@@ -51,11 +51,21 @@ async function removeWorkspace(installPath: string) {
 
   if (process.platform === 'linux') {
     try {
-      // Lower only deletion's I/O priority; builds and installs keep theirs.
-      await executeFile('ionice', ['-c', '3', 'rm', '-rf', '--', installPath])
+      // Lower only deletion's CPU and I/O priority; builds and installs keep theirs.
+      await executeFile('chrt', [
+        '--idle',
+        '0',
+        'ionice',
+        '-c',
+        '3',
+        'rm',
+        '-rf',
+        '--',
+        installPath,
+      ])
       return
     } catch (error) {
-      // Keep cleanup portable on hosts without util-linux's ionice command.
+      // Keep cleanup portable on hosts without util-linux's scheduling commands.
       if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error
     }
   }
