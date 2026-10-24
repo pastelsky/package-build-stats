@@ -81,7 +81,9 @@ const installFlags = {
   pnpm: flags('--no-optional --loglevel=error --ignore-scripts --save-exact'),
   bun: [
     `--cache-dir=${path.join(cachePath, 'bun')}`,
-    ...flags('--no-save --production --ignore-scripts --no-progress --silent'),
+    ...flags(
+      '--no-save --production --omit=optional --ignore-scripts --no-progress --silent',
+    ),
   ],
 } satisfies Record<PackageManager, string[]>
 

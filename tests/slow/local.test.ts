@@ -49,7 +49,7 @@ describe('InstallationUtils (integration)', () => {
    * Regression: local package paths containing shell metacharacters (e.g. `;`)
    * must never be passed through a shell – they are forwarded as argv arguments.
    */
-  test('installs a local package whose path contains shell metacharacters', async () => {
+  test.each(['npm', 'bun'] as const)('%s omits optionals', async client => {
     const temporaryDirectory = await fs.mkdtemp(
       path.join(os.tmpdir(), 'package-build-stats-install-'),
     )
@@ -64,6 +64,8 @@ describe('InstallationUtils (integration)', () => {
           name: 'local-fixture',
           version: '1.0.0',
           main: 'index.js',
+          dependencies: { 'is-number': '7.0.0' },
+          optionalDependencies: { 'is-odd': '3.0.1' },
         }),
       )
       await fs.writeFile(
@@ -74,8 +76,8 @@ describe('InstallationUtils (integration)', () => {
       await InstallationUtils.installWithClient(
         packagePath,
         installPath,
-        { client: 'npm', isLocal: true, installTimeout: 30_000 },
-        'npm',
+        { client, isLocal: true, installTimeout: 30_000 },
+        client,
       )
 
       const installedPackage = JSON.parse(
@@ -90,6 +92,12 @@ describe('InstallationUtils (integration)', () => {
         ),
       )
       expect(installedPackage.name).toBe('local-fixture')
+      await expect(
+        fs.access(path.join(installPath, 'node_modules', 'is-number')),
+      ).resolves.toBeUndefined()
+      await expect(
+        fs.access(path.join(installPath, 'node_modules', 'is-odd')),
+      ).rejects.toMatchObject({ code: 'ENOENT' })
     } finally {
       await InstallationUtils.cleanupPath(installPath)
       await fs.rm(temporaryDirectory, { recursive: true, force: true })
