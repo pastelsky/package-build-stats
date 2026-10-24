@@ -1,5 +1,11 @@
 # package-build-stats
 
+## 9.5.5
+
+### Patch Changes
+
+- 4623397: Run Linux workspace deletion with idle CPU scheduling as well as idle I/O priority, so cleanup yields to builds and installs.
+
 ## 9.5.4
 
 ### Patch Changes
