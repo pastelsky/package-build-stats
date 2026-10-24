@@ -1,5 +1,11 @@
 # package-build-stats
 
+## 9.5.4
+
+### Patch Changes
+
+- 528202f: Report actual package analysis duration instead of process uptime on success and failure.
+
 ## 9.5.3
 
 ### Patch Changes
