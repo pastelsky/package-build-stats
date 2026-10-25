@@ -15,7 +15,12 @@ import {
   PackageNotFoundError,
   UnsupportedPackageError,
 } from '../errors/CustomError.js'
-import { exec, ProcessExecutionError, throwIfAborted } from './common.utils.js'
+import {
+  exec,
+  ProcessExecutionError,
+  throwIfAborted,
+  parsePackageString,
+} from './common.utils.js'
 import config from '../config/config.js'
 import { packageManagers } from '../common.types.js'
 import type { InstallPackageOptions, PackageManager } from '../common.types.js'
@@ -156,6 +161,7 @@ function isPackageNotFound(err: ProcessExecutionError): boolean {
   return (
     output.includes('code E404') ||
     output.includes('code ETARGET') ||
+    output.includes('code ENOVERSIONS') ||
     output.includes("Couldn't find package") ||
     output.includes('YN0035') ||
     output.includes('ERR_PNPM_NO_MATCHING_VERSION') ||
@@ -167,7 +173,7 @@ function isPackageNotFound(err: ProcessExecutionError): boolean {
 }
 
 // Returns true when the error indicates a platform architecture mismatch (os/cpu)
-// or an unresolvable private git repository authentication error.
+// an unresolvable private git repository, or an unsupported dependency protocol.
 function isUnsupportedPackage(err: ProcessExecutionError): boolean {
   const output = `${err.stderr}\n${err.stdout}`
 
@@ -185,7 +191,9 @@ function isUnsupportedPackage(err: ProcessExecutionError): boolean {
       (output.includes('ls-remote ssh://') ||
         output.includes('git@github.com')))
 
-  return isPlatformMismatch || isGitAuthError
+  const isUnsupportedProtocol = /Unsupported URL Type ["']/i.test(output)
+
+  return isPlatformMismatch || isGitAuthError || isUnsupportedProtocol
 }
 
 const InstallationUtils = {
@@ -370,6 +378,12 @@ const InstallationUtils = {
           signal,
         },
         installTimeout,
+      )
+      // Bun can exit successfully after skipping an incompatible OS/CPU package.
+      // Validate the requested package before accepting this client's result.
+      const { name } = parsePackageString(packageString)
+      await fs.access(
+        path.join(installPath, 'node_modules', name, 'package.json'),
       )
       const execDuration = performance.now() - execStartTime
 

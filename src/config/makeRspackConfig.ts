@@ -100,7 +100,8 @@ export default function makeRspackConfig({
     module: {
       rules: [
         {
-          test: /\.(jsx|[cm]?ts|tsx)$/,
+          test: /\.(jsx?|[cm]?ts|tsx)$/,
+          exclude: /\.svelte(?:\.[^./\\]+)*\.[jt]s$/,
           loader: 'builtin:swc-loader',
           options: {
             detectSyntax: 'auto',
@@ -121,7 +122,7 @@ export default function makeRspackConfig({
           ],
         },
         {
-          test: /\.(html|svelte)$/,
+          test: /\.(html|svelte)$|\.svelte(?:\.[^./\\]+)*\.[jt]s$/,
           use: {
             loader: require.resolve('svelte-loader'),
             options: {
