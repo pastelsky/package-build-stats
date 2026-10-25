@@ -89,7 +89,7 @@ test.each(cases)(
       expect(Object.keys(exports).sort()).toEqual([...scenario.exports].sort())
       if (scenario.fixture === 'private-imports')
         expect(exports.environment).toMatch(/browser\.js$/)
-    } else if (scenario.fixture === 'css-style') {
+    } else {
       expect(stats.assets).toEqual(
         expect.arrayContaining([expect.objectContaining({ type: 'css' })]),
       )
