@@ -59,7 +59,9 @@ describe('InstallationUtils', () => {
       )
       .mockResolvedValueOnce(undefined)
     try {
-      await InstallationUtils.installPackage('example', '/tmp/unused', {})
+      await expect(
+        InstallationUtils.installPackage('example', '/tmp/unused', {}),
+      ).resolves.toBe('npm')
       expect(install.mock.calls.map(call => call[3])).toEqual(['bun', 'npm'])
     } finally {
       install.mockRestore()
@@ -89,6 +91,56 @@ describe('InstallationUtils', () => {
       installWithClient.mockRestore()
     }
   })
+})
+
+test.each([false, true])(
+  'Bun lockfile recording is opt-in: %s',
+  async saveLockfile => {
+    vi.mocked(exec).mockResolvedValue('')
+    await InstallationUtils.installWithClient(
+      'example@1.0.0',
+      '/tmp/unused',
+      { saveLockfile },
+      'bun',
+    )
+    const args = vi.mocked(exec).mock.calls.at(-1)![1]
+    expect(args).toContain(saveLockfile ? '--save-text-lockfile' : '--no-save')
+    expect(args).not.toContain(
+      saveLockfile ? '--no-save' : '--save-text-lockfile',
+    )
+    expect(args).toContain(saveLockfile ? '--omit=dev' : '--production')
+    expect(args).not.toContain(saveLockfile ? '--production' : '--omit=dev')
+  },
+)
+
+test('hosts can wrap the package-manager command without changing timeout or cancellation', async () => {
+  vi.mocked(exec).mockResolvedValue('')
+  const signal = new AbortController().signal
+  await InstallationUtils.installWithClient(
+    'example@1.0.0',
+    '/tmp/unused',
+    {
+      signal,
+      installTimeout: 1234,
+      packageManagerCommand: (client, args) => ({
+        command: 'flock',
+        args: ['--shared', '/tmp/lock', client, ...args],
+      }),
+    },
+    'bun',
+  )
+  expect(exec).toHaveBeenLastCalledWith(
+    'flock',
+    expect.arrayContaining([
+      '--shared',
+      '/tmp/lock',
+      'bun',
+      'add',
+      'example@1.0.0',
+    ]),
+    expect.objectContaining({ signal, cwd: '/tmp/unused' }),
+    1234,
+  )
 })
 
 // vi.mock is hoisted by Vitest, so exec is replaced for the whole file.

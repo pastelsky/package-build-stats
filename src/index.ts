@@ -1,6 +1,8 @@
 export { default as getPackageStats } from './getPackageStats.js'
 export { getPackageEntryPoints } from './getPackageEntryPoints.js'
 export type {
+  CleanupFunction,
+  PackageManagerCommand,
   InstallationLease,
   InstallationProvider,
   GetPackageStatsOptions,

@@ -34,27 +34,35 @@ export async function installPackage(
   )
 
   try {
-    await InstallationUtils.installPackage(packageString, installPath, {
-      ...options,
-      installationProvider: undefined,
-      isLocal,
-    })
+    const client = await InstallationUtils.installPackage(
+      packageString,
+      installPath,
+      {
+        ...options,
+        installationProvider: undefined,
+        isLocal,
+      },
+    )
     return {
       packageString,
       packageName,
+      client,
       installPath,
       packagePath:
         normalPath || path.join(installPath, 'node_modules', packageName),
     }
   } catch (error) {
-    await InstallationUtils.cleanupPath(installPath)
+    await InstallationUtils.cleanupPath(installPath, options.cleanup)
     throw error
   }
 }
 
 /** Removes a locally owned installation. */
-export async function disposePackage(installation: PackageInstallation) {
-  await InstallationUtils.cleanupPath(installation.installPath)
+export async function disposePackage(
+  installation: Pick<PackageInstallation, 'installPath'>,
+  options: Pick<InstallPackageOptions, 'cleanup'> = {},
+) {
+  await InstallationUtils.cleanupPath(installation.installPath, options.cleanup)
 }
 
 /** Prepares an installation and an isolated directory for generated artifacts. */
@@ -74,7 +82,7 @@ export async function preparePackage(
       ...installation,
       buildPath: installation.installPath,
       async cleanup(retainLocalFiles = false) {
-        if (!retainLocalFiles) await disposePackage(installation)
+        if (!retainLocalFiles) await disposePackage(installation, options)
       },
     }
   }
@@ -96,7 +104,7 @@ export async function preparePackage(
       async cleanup(retainLocalFiles = false) {
         try {
           if (needsBuildPath && !retainLocalFiles) {
-            await InstallationUtils.cleanupPath(buildPath)
+            await InstallationUtils.cleanupPath(buildPath, options.cleanup)
           }
         } finally {
           await installation.release()
