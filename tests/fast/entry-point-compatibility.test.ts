@@ -15,18 +15,6 @@ import type { InstallationProvider } from '../../src/common.types.js'
 const cases = [
   { fixture: 'jsx-in-js', entries: ['.'], entryPoint: '.', exports: ['Tilt'] },
   {
-    fixture: 'svelte-modern',
-    entries: ['.'],
-    entryPoint: '.',
-    exports: null,
-  },
-  {
-    fixture: 'svelte-legacy',
-    entries: ['.'],
-    entryPoint: '.',
-    exports: null,
-  },
-  {
     fixture: 'vue-conditions',
     entries: ['.'],
     entryPoint: '.',

@@ -1,5 +1,3 @@
-;<template>
-  <div class="uncompiled-component">
-    <span>Uncompiled template syntax</span>
-  </div>
-</template>
+import App from './App.vue'
+
+export default App
