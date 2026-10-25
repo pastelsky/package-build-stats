@@ -252,7 +252,7 @@ describe('Export Size Analysis Edge Cases', () => {
   test('should only compile the first 1000 exports and return placeholders with size 0/gzip 0 for the rest', async () => {
     const installSpy = vi
       .spyOn(InstallationUtils, 'installPackage')
-      .mockImplementation(async () => {})
+      .mockImplementation(async () => 'npm' as const)
     const getAllExportsSpy = vi
       .spyOn(exportsUtils, 'getAllExports')
       .mockImplementation(async () => {
@@ -323,7 +323,7 @@ describe('Export Size Analysis Edge Cases', () => {
   test('should chunk export compilation serially in batches of 100 internally without breaking response format', async () => {
     const installSpy = vi
       .spyOn(InstallationUtils, 'installPackage')
-      .mockImplementation(async () => {})
+      .mockImplementation(async () => 'npm' as const)
     const getAllExportsSpy = vi
       .spyOn(exportsUtils, 'getAllExports')
       .mockImplementation(async () => {

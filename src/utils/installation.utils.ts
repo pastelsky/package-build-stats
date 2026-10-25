@@ -1,6 +1,4 @@
 import { rimraf } from 'rimraf'
-import { execFile } from 'node:child_process'
-import { promisify } from 'node:util'
 import { randomUUID } from 'node:crypto'
 import fs from 'node:fs/promises'
 import path from 'node:path'
@@ -18,7 +16,11 @@ import {
 import { exec, ProcessExecutionError, throwIfAborted } from './common.utils.js'
 import config from '../config/config.js'
 import { packageManagers } from '../common.types.js'
-import type { InstallPackageOptions, PackageManager } from '../common.types.js'
+import type {
+  CleanupPath,
+  InstallPackageOptions,
+  PackageManager,
+} from '../common.types.js'
 import Telemetry from './telemetry.utils.js'
 
 // A different package manager cannot recover exhausted disk blocks or inodes.
@@ -39,39 +41,6 @@ function isOutOfSpace(error: unknown): boolean {
 }
 
 const cachePath = path.join(config.tmp, 'cache')
-
-const executeFile = promisify(execFile)
-
-async function removeWorkspace(installPath: string) {
-  if (
-    path.resolve(installPath) === path.parse(path.resolve(installPath)).root
-  ) {
-    throw new Error('Refusing to remove a filesystem root')
-  }
-
-  if (process.platform === 'linux') {
-    try {
-      // Lower only deletion's CPU and I/O priority; builds and installs keep theirs.
-      await executeFile('chrt', [
-        '--idle',
-        '0',
-        'ionice',
-        '-c',
-        '3',
-        'rm',
-        '-rf',
-        '--',
-        installPath,
-      ])
-      return
-    } catch (error) {
-      // Keep cleanup portable on hosts without util-linux's scheduling commands.
-      if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error
-    }
-  }
-
-  await rimraf(installPath)
-}
 
 async function packLocalPackage(
   packagePath: string,
@@ -116,9 +85,7 @@ const installFlags = {
   pnpm: flags('--no-optional --loglevel=error --ignore-scripts --save-exact'),
   bun: [
     `--cache-dir=${path.join(cachePath, 'bun')}`,
-    ...flags(
-      '--no-save --production --omit=optional --ignore-scripts --no-progress --silent',
-    ),
+    ...flags('--omit=optional --ignore-scripts --no-progress --silent'),
   ],
 } satisfies Record<PackageManager, string[]>
 
@@ -134,6 +101,16 @@ function getInstallArgs(
     ...additionalPackages,
     ...installFlags[client],
   ]
+
+  if (client === 'bun') {
+    // --production suppresses lockfile writes; --omit=dev keeps the same
+    // dependency selection while allowing the host to request a lockfile.
+    args.push(
+      ...(options.saveLockfile
+        ? ['--save-text-lockfile', '--omit=dev']
+        : ['--no-save', '--production']),
+    )
+  }
 
   if (client === 'yarn' && options.limitConcurrency) {
     args.push('--mutex', 'network')
@@ -309,7 +286,7 @@ const InstallationUtils = {
         if (installOptions.debug || process.env.DEBUG_TIMING) {
           console.log(`[INSTALL] Successfully installed with ${currentClient}`)
         }
-        return
+        return currentClient
       } catch (error) {
         if (error instanceof BuildCancelledError || isOutOfSpace(error)) {
           throw error
@@ -407,9 +384,14 @@ const InstallationUtils = {
     }
   },
 
-  async cleanupPath(installPath: string) {
+  async cleanupPath(installPath: string, cleanup?: CleanupPath) {
     try {
-      await removeWorkspace(installPath)
+      const resolved = path.resolve(installPath)
+      if (resolved === path.parse(resolved).root) {
+        throw new Error('Refusing to remove a filesystem root')
+      }
+      if (cleanup) await cleanup(installPath)
+      else await rimraf(installPath)
     } catch (err) {
       console.error('cleaning up path ', installPath, ' failed due to ', err)
     }
