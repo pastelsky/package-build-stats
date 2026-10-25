@@ -2,6 +2,10 @@ export const packageManagers = ['npm', 'yarn', 'pnpm', 'bun'] as const
 export type PackageManager = (typeof packageManagers)[number]
 
 export type CleanupPath = (directory: string) => Promise<void>
+export type PackageManagerCommand = (
+  client: PackageManager,
+  args: readonly string[],
+) => { command: string; args: string[] }
 
 export type PackageInstallation = {
   packageString: string
@@ -42,6 +46,8 @@ type AllOptions = {
   cleanupPath?: CleanupPath
   /** Keep Bun's text lockfile for host-side dependency accounting. */
   saveLockfile?: boolean
+  /** Optional host wrapper for package-manager execution, e.g. an OS lock. */
+  packageManagerCommand?: PackageManagerCommand
 }
 
 export type BuildPackageOptions = Pick<
@@ -73,6 +79,7 @@ export type InstallPackageOptions = Pick<
   | 'installationProvider'
   | 'cleanupPath'
   | 'saveLockfile'
+  | 'packageManagerCommand'
 >
 
 export type GetPackageStatsOptions = Pick<
@@ -88,6 +95,7 @@ export type GetPackageStatsOptions = Pick<
   | 'installationProvider'
   | 'cleanupPath'
   | 'saveLockfile'
+  | 'packageManagerCommand'
   | 'entryPoint'
 >
 

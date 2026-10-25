@@ -113,6 +113,36 @@ test.each([false, true])(
   },
 )
 
+test('hosts can wrap the package-manager command without changing timeout or cancellation', async () => {
+  vi.mocked(exec).mockResolvedValue('')
+  const signal = new AbortController().signal
+  await InstallationUtils.installWithClient(
+    'example@1.0.0',
+    '/tmp/unused',
+    {
+      signal,
+      installTimeout: 1234,
+      packageManagerCommand: (client, args) => ({
+        command: 'flock',
+        args: ['--shared', '/tmp/lock', client, ...args],
+      }),
+    },
+    'bun',
+  )
+  expect(exec).toHaveBeenLastCalledWith(
+    'flock',
+    expect.arrayContaining([
+      '--shared',
+      '/tmp/lock',
+      'bun',
+      'add',
+      'example@1.0.0',
+    ]),
+    expect.objectContaining({ signal, cwd: '/tmp/unused' }),
+    1234,
+  )
+})
+
 // vi.mock is hoisted by Vitest, so exec is replaced for the whole file.
 vi.mock('../../src/utils/common.utils.js', async importOriginal => {
   const actual =

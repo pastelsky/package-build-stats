@@ -338,9 +338,18 @@ const InstallationUtils = {
         : packageString
 
       const execStartTime = performance.now()
-      await exec(
+      const args = getInstallArgs(
         currentClient,
-        getInstallArgs(currentClient, packageToInstall, installOptions),
+        packageToInstall,
+        installOptions,
+      )
+      const command = installOptions.packageManagerCommand?.(
+        currentClient,
+        args,
+      ) ?? { command: currentClient, args }
+      await exec(
+        command.command,
+        command.args,
         {
           cwd: installPath,
           maxBuffer: 1024 * 500,
