@@ -52,7 +52,7 @@ export async function installPackage(
         normalPath || path.join(installPath, 'node_modules', packageName),
     }
   } catch (error) {
-    await InstallationUtils.cleanupPath(installPath, options.cleanupPath)
+    await InstallationUtils.cleanupPath(installPath, options.cleanup)
     throw error
   }
 }
@@ -60,12 +60,9 @@ export async function installPackage(
 /** Removes a locally owned installation. */
 export async function disposePackage(
   installation: Pick<PackageInstallation, 'installPath'>,
-  options: Pick<InstallPackageOptions, 'cleanupPath'> = {},
+  options: Pick<InstallPackageOptions, 'cleanup'> = {},
 ) {
-  await InstallationUtils.cleanupPath(
-    installation.installPath,
-    options.cleanupPath,
-  )
+  await InstallationUtils.cleanupPath(installation.installPath, options.cleanup)
 }
 
 /** Prepares an installation and an isolated directory for generated artifacts. */
@@ -107,7 +104,7 @@ export async function preparePackage(
       async cleanup(retainLocalFiles = false) {
         try {
           if (needsBuildPath && !retainLocalFiles) {
-            await InstallationUtils.cleanupPath(buildPath, options.cleanupPath)
+            await InstallationUtils.cleanupPath(buildPath, options.cleanup)
           }
         } finally {
           await installation.release()

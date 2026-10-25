@@ -1,7 +1,8 @@
 export const packageManagers = ['npm', 'yarn', 'pnpm', 'bun'] as const
 export type PackageManager = (typeof packageManagers)[number]
 
-export type CleanupPath = (directory: string) => Promise<void>
+/** Host-supplied removal of one SDK-owned workspace, not shared-cache eviction. */
+export type CleanupFunction = (directory: string) => Promise<void>
 export type PackageManagerCommand = (
   client: PackageManager,
   args: readonly string[],
@@ -43,7 +44,7 @@ type AllOptions = {
   signal?: AbortSignal
   installationProvider?: InstallationProvider
   /** Removes SDK-owned workspaces; defaults to portable recursive deletion. */
-  cleanupPath?: CleanupPath
+  cleanup?: CleanupFunction
   /** Keep Bun's text lockfile for host-side dependency accounting. */
   saveLockfile?: boolean
   /** Optional host wrapper for package-manager execution, e.g. an OS lock. */
@@ -77,7 +78,7 @@ export type InstallPackageOptions = Pick<
   | 'debug'
   | 'signal'
   | 'installationProvider'
-  | 'cleanupPath'
+  | 'cleanup'
   | 'saveLockfile'
   | 'packageManagerCommand'
 >
@@ -93,7 +94,7 @@ export type GetPackageStatsOptions = Pick<
   | 'minify'
   | 'signal'
   | 'installationProvider'
-  | 'cleanupPath'
+  | 'cleanup'
   | 'saveLockfile'
   | 'packageManagerCommand'
   | 'entryPoint'

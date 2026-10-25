@@ -1,6 +1,6 @@
 export { disposePackage, installPackage } from './packageInstallation.js'
 export type {
-  CleanupPath,
+  CleanupFunction,
   PackageManagerCommand,
   InstallPackageOptions,
   PackageInstallation,

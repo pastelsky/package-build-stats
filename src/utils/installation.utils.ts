@@ -17,7 +17,7 @@ import { exec, ProcessExecutionError, throwIfAborted } from './common.utils.js'
 import config from '../config/config.js'
 import { packageManagers } from '../common.types.js'
 import type {
-  CleanupPath,
+  CleanupFunction,
   InstallPackageOptions,
   PackageManager,
 } from '../common.types.js'
@@ -393,7 +393,7 @@ const InstallationUtils = {
     }
   },
 
-  async cleanupPath(installPath: string, cleanup?: CleanupPath) {
+  async cleanupPath(installPath: string, cleanup?: CleanupFunction) {
     try {
       const resolved = path.resolve(installPath)
       if (resolved === path.parse(resolved).root) {
