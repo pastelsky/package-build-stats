@@ -19,6 +19,21 @@ describe('package installation', () => {
     vi.restoreAllMocks()
   })
 
+  test('records a Bun text lockfile only when requested', async () => {
+    const installation = await installPackage(
+      path.resolve(__dirname, '../fixtures/basic/simple-cjs'),
+      { client: 'bun', saveLockfile: true },
+    )
+    try {
+      expect(installation.client).toBe('bun')
+      expect(
+        (await fs.stat(path.join(installation.installPath, 'bun.lock'))).size,
+      ).toBeGreaterThan(0)
+    } finally {
+      await disposePackage(installation)
+    }
+  })
+
   test.each([
     [fixturePath, undefined],
     [path.resolve(__dirname, '../fixtures/entry-points'), './mini'],
