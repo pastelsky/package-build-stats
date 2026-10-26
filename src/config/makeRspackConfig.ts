@@ -113,7 +113,11 @@ export default function makeRspackConfig({
           options: {
             jsc: {
               target: 'esnext',
-              parser: { syntax: 'ecmascript', jsx: true },
+              parser: {
+                syntax: 'ecmascript',
+                jsx: true,
+                allowReturnOutsideFunction: true,
+              },
             },
           },
           type: 'javascript/auto',
