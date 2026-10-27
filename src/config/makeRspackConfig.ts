@@ -25,7 +25,6 @@ type MakeRspackConfigOptions = {
   entry: Entry
   dependencyPath?: string
   outputPath: string
-  jsxPackages?: string[]
 }
 
 export default function makeRspackConfig({
@@ -36,7 +35,6 @@ export default function makeRspackConfig({
   debug: _debug,
   minify = true,
   outputPath,
-  jsxPackages = [],
 }: MakeRspackConfigOptions): Configuration {
   const externalsRegex = makeExternalsRegex(externals.externalPackages)
   const isExternalRequest = (request: string) => {
@@ -101,26 +99,6 @@ export default function makeRspackConfig({
     },
     module: {
       rules: [
-        ...(jsxPackages.length
-          ? [
-              {
-                test: /\.js$/,
-                include: jsxPackages,
-                loader: 'builtin:swc-loader',
-                options: {
-                  jsc: {
-                    target: 'esnext',
-                    parser: {
-                      syntax: 'ecmascript',
-                      jsx: true,
-                      allowReturnOutsideFunction: true,
-                    },
-                  },
-                },
-                type: 'javascript/auto' as const,
-              },
-            ]
-          : []),
         {
           test: /\.(jsx|[cm]?ts|tsx)$/,
           loader: 'builtin:swc-loader',

@@ -28,7 +28,7 @@ describe('BuildUtils.compilePackage', () => {
 
   test('closes the rspack compiler before resolving', async () => {
     const close = vi.fn(callback => callback())
-    const stats = { compilation: { errors: [] }, hasErrors: () => false }
+    const stats = { compilation: { errors: [] } }
 
     mockRspack.mockReturnValue({
       run: (callback: (error: Error | null, stats: typeof stats) => void) =>

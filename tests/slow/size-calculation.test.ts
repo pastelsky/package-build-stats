@@ -150,8 +150,7 @@ describe('Bundle Size Calculation', () => {
     const jsAsset = result.assets.find(a => a.type === 'js')
     const cssAsset = result.assets.find(a => a.type === 'css')
 
-    // Hashed module IDs appear twice; one-digit IDs save up to four bytes.
-    expect(jsAsset?.size).toBeGreaterThanOrEqual(246)
+    expect(jsAsset?.size).toBeGreaterThanOrEqual(250)
     expect(jsAsset?.size).toBeLessThanOrEqual(260)
     expect(jsAsset?.gzip).toBeGreaterThan(0)
 

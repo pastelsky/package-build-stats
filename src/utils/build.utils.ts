@@ -3,7 +3,6 @@ import path from 'node:path'
 import { performance } from 'node:perf_hooks'
 import { gzipSync } from 'node:zlib'
 import { rspack } from '@rspack/core'
-import { parseJsx } from './exports.utils.js'
 import type { Entry, Stats, StatsOptions } from '@rspack/core'
 import isValidNPMName from 'is-valid-npm-name'
 import getDependencySizes from '../getDependencySizeTree.js'
@@ -31,7 +30,6 @@ type CompilePackageArgs = {
   minify?: boolean
   outputPath: string
   signal?: AbortSignal
-  jsxPackages?: string[]
 }
 
 type CompilePackageReturn = {
@@ -105,39 +103,6 @@ function getCompilationErrors(stats: Stats) {
   return [...stats.compilation.errors].filter(notEmpty).flat()
 }
 
-async function getJsxPackages(stats: Stats, signal?: AbortSignal) {
-  const files = new Set(
-    getCompilationErrors(stats)
-      .filter(error => error.name === 'ModuleParseError')
-      .map(error => error.module?.nameForCondition())
-      .filter((file): file is string => Boolean(file?.endsWith('.js'))),
-  )
-  const packages = new Set<string>()
-  for (const file of files) {
-    throwIfAborted(signal)
-    // Only failed modules are read; successful ordinary JavaScript is untouched.
-    // oxlint-disable-next-line no-await-in-loop
-    const source = await fs.promises.readFile(file, 'utf8').catch(() => null)
-    throwIfAborted(signal)
-    if (source === null) continue
-    if (!parseJsx(file, source)) continue
-    const marker = `${path.sep}node_modules${path.sep}`
-    const index = file.lastIndexOf(marker)
-    const segments = file.slice(index + marker.length).split(path.sep)
-    const packageLength = segments[0].startsWith('@') ? 2 : 1
-    const directory =
-      index === -1
-        ? path.dirname(file)
-        : path.join(
-            file.slice(0, index + marker.length),
-            ...segments.slice(0, packageLength),
-          )
-    // Include a separator so similarly-prefixed package names cannot match.
-    packages.add(directory + path.sep)
-  }
-  return [...packages]
-}
-
 function closeCompiler(compiler: Compiler) {
   return new Promise<void>((resolve, reject) => {
     compiler.close(error => {
@@ -202,18 +167,16 @@ const BuildUtils = {
     }
   },
 
-  compilePackage(args: CompilePackageArgs) {
-    const {
-      name,
-      entry,
-      dependencyPath,
-      externals,
-      debug,
-      minify,
-      outputPath,
-      signal,
-      jsxPackages = [],
-    } = args
+  compilePackage({
+    name,
+    entry,
+    dependencyPath,
+    externals,
+    debug,
+    minify,
+    outputPath,
+    signal,
+  }: CompilePackageArgs) {
     throwIfAborted(signal)
     const startTime = performance.now()
 
@@ -225,7 +188,6 @@ const BuildUtils = {
       debug,
       minify,
       outputPath,
-      jsxPackages,
     })
 
     const compiler = rspack(options)
@@ -243,19 +205,6 @@ const BuildUtils = {
           throwIfAborted(signal)
           if (!stats) {
             throw error ?? new Error('stats is null')
-          }
-
-          if (!error && !jsxPackages.length && stats.hasErrors()) {
-            const recoveredPackages = await getJsxPackages(stats, signal)
-            if (recoveredPackages.length) {
-              resolve(
-                await BuildUtils.compilePackage({
-                  ...args,
-                  jsxPackages: recoveredPackages,
-                }),
-              )
-              return
-            }
           }
 
           if (error) {

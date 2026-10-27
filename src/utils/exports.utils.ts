@@ -6,7 +6,6 @@
  */
 
 import { parseSync } from 'oxc-parser'
-import { walk } from 'oxc-walker'
 import type { StaticExport, StaticExportEntry } from 'oxc-parser'
 import fs from 'node:fs/promises'
 import path from 'node:path'
@@ -14,31 +13,6 @@ import { performance } from 'node:perf_hooks'
 import Telemetry from './telemetry.utils.js'
 import { getPackageImportPath, throwIfAborted } from './common.utils.js'
 import { resolvePackageModule } from '../config/packageResolution.js'
-
-/** Confirm valid JSX, not HTML in a comment/string or another unsupported syntax. */
-export function parseJsx(filename: string, source: string) {
-  const result = parseSync(filename, source, {
-    lang: 'jsx',
-    sourceType: 'unambiguous',
-  })
-  if (result.errors.length) return
-  let hasJsx = false
-  walk(result.program, {
-    enter(node) {
-      if (node.type === 'JSXElement' || node.type === 'JSXFragment')
-        hasJsx = true
-    },
-  })
-  return hasJsx ? result : undefined
-}
-
-function parseModule(filename: string, source: string) {
-  const result = parseSync(filename, source, { sourceType: 'module' })
-  if (result.errors.length && filename.endsWith('.js')) {
-    return parseJsx(filename, source) ?? result
-  }
-  return result
-}
 
 /**
  * Represents a named export with its optional source module
@@ -137,7 +111,7 @@ async function walkExports(
     if (cached) return cached
     const code = await fs.readFile(modulePath, 'utf8')
     throwIfAborted(signal)
-    const { module } = parseModule(modulePath, code)
+    const { module } = parseSync(modulePath, code, { sourceType: 'module' })
     const details = getExportsFromStaticExports(module.staticExports)
     const result = {
       named: new Map(details.exports.map(exp => [exp.name, exp])),
@@ -262,7 +236,9 @@ export async function getAllExports(
  * Returns simple string arrays for exports (without moduleRequest info)
  */
 export function getExportsDetails(code: string, filename = 'module.js') {
-  const parseResult = parseModule(filename, code)
+  const parseResult = parseSync(filename, code, {
+    sourceType: 'module',
+  })
 
   const result = getExportsFromStaticExports(parseResult.module.staticExports)
 
