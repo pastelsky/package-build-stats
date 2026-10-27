@@ -177,11 +177,9 @@ describe('aggregating modules', () => {
 
   test('named re-export', () => {
     const exportsA = getExportsDetails(`export * as new from './some-file';`)
-    // Note: oxc-parser treats "export * as name" as a star export with module request
-    // This is the correct ESM behavior - it's a namespace re-export
     expect(exportsA).toStrictEqual({
-      exportAllLocations: ['./some-file'],
-      exports: [],
+      exportAllLocations: [],
+      exports: ['new'],
     })
   })
 })
