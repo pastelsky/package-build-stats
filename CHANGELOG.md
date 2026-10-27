@@ -1,5 +1,11 @@
 # package-build-stats
 
+## 9.5.6
+
+### Patch Changes
+
+- a8d086b: Fix export-size analysis for namespace exports and reserved or non-identifier export names. Exclude defaults from star re-exports, preserve explicit exports, and keep generated build filenames separate from public export names. Scan shared and cyclic export graphs without repeatedly expanding their branches.
+
 ## 9.5.5
 
 ### Patch Changes
