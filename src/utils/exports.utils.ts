@@ -42,12 +42,12 @@ function getExportsFromStaticExports(staticExports: StaticExport[]): {
       // Handle different export types based on importName kind
       switch (entry.importName.kind) {
         case 'AllButDefault': // export * from "mod"
-        case 'All': // export * as ns from "mod"
           if (entry.moduleRequest) {
             exportAllLocations.push(entry.moduleRequest.value)
           }
           break
 
+        case 'All': // export * as ns from "mod"
         case 'Name': // export { foo } or export { foo } from "mod"
         case 'None': // export const foo = 1
           // Get the export name
@@ -130,7 +130,7 @@ async function walkExportsRecursive(
     parseResult.module.staticExports,
   )
 
-  const resolvedExports: ResolvedExports = {}
+  const resolvedExports: ResolvedExports = Object.create(null)
 
   // Add direct exports from this module, resolving re-exports to their source files
   for (const exp of exports) {
@@ -164,22 +164,26 @@ async function walkExportsRecursive(
   }
 
   // Recursively process export * statements
-  const promises = exportAllLocations.map(async location => {
-    const starExports = await walkExportsRecursive(
+  const promises = exportAllLocations.map(location =>
+    walkExportsRecursive(
       path.dirname(resolvedPath),
       location,
-      visited,
+      new Set(visited),
       root, // Pass root context through recursion
       false,
       signal,
-    )
-    // Merge star exports into our exports
-    Object.keys(starExports).forEach(expKey => {
-      resolvedExports[expKey] = starExports[expKey]
-    })
-  })
+    ),
+  )
 
-  await Promise.all(promises)
+  const starExports = await Promise.all(promises)
+  for (const inheritedExports of starExports) {
+    for (const [name, sourcePath] of Object.entries(inheritedExports)) {
+      // Star exports exclude default; explicit exports take precedence.
+      if (name !== 'default' && !Object.hasOwn(resolvedExports, name)) {
+        resolvedExports[name] = sourcePath
+      }
+    }
+  }
   throwIfAborted(signal)
   return resolvedExports
 }
@@ -225,7 +229,7 @@ export async function getAllExports(
       signal,
     )
     Telemetry.walkPackageExportsTree(packageString, startTime, true)
-    return results
+    return { ...results }
   } catch (err) {
     Telemetry.walkPackageExportsTree(packageString, startTime, false, err)
     throw err

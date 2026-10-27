@@ -130,21 +130,29 @@ const BuildUtils = {
       getPackageImportPath(packageName, options.entryPoint),
     )
     let importStatement: string
+    const customImports = options.customImports ?? []
+    const localNames = customImports.map((_, index) => `value${index}`)
 
     if (options.esm) {
       if (options.customImports) {
+        const specifiers = customImports.map(
+          (name, index) => `${JSON.stringify(name)} as ${localNames[index]}`,
+        )
         importStatement = `
-          import { ${options.customImports.join(', ')} } from ${importPath};
-          console.log(${options.customImports.join(', ')})
+          import { ${specifiers.join(', ')} } from ${importPath};
+          console.log(${localNames.join(', ')})
      `
       } else {
         importStatement = `import * as p from ${importPath}; console.log(p)`
       }
     } else {
       if (options.customImports) {
+        const properties = customImports.map(
+          (name, index) => `${JSON.stringify(name)}: ${localNames[index]}`,
+        )
         importStatement = `
-        const { ${options.customImports.join(', ')} } = require(${importPath});
-        console.log(${options.customImports.join(', ')})
+        const { ${properties.join(', ')} } = require(${importPath});
+        console.log(${localNames.join(', ')})
         `
       } else {
         importStatement = `const p = require(${importPath}); console.log(p)`
@@ -263,19 +271,26 @@ const BuildUtils = {
     throwIfAborted(options.signal)
     // Concurrent analyses share dependencies but own separate artifact paths.
     const outputPath = path.join(installPath, 'build')
-    let entry: any = {}
+    const entry: Record<string, string> = {}
+    const exportNames = new Map<string, string>()
 
     if (options.splitCustomImports) {
       if (!options.customImports || !options.customImports.length) {
         return { assets: [] }
       }
-      options.customImports.forEach(importt => {
-        entry[importt] = BuildUtils.createEntryPoint(packageName, installPath, {
-          customImports: [importt],
-          entryPoint: options.entryPoint,
-          entryFilename: importt,
-          esm: true,
-        })
+      options.customImports.forEach((exportName, index) => {
+        const entryName = `export-${index}`
+        exportNames.set(entryName, exportName)
+        entry[entryName] = BuildUtils.createEntryPoint(
+          packageName,
+          installPath,
+          {
+            customImports: [exportName],
+            entryPoint: options.entryPoint,
+            entryFilename: `${entryName}.js`,
+            esm: true,
+          },
+        )
       })
     } else {
       entry['main'] = BuildUtils.createEntryPoint(packageName, installPath, {
@@ -357,7 +372,7 @@ const BuildUtils = {
       const extension = rawExtension.replace(/^\./, '')
 
       return {
-        name: entryName,
+        name: exportNames.get(entryName) ?? entryName,
         type: extension,
         size: asset.size,
         gzip,
