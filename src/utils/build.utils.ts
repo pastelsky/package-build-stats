@@ -245,7 +245,7 @@ const BuildUtils = {
             throw error ?? new Error('stats is null')
           }
 
-          if (!jsxPackages.length) {
+          if (!error && !jsxPackages.length && stats.hasErrors()) {
             const recoveredPackages = await getJsxPackages(stats, signal)
             if (recoveredPackages.length) {
               resolve(

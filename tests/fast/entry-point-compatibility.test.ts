@@ -13,6 +13,13 @@ import {
 import type { InstallationProvider } from '../../src/common.types.js'
 
 const cases = [
+  { fixture: 'jsx-in-js', entries: ['.'], entryPoint: '.', exports: ['Tilt'] },
+  {
+    fixture: 'commonjs-return',
+    entries: ['.'],
+    entryPoint: '.',
+    exports: null,
+  },
   {
     fixture: 'vue-conditions',
     entries: ['.'],
@@ -88,7 +95,7 @@ test.each(cases)(
       expect(Object.keys(exports).sort()).toEqual([...scenario.exports].sort())
       if (scenario.fixture === 'private-imports')
         expect(exports.environment).toMatch(/browser\.js$/)
-    } else {
+    } else if (scenario.fixture === 'css-style') {
       expect(stats.assets).toEqual(
         expect.arrayContaining([expect.objectContaining({ type: 'css' })]),
       )
