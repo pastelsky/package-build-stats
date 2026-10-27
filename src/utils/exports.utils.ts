@@ -91,101 +91,97 @@ type ResolvedExports = {
 }
 
 /**
- * Recursively walk exports following export * statements
- *
- * This mirrors the walk_exported_recursive function in export.rs
+ * Parse each reachable module once, then find each export's source with its own
+ * cycle guard. Shared/cyclic star graphs must not multiply filesystem work.
  */
-async function walkExportsRecursive(
+async function walkExports(
   context: string,
   lookupPath: string,
-  visited: Set<string>,
-  rootContext?: string,
-  _isRootCall: boolean = false,
+  rootContext: string,
   signal?: AbortSignal,
 ): Promise<ResolvedExports> {
-  throwIfAborted(signal)
-  // Use rootContext for calculating relative paths, context for resolution
-  const root = rootContext || context
-  const resolvedPath = await resolveModule(context, lookupPath, signal)
-
-  // Avoid circular dependencies
-  if (visited.has(resolvedPath)) {
-    return {}
+  type ModuleExports = {
+    named: Map<string, NamedExport>
+    stars: string[]
   }
-  visited.add(resolvedPath)
-
-  // Parse the file to get exports
-  const code = await fs.readFile(resolvedPath, 'utf8')
-  throwIfAborted(signal)
-  const parseResult = parseSync(resolvedPath, code, {
-    sourceType: 'module',
-  })
-
-  // Check if file has module syntax
-  if (!parseResult.module.hasModuleSyntax) {
-    return {}
-  }
-
-  const { exports, exportAllLocations } = getExportsFromStaticExports(
-    parseResult.module.staticExports,
-  )
-
-  const resolvedExports: ResolvedExports = Object.create(null)
-
-  // Add direct exports from this module, resolving re-exports to their source files
-  for (const exp of exports) {
+  const modules = new Map<string, ModuleExports>()
+  async function readModule(modulePath: string): Promise<ModuleExports> {
     throwIfAborted(signal)
-    let sourcePath = resolvedPath
+    const cached = modules.get(modulePath)
+    if (cached) return cached
+    const code = await fs.readFile(modulePath, 'utf8')
+    throwIfAborted(signal)
+    const { module } = parseSync(modulePath, code, { sourceType: 'module' })
+    const details = getExportsFromStaticExports(module.staticExports)
+    const result = {
+      named: new Map(details.exports.map(exp => [exp.name, exp])),
+      stars: await Promise.all(
+        details.exportAllLocations.map(location =>
+          resolveModule(path.dirname(modulePath), location, signal),
+        ),
+      ),
+    }
+    modules.set(modulePath, result)
+    return result
+  }
 
-    // If this is a re-export (export { foo } from './module.js'), resolve to the source file
-    if (exp.moduleRequest) {
+  const root = await resolveModule(context, lookupPath, signal)
+  const names = new Set<string>()
+  const collected = new Set<string>()
+  async function collectNames(modulePath: string): Promise<void> {
+    if (collected.has(modulePath)) return
+    collected.add(modulePath)
+    const module = await readModule(modulePath)
+    for (const name of module.named.keys()) {
+      if (name !== 'default' || modulePath === root) names.add(name)
+    }
+    for (const source of module.stars) {
+      // oxlint-disable-next-line no-await-in-loop
+      await collectNames(source)
+    }
+  }
+
+  async function findSource(
+    modulePath: string,
+    name: string,
+    seen: Set<string>,
+  ): Promise<string | undefined> {
+    if (seen.has(modulePath)) return
+    seen.add(modulePath)
+    const module = await readModule(modulePath)
+    const exp = module.named.get(name)
+    if (exp) {
+      if (!exp.moduleRequest) return modulePath
       try {
-        // Resolve one export at a time to avoid unbounded filesystem work.
-        // oxlint-disable-next-line no-await-in-loop
-        sourcePath = await resolveModule(
-          path.dirname(resolvedPath),
+        return await resolveModule(
+          path.dirname(modulePath),
           exp.moduleRequest,
           signal,
         )
       } catch {
         throwIfAborted(signal)
-        // If resolution fails, fall back to current file
-        sourcePath = resolvedPath
+        return modulePath
       }
     }
-
-    // Use path.relative() to calculate the relative path from root to sourcePath
-    // This works correctly since symlinks are not resolved (symlinks: false in resolver config)
-    const relativePath = root
-      ? path.relative(root, sourcePath)
-      : path.basename(sourcePath)
-
-    resolvedExports[exp.name] = relativePath
-  }
-
-  // Recursively process export * statements
-  const promises = exportAllLocations.map(location =>
-    walkExportsRecursive(
-      path.dirname(resolvedPath),
-      location,
-      new Set(visited),
-      root, // Pass root context through recursion
-      false,
-      signal,
-    ),
-  )
-
-  const starExports = await Promise.all(promises)
-  for (const inheritedExports of starExports) {
-    for (const [name, sourcePath] of Object.entries(inheritedExports)) {
-      // Star exports exclude default; explicit exports take precedence.
-      if (name !== 'default' && !Object.hasOwn(resolvedExports, name)) {
-        resolvedExports[name] = sourcePath
-      }
+    if (name === 'default') return
+    for (const source of module.stars) {
+      // Search each module at most once for this name, including in cycles.
+      // oxlint-disable-next-line no-await-in-loop
+      const candidate = await findSource(source, name, seen)
+      if (candidate) return candidate
     }
   }
-  throwIfAborted(signal)
-  return resolvedExports
+
+  await collectNames(root)
+  const result: ResolvedExports = Object.create(null)
+  for (const name of names) {
+    // oxlint-disable-next-line no-await-in-loop
+    const source = await findSource(root, name, new Set())
+    if (source) {
+      result[name] = path.relative(rootContext, source)
+    }
+  }
+  return result
 }
 
 /**
@@ -202,7 +198,6 @@ export async function getAllExports(
   entryPoint = '.',
 ) {
   const startTime = performance.now()
-  const visited = new Set<string>()
 
   try {
     throwIfAborted(signal)
@@ -220,12 +215,10 @@ export async function getAllExports(
 
     // Resolve the entry point relative to context
     // Pass installPath as rootContext for calculating relative paths
-    const results = await walkExportsRecursive(
+    const results = await walkExports(
       context,
       request,
-      visited,
-      installPath,
-      true,
+      installPath ?? context,
       signal,
     )
     Telemetry.walkPackageExportsTree(packageString, startTime, true)
