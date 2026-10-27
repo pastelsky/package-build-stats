@@ -1,3 +1,6 @@
+import fs from 'node:fs/promises'
+import os from 'node:os'
+import path from 'node:path'
 import { vi } from 'vitest'
 
 import {
@@ -131,6 +134,12 @@ describe('installWithClient – package-not-found error classification', () => {
         'npm ERR! code ETARGET\nnpm ERR! No matching version found for react@0.0.0-nonexistent.',
     },
     {
+      pm: 'npm',
+      label: 'npm ENOVERSIONS (dependency has no published versions)',
+      stderr:
+        'npm error code ENOVERSIONS\nnpm error No versions available for fb-chat-support',
+    },
+    {
       pm: 'yarn',
       label: "yarn classic – Couldn't find package",
       stderr:
@@ -250,3 +259,62 @@ describe('installWithClient – unsupported package error classification', () =>
     })
   }
 })
+
+test('falls back when Bun succeeds without installing an incompatible package', async () => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'skipped-install-'))
+  vi.mocked(exec)
+    .mockResolvedValueOnce('')
+    .mockRejectedValueOnce(
+      makeProcessError('npm error code EBADPLATFORM\nUnsupported platform'),
+    )
+  try {
+    await expect(
+      InstallationUtils.installPackage('platform-binary@1.0.0', root, {}),
+    ).rejects.toBeInstanceOf(UnsupportedPackageError)
+    expect(vi.mocked(exec).mock.calls.map(call => call[0])).toEqual([
+      'bun',
+      'npm',
+    ])
+  } finally {
+    vi.mocked(exec).mockReset()
+    await fs.rm(root, { recursive: true, force: true })
+  }
+})
+
+test('accepts a successful install when the requested manifest exists', async () => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'valid-install-'))
+  const installed = path.join(root, 'node_modules', '@scope', 'example')
+  await fs.mkdir(installed, { recursive: true })
+  await fs.writeFile(path.join(installed, 'package.json'), '{}')
+  vi.mocked(exec).mockResolvedValueOnce('')
+  try {
+    await InstallationUtils.installPackage('@scope/example@1.0.0', root, {})
+    expect(exec).toHaveBeenCalledTimes(1)
+  } finally {
+    vi.mocked(exec).mockReset()
+    await fs.rm(root, { recursive: true, force: true })
+  }
+})
+
+test.each(['workspace:*', 'link:../private-package', 'yarn:private-package@1'])(
+  'classifies unsupported dependency protocol %s',
+  async specifier => {
+    vi.mocked(exec).mockRejectedValueOnce(
+      makeProcessError(
+        `npm error code EUNSUPPORTEDPROTOCOL\nnpm error Unsupported URL Type "${specifier.split(':')[0]}:": ${specifier}`,
+      ),
+    )
+    try {
+      await expect(
+        InstallationUtils.installWithClient(
+          'broken-workspace@1.0.0',
+          '/unused',
+          {},
+          'npm',
+        ),
+      ).rejects.toBeInstanceOf(UnsupportedPackageError)
+    } finally {
+      vi.mocked(exec).mockReset()
+    }
+  },
+)
