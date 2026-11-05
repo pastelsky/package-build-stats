@@ -222,7 +222,8 @@ describe('Bundle Size Calculation', () => {
     const jsAsset = result.assets.find(a => a.type === 'js')
     const cssAsset = result.assets.find(a => a.type === 'css')
 
-    expect(jsAsset?.size).toBeGreaterThanOrEqual(255)
+    // Sass versions can shift this fixture bundle by a few bytes.
+    expect(jsAsset?.size).toBeGreaterThanOrEqual(250)
     expect(jsAsset?.size).toBeLessThanOrEqual(265)
     expect(jsAsset?.gzip).toBeGreaterThan(0)
 
@@ -607,8 +608,8 @@ describe('Dependency Size Trees', () => {
     const fixturePath = path.resolve(__dirname, '../fixtures/sizes/small')
     const result = await getPackageStats(fixturePath)
 
-    // Assert ranges
-    expect(result.size).toBeGreaterThanOrEqual(245)
+    // Rspack updates can shift this fixture bundle by a few bytes.
+    expect(result.size).toBeGreaterThanOrEqual(240)
     expect(result.size).toBeLessThanOrEqual(250)
     expect(result.gzip).toBeGreaterThan(0)
     expect(result.gzip).toBeLessThan(result.size)
