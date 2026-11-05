@@ -108,7 +108,6 @@
     "less-loader": "^13.1.0",
     "lodash": "^4.18.1",
     "mitt": "^3.0.1",
-    "node-fetch": "^3.3.2",
     "np": "^12.1.1",
     "oxc-minify": "^0.157.0",
     "oxc-parser": "^0.157.0",

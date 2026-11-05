@@ -23,9 +23,16 @@ export default class OxcJsMinimizerRspackPlugin implements RspackPluginInstance 
                 JAVASCRIPT_ASSET.test(asset.name) && !asset.info.minimized,
             )
 
-          const minifications = await Promise.allSettled(
-            assets.map(asset =>
-              queue.add(async () => {
+          let minificationFailed = false
+          let firstMinificationError: unknown
+
+          // Backpressure keeps large compilations from queuing every asset at once.
+          // oxlint-disable-next-line no-await-in-loop
+          for (const asset of assets) {
+            await queue.onSizeLessThan(queue.concurrency)
+
+            void queue
+              .add(async () => {
                 const originalCode = asset.source.source().toString()
                 const result = await minify(asset.name, originalCode, {
                   compress: true,
@@ -52,15 +59,19 @@ export default class OxcJsMinimizerRspackPlugin implements RspackPluginInstance 
                     minimized: true,
                   }),
                 )
-              }),
-            ),
-          )
+              })
+              .catch(error => {
+                if (!minificationFailed) {
+                  minificationFailed = true
+                  firstMinificationError = error
+                }
+              })
+          }
 
-          const failedMinification = minifications.find(
-            result => result.status === 'rejected',
-          )
-          if (failedMinification?.status === 'rejected') {
-            throw failedMinification.reason
+          await queue.onIdle()
+
+          if (minificationFailed) {
+            throw firstMinificationError
           }
         },
       )

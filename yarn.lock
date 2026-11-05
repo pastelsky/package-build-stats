@@ -8764,7 +8764,6 @@ __metadata:
     less-loader: "npm:^13.1.0"
     lodash: "npm:^4.18.1"
     mitt: "npm:^3.0.1"
-    node-fetch: "npm:^3.3.2"
     np: "npm:^12.1.1"
     oxc-minify: "npm:^0.157.0"
     oxc-parser: "npm:^0.157.0"
