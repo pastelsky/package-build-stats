@@ -9,7 +9,7 @@ on:
 jobs:
   test:
     name: Test (Node ${{ matrix.node-version }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     strategy:
       fail-fast: false
@@ -70,7 +70,7 @@ jobs:
 
   build-check:
     name: Build Check
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout code
