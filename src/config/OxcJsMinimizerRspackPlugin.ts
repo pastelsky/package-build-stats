@@ -27,8 +27,9 @@ export default class OxcJsMinimizerRspackPlugin implements RspackPluginInstance 
           let firstMinificationError: unknown
 
           // Backpressure keeps large compilations from queuing every asset at once.
-          // oxlint-disable-next-line no-await-in-loop
           for (const asset of assets) {
+            // Backpressure must pause the producer until queue capacity is available.
+            // oxlint-disable-next-line no-await-in-loop
             await queue.onSizeLessThan(queue.concurrency)
 
             void queue
