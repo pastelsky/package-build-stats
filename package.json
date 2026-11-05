@@ -124,7 +124,7 @@
     "sass": "^1.107.1",
     "sass-loader": "^17.1.0",
     "server": "^1.0.42",
-    "svelte": "^5.57.3",
+    "svelte": "^4.2.20",
     "svelte-loader": "^3.2.4",
     "terser": "^5.51.2",
     "yargs": "^18.2.0"
