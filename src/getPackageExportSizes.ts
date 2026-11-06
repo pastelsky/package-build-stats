@@ -91,7 +91,7 @@ export async function getPackageExportSizes(
     )
 
     const buildStart = performance.now()
-    const chunkSize = 100
+    const chunkSize = 20
     const assets: Array<{
       name: string
       type: string
