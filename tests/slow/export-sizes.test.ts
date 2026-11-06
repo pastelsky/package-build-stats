@@ -6,6 +6,7 @@
  */
 
 import path from 'path'
+import fs from 'node:fs/promises'
 import {
   getAllPackageExports,
   getPackageExportSizes,
@@ -15,6 +16,19 @@ import { vi } from 'vitest'
 import * as exportsUtils from '../../src/utils/exports.utils.js'
 import BuildUtils from '../../src/utils/build.utils.js'
 import InstallationUtils from '../../src/utils/installation.utils.js'
+
+async function writeMockSources(installPath: string, count: number) {
+  const sourcePath = path.join(installPath, 'src')
+  await fs.mkdir(sourcePath, { recursive: true })
+  await Promise.all(
+    Array.from({ length: count }, (_, index) =>
+      fs.writeFile(
+        path.join(sourcePath, `file_${index}.js`),
+        'export const value=1',
+      ),
+    ),
+  )
+}
 
 vi.mock('../../src/utils/common.utils.js', async importOriginal => {
   const original = (await importOriginal()) as any
@@ -252,7 +266,9 @@ describe('Export Size Analysis Edge Cases', () => {
   test('should only compile the first 1000 exports and return placeholders with size 0/gzip 0 for the rest', async () => {
     const installSpy = vi
       .spyOn(InstallationUtils, 'installPackage')
-      .mockImplementation(async () => {})
+      .mockImplementation(async (_packageString, installPath) => {
+        await writeMockSources(installPath, 1050)
+      })
     const getAllExportsSpy = vi
       .spyOn(exportsUtils, 'getAllExports')
       .mockImplementation(async () => {
@@ -323,7 +339,9 @@ describe('Export Size Analysis Edge Cases', () => {
   test('should chunk export compilation serially in batches of 100 internally without breaking response format', async () => {
     const installSpy = vi
       .spyOn(InstallationUtils, 'installPackage')
-      .mockImplementation(async () => {})
+      .mockImplementation(async (_packageString, installPath) => {
+        await writeMockSources(installPath, 150)
+      })
     const getAllExportsSpy = vi
       .spyOn(exportsUtils, 'getAllExports')
       .mockImplementation(async () => {
