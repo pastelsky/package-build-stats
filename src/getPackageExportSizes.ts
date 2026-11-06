@@ -13,6 +13,7 @@ import type {
   GetPackageExportsOptions,
 } from './common.types.js'
 import { preparePackage, type PreparedPackage } from './packageInstallation.js'
+import { exportBatches } from './utils/export-batches.utils.js'
 
 export async function getAllPackageExports(
   packageString: string,
@@ -91,7 +92,6 @@ export async function getPackageExportSizes(
     )
 
     const buildStart = performance.now()
-    const chunkSize = 100
     const assets: Array<{
       name: string
       type: string
@@ -100,9 +100,13 @@ export async function getPackageExportSizes(
     }> = []
     const ignoredMissingDependenciesSet = new Set<string>()
 
-    for (let i = 0; i < buildExports.length; i += chunkSize) {
+    for await (const chunk of exportBatches(
+      buildExports,
+      exportMap,
+      installPath,
+      options.signal,
+    )) {
       throwIfAborted(options.signal)
-      const chunk = buildExports.slice(i, i + chunkSize)
       // Build chunks sequentially to cap Rspack's peak memory usage.
       // oxlint-disable-next-line no-await-in-loop
       const chunkDetails = await BuildUtils.buildPackageIgnoringMissingDeps({
