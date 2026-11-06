@@ -284,7 +284,7 @@ describe('Export Size Analysis Edge Cases', () => {
     try {
       const result = await getPackageExportSizes('some-package')
 
-      expect(buildSpy).toHaveBeenCalledTimes(10)
+      expect(buildSpy).toHaveBeenCalledTimes(11)
       expect(result.assets.length).toBe(1050)
 
       expect(result.assets[0]).toEqual({
@@ -324,7 +324,7 @@ describe('Export Size Analysis Edge Cases', () => {
     }
   })
 
-  test('should preserve the compilation count and response format when memory is low', async () => {
+  test('should grow batches after the initial probe when memory stays low', async () => {
     const memorySpy = vi
       .spyOn(process.memoryUsage, 'rss')
       .mockReturnValue(100 * 1024 * 1024)
@@ -359,21 +359,21 @@ describe('Export Size Analysis Edge Cases', () => {
     try {
       const result = await getPackageExportSizes('some-package')
 
-      expect(buildSpy).toHaveBeenCalledTimes(2)
+      expect(buildSpy).toHaveBeenCalledTimes(3)
 
-      expect(buildSpy.mock.calls[0][0].options?.customImports?.length).toBe(50)
+      expect(buildSpy.mock.calls[0][0].options?.customImports?.length).toBe(20)
       expect(buildSpy.mock.calls[0][0].options?.customImports?.[0]).toBe(
         'export_0',
       )
-      expect(buildSpy.mock.calls[0][0].options?.customImports?.[49]).toBe(
-        'export_49',
+      expect(buildSpy.mock.calls[0][0].options?.customImports?.[19]).toBe(
+        'export_19',
       )
 
-      expect(buildSpy.mock.calls[1][0].options?.customImports?.length).toBe(100)
-      expect(buildSpy.mock.calls[1][0].options?.customImports?.[0]).toBe(
-        'export_50',
+      expect(buildSpy.mock.calls[2][0].options?.customImports?.length).toBe(30)
+      expect(buildSpy.mock.calls[2][0].options?.customImports?.[0]).toBe(
+        'export_120',
       )
-      expect(buildSpy.mock.calls[1][0].options?.customImports?.[99]).toBe(
+      expect(buildSpy.mock.calls[2][0].options?.customImports?.[29]).toBe(
         'export_149',
       )
 
@@ -407,7 +407,10 @@ describe('Export Size Analysis Edge Cases', () => {
         .spyOn(process.memoryUsage, 'rss')
         .mockReturnValue(100 * 1024 * 1024)
       memorySpy.mockReturnValueOnce((alreadyHigh ? 900 : 100) * 1024 * 1024)
-      if (!alreadyHigh) memorySpy.mockReturnValueOnce(900 * 1024 * 1024)
+      if (!alreadyHigh) {
+        memorySpy.mockReturnValueOnce(100 * 1024 * 1024)
+        memorySpy.mockReturnValueOnce(900 * 1024 * 1024)
+      }
       const installSpy = vi
         .spyOn(InstallationUtils, 'installPackage')
         .mockImplementation(async () => {})
@@ -438,8 +441,11 @@ describe('Export Size Analysis Edge Cases', () => {
         })
       try {
         const result = await getPackageExportSizes('some-package')
-        expect(batches[0]).toHaveLength(alreadyHigh ? 20 : 50)
-        expect(batches.slice(1).every(batch => batch.length <= 20)).toBe(true)
+        expect(batches[0]).toHaveLength(20)
+        if (!alreadyHigh) expect(batches[1]).toHaveLength(100)
+        expect(
+          batches.slice(alreadyHigh ? 1 : 2).every(batch => batch.length <= 20),
+        ).toBe(true)
         expect(batches.flat()).toEqual(names)
         expect(result.assets.map(asset => asset.name)).toEqual(names)
         expect(

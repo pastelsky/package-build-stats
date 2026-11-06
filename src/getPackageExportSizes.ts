@@ -95,10 +95,8 @@ export async function getPackageExportSizes(
     const smallChunkSize = 20
     const rssThreshold = 768 * 1024 * 1024
     let useSmallChunks = process.memoryUsage.rss() >= rssThreshold
-    // Starting with the remainder avoids an extra compilation when RSS stays low.
-    let chunkSize = useSmallChunks
-      ? smallChunkSize
-      : buildExports.length % maxChunkSize || maxChunkSize
+    // Probe a small batch before choosing the size of subsequent compilations.
+    let chunkSize = smallChunkSize
     const assets: Array<{
       name: string
       type: string
