@@ -3,6 +3,7 @@ import path from 'node:path'
 import { performance } from 'node:perf_hooks'
 import { gzipSync } from 'node:zlib'
 import { rspack } from '@rspack/core'
+import PQueue from 'p-queue'
 import type { Entry, Stats, StatsOptions } from '@rspack/core'
 import isValidNPMName from 'is-valid-npm-name'
 import getDependencySizes from '../getDependencySizeTree.js'
@@ -20,6 +21,9 @@ import type {
 } from '../common.types.js'
 import Telemetry from './telemetry.utils.js'
 import { getPackageImportPath, throwIfAborted } from './common.utils.js'
+
+// Share the buffer budget across overlapping builds in this process.
+const assetStatsQueue = new PQueue({ concurrency: 4 })
 
 type CompilePackageArgs = {
   name: string
@@ -394,7 +398,7 @@ const BuildUtils = {
             typeof asset.name === 'string' &&
             !asset.name.endsWith('LICENSE.txt'),
         )
-        .map(getAssetStats) || []
+        .map(asset => assetStatsQueue.add(() => getAssetStats(asset))) || []
     const assetStats = await Promise.all(assetStatsPromises)
     throwIfAborted(options.signal)
     Telemetry.assetsGZIPParseTime(packageName, performance.now())
