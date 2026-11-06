@@ -281,7 +281,7 @@ describe('Export Size Analysis Edge Cases', () => {
     try {
       const result = await getPackageExportSizes('some-package')
 
-      expect(buildSpy).toHaveBeenCalledTimes(10)
+      expect(buildSpy).toHaveBeenCalledTimes(50)
       expect(result.assets.length).toBe(1050)
 
       expect(result.assets[0]).toEqual({
@@ -320,7 +320,7 @@ describe('Export Size Analysis Edge Cases', () => {
     }
   })
 
-  test('should chunk export compilation serially in batches of 100 internally without breaking response format', async () => {
+  test('should chunk export compilation serially in batches of 20 internally without breaking response format', async () => {
     const installSpy = vi
       .spyOn(InstallationUtils, 'installPackage')
       .mockImplementation(async () => {})
@@ -352,21 +352,21 @@ describe('Export Size Analysis Edge Cases', () => {
     try {
       const result = await getPackageExportSizes('some-package')
 
-      expect(buildSpy).toHaveBeenCalledTimes(2)
+      expect(buildSpy).toHaveBeenCalledTimes(8)
 
-      expect(buildSpy.mock.calls[0][0].options?.customImports?.length).toBe(100)
+      expect(buildSpy.mock.calls[0][0].options?.customImports?.length).toBe(20)
       expect(buildSpy.mock.calls[0][0].options?.customImports?.[0]).toBe(
         'export_0',
       )
-      expect(buildSpy.mock.calls[0][0].options?.customImports?.[99]).toBe(
-        'export_99',
+      expect(buildSpy.mock.calls[0][0].options?.customImports?.[19]).toBe(
+        'export_19',
       )
 
-      expect(buildSpy.mock.calls[1][0].options?.customImports?.length).toBe(50)
-      expect(buildSpy.mock.calls[1][0].options?.customImports?.[0]).toBe(
-        'export_100',
+      expect(buildSpy.mock.calls[7][0].options?.customImports?.length).toBe(10)
+      expect(buildSpy.mock.calls[7][0].options?.customImports?.[0]).toBe(
+        'export_140',
       )
-      expect(buildSpy.mock.calls[1][0].options?.customImports?.[49]).toBe(
+      expect(buildSpy.mock.calls[7][0].options?.customImports?.[9]).toBe(
         'export_149',
       )
 
