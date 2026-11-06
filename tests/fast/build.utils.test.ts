@@ -1,5 +1,9 @@
 import { afterEach, describe, expect, test, vi } from 'vitest'
 import { BuildCancelledError } from '../../src/errors/CustomError'
+import fs from 'node:fs'
+import path from 'node:path'
+import { gzipSync } from 'node:zlib'
+import type { Stats } from '@rspack/core'
 
 const mockRspack = vi.fn()
 const mockCompilePackage = vi.fn()
@@ -15,10 +19,72 @@ vi.mock('../../src/config/makeRspackConfig.js', () => ({
 vi.mock('../../src/utils/telemetry.utils.js', () => ({
   default: {
     compilePackage: mockCompilePackage,
+    parseWebpackStats: vi.fn(),
+    assetsGZIPParseTime: vi.fn(),
   },
 }))
 
 const { default: BuildUtils } = await import('../../src/utils/build.utils.js')
+
+test('bounds asset reads across overlapping builds and preserves ordered gzip results', async () => {
+  const content = Buffer.from('export const answer = 42')
+  const assets = Array.from({ length: 3 }, (_, index) => ({
+    name: `asset-${index}.bundle.js`,
+    size: content.length,
+  }))
+  vi.spyOn(BuildUtils, 'createEntryPoint').mockReturnValue('/unused/index.js')
+  vi.spyOn(BuildUtils, 'compilePackage').mockResolvedValue({
+    error: null,
+    stats: {
+      compilation: { errors: [] },
+      toJson: () => ({ assets }),
+    } as unknown as Stats,
+  })
+
+  const releases: Array<() => void> = []
+  let active = 0
+  let peak = 0
+  vi.spyOn(fs.promises, 'readFile').mockImplementation(async () => {
+    active++
+    peak = Math.max(peak, active)
+    await new Promise<void>(resolve => releases.push(resolve))
+    active--
+    return content
+  })
+  const build = () =>
+    BuildUtils.buildPackage({
+      name: 'demo-package',
+      installPath: path.join('/unused', 'demo-package'),
+      externals: { externalPackages: [], externalBuiltIns: [] },
+      options: { includeDependencySizes: false },
+    })
+
+  try {
+    const results = Promise.all([build(), build()])
+    await vi.waitFor(() => expect(releases.length).toBeGreaterThanOrEqual(4))
+    expect(active).toBe(4)
+    releases
+      .splice(0)
+      .reverse()
+      .forEach(release => release())
+    await vi.waitFor(() => expect(releases.length).toBeGreaterThanOrEqual(2))
+    releases
+      .splice(0)
+      .reverse()
+      .forEach(release => release())
+    const expected = assets.map((asset, index) => ({
+      name: `asset-${index}`,
+      type: 'js',
+      size: asset.size,
+      gzip: gzipSync(content).length,
+    }))
+    for (const result of await results) expect(result.assets).toEqual(expected)
+    expect(peak).toBe(4)
+  } finally {
+    releases.splice(0).forEach(release => release())
+    vi.restoreAllMocks()
+  }
+})
 
 describe('BuildUtils.compilePackage', () => {
   afterEach(() => {
