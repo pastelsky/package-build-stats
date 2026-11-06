@@ -91,7 +91,14 @@ export async function getPackageExportSizes(
     )
 
     const buildStart = performance.now()
-    const chunkSize = 20
+    const maxChunkSize = 100
+    const smallChunkSize = 20
+    const rssThreshold = 768 * 1024 * 1024
+    let useSmallChunks = process.memoryUsage.rss() >= rssThreshold
+    // Starting with the remainder avoids an extra compilation when RSS stays low.
+    let chunkSize = useSmallChunks
+      ? smallChunkSize
+      : buildExports.length % maxChunkSize || maxChunkSize
     const assets: Array<{
       name: string
       type: string
@@ -100,7 +107,7 @@ export async function getPackageExportSizes(
     }> = []
     const ignoredMissingDependenciesSet = new Set<string>()
 
-    for (let i = 0; i < buildExports.length; i += chunkSize) {
+    for (let i = 0; i < buildExports.length;) {
       throwIfAborted(options.signal)
       const chunk = buildExports.slice(i, i + chunkSize)
       // Build chunks sequentially to cap Rspack's peak memory usage.
@@ -120,6 +127,10 @@ export async function getPackageExportSizes(
       })
       throwIfAborted(options.signal)
       assets.push(...chunkDetails.assets)
+      i += chunk.length
+      // Keep smaller batches for this analysis once the process is under pressure.
+      useSmallChunks ||= process.memoryUsage.rss() >= rssThreshold
+      chunkSize = useSmallChunks ? smallChunkSize : maxChunkSize
       if (chunkDetails.ignoredMissingDependencies) {
         chunkDetails.ignoredMissingDependencies.forEach(dep => {
           ignoredMissingDependenciesSet.add(dep)

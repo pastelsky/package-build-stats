@@ -2,4 +2,4 @@
 'package-build-stats': patch
 ---
 
-Reduce peak memory during export-size analysis by compiling 20 exports at a time while preserving the full set of export measurements.
+Reduce export compilation batches from 100 to 20 under process memory pressure, retaining larger batches for low-memory analyses and preserving every export measurement.
