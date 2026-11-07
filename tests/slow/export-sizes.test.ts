@@ -324,10 +324,10 @@ describe('Export Size Analysis Edge Cases', () => {
     }
   })
 
-  test('should grow batches after the initial probe when memory stays low', async () => {
+  test('should grow batches below the configured worker budget', async () => {
     const memorySpy = vi
       .spyOn(process.memoryUsage, 'rss')
-      .mockReturnValue(100 * 1024 * 1024)
+      .mockReturnValue(900 * 1024 * 1024)
     const installSpy = vi
       .spyOn(InstallationUtils, 'installPackage')
       .mockImplementation(async () => {})
@@ -357,7 +357,9 @@ describe('Export Size Analysis Edge Cases', () => {
       })
 
     try {
-      const result = await getPackageExportSizes('some-package')
+      const result = await getPackageExportSizes('some-package', {
+        memoryLimitBytes: 2 * 1024 * 1024 * 1024,
+      })
 
       expect(buildSpy).toHaveBeenCalledTimes(3)
 
@@ -399,17 +401,34 @@ describe('Export Size Analysis Edge Cases', () => {
       memorySpy.mockRestore()
     }
   })
-  test.each([true, false])(
-    'keeps serial, smaller batches after memory pressure (already high: %s)',
-    async alreadyHigh => {
+  test.each([0, -1, NaN, Infinity])(
+    'rejects invalid memory budget %s',
+    async memoryLimitBytes => {
+      await expect(
+        getPackageExportSizes('some-package', { memoryLimitBytes }),
+      ).rejects.toThrow(
+        'memoryLimitBytes must be a positive, finite byte count',
+      )
+    },
+  )
+  test.each([
+    [true, 512],
+    [false, 512],
+    [true, 2048],
+    [false, 2048],
+  ] as const)(
+    'keeps serial, smaller batches after pressure (already high: %s, budget MiB: %s)',
+    async (alreadyHigh, budgetMiB) => {
       const names = Array.from({ length: 250 }, (_, index) => `export_${index}`)
       const memorySpy = vi
         .spyOn(process.memoryUsage, 'rss')
         .mockReturnValue(100 * 1024 * 1024)
-      memorySpy.mockReturnValueOnce((alreadyHigh ? 900 : 100) * 1024 * 1024)
+      memorySpy.mockReturnValueOnce(
+        (alreadyHigh ? budgetMiB * 0.8 : 100) * 1024 * 1024,
+      )
       if (!alreadyHigh) {
         memorySpy.mockReturnValueOnce(100 * 1024 * 1024)
-        memorySpy.mockReturnValueOnce(900 * 1024 * 1024)
+        memorySpy.mockReturnValueOnce(budgetMiB * 0.8 * 1024 * 1024)
       }
       const installSpy = vi
         .spyOn(InstallationUtils, 'installPackage')
@@ -440,7 +459,9 @@ describe('Export Size Analysis Edge Cases', () => {
           }
         })
       try {
-        const result = await getPackageExportSizes('some-package')
+        const result = await getPackageExportSizes('some-package', {
+          memoryLimitBytes: budgetMiB * 1024 * 1024,
+        })
         expect(batches[0]).toHaveLength(20)
         if (!alreadyHigh) expect(batches[1]).toHaveLength(100)
         expect(

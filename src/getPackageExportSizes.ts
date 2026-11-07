@@ -47,6 +47,12 @@ export async function getPackageExportSizes(
   packageString: string,
   options: GetPackageStatsOptions = {},
 ) {
+  const memoryLimitBytes = options.memoryLimitBytes ?? 1024 * 1024 * 1024
+  if (!Number.isFinite(memoryLimitBytes) || memoryLimitBytes <= 0) {
+    throw new RangeError(
+      'memoryLimitBytes must be a positive, finite byte count',
+    )
+  }
   const startTime = performance.now()
   const timings: Record<string, number> = {}
   let preparedPackage: PreparedPackage | undefined
@@ -93,7 +99,7 @@ export async function getPackageExportSizes(
     const buildStart = performance.now()
     const maxChunkSize = 100
     const smallChunkSize = 20
-    const rssThreshold = 768 * 1024 * 1024
+    const rssThreshold = memoryLimitBytes * 0.75
     let useSmallChunks = process.memoryUsage.rss() >= rssThreshold
     // Probe a small batch before choosing the size of subsequent compilations.
     let chunkSize = smallChunkSize
