@@ -1,3 +1,6 @@
+import fs from 'node:fs/promises'
+import os from 'node:os'
+import path from 'node:path'
 import { vi } from 'vitest'
 
 import {
@@ -248,5 +251,82 @@ describe('installWithClient – unsupported package error classification', () =>
         ),
       ).rejects.toBeInstanceOf(UnsupportedPackageError)
     })
+  }
+})
+
+test('falls back when Bun succeeds without installing an incompatible package', async () => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'skipped-install-'))
+  vi.mocked(exec)
+    .mockResolvedValueOnce('')
+    .mockRejectedValueOnce(
+      makeProcessError('npm error code EBADPLATFORM\nUnsupported platform'),
+    )
+  try {
+    await expect(
+      InstallationUtils.installPackage('platform-binary@1.0.0', root, {}),
+    ).rejects.toBeInstanceOf(UnsupportedPackageError)
+    expect(vi.mocked(exec).mock.calls.map(call => call[0])).toEqual([
+      'bun',
+      'npm',
+    ])
+  } finally {
+    vi.mocked(exec).mockReset()
+    await fs.rm(root, { recursive: true, force: true })
+  }
+})
+
+test('recovers when npm installs the manifest after Bun skipped it', async () => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'fallback-install-'))
+  vi.mocked(exec)
+    .mockResolvedValueOnce('')
+    .mockImplementationOnce(async () => {
+      const installed = path.join(root, 'node_modules', 'example')
+      await fs.mkdir(installed, { recursive: true })
+      await fs.writeFile(path.join(installed, 'package.json'), '{}')
+      return ''
+    })
+  try {
+    await InstallationUtils.installPackage('example@1.0.0', root, {})
+    expect(vi.mocked(exec).mock.calls.map(call => call[0])).toEqual([
+      'bun',
+      'npm',
+    ])
+  } finally {
+    vi.mocked(exec).mockReset()
+    await fs.rm(root, { recursive: true, force: true })
+  }
+})
+
+test('rejects a missing manifest when no fallback client is configured', async () => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'missing-install-'))
+  vi.mocked(exec).mockResolvedValueOnce('')
+  try {
+    await expect(
+      InstallationUtils.installPackage('example@1.0.0', root, {
+        client: 'bun',
+      }),
+    ).rejects.toMatchObject({
+      name: 'InstallError',
+      originalError: expect.objectContaining({ code: 'ENOENT' }),
+    })
+    expect(exec).toHaveBeenCalledTimes(1)
+  } finally {
+    vi.mocked(exec).mockReset()
+    await fs.rm(root, { recursive: true, force: true })
+  }
+})
+
+test('accepts a successful install when the requested manifest exists', async () => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'valid-install-'))
+  const installed = path.join(root, 'node_modules', '@scope', 'example')
+  await fs.mkdir(installed, { recursive: true })
+  await fs.writeFile(path.join(installed, 'package.json'), '{}')
+  vi.mocked(exec).mockResolvedValueOnce('')
+  try {
+    await InstallationUtils.installPackage('@scope/example@1.0.0', root, {})
+    expect(exec).toHaveBeenCalledTimes(1)
+  } finally {
+    vi.mocked(exec).mockReset()
+    await fs.rm(root, { recursive: true, force: true })
   }
 })

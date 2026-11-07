@@ -15,7 +15,12 @@ import {
   PackageNotFoundError,
   UnsupportedPackageError,
 } from '../errors/CustomError.js'
-import { exec, ProcessExecutionError, throwIfAborted } from './common.utils.js'
+import {
+  exec,
+  ProcessExecutionError,
+  throwIfAborted,
+  parsePackageString,
+} from './common.utils.js'
 import config from '../config/config.js'
 import { packageManagers } from '../common.types.js'
 import type { InstallPackageOptions, PackageManager } from '../common.types.js'
@@ -370,6 +375,12 @@ const InstallationUtils = {
           signal,
         },
         installTimeout,
+      )
+      // Bun can exit successfully after skipping an incompatible OS/CPU package.
+      // Validate the requested package before accepting this client's result.
+      const { name } = parsePackageString(packageString)
+      await fs.access(
+        path.join(installPath, 'node_modules', name, 'package.json'),
       )
       const execDuration = performance.now() - execStartTime
 
