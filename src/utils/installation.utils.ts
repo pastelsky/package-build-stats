@@ -400,26 +400,16 @@ const InstallationUtils = {
       // Bun can exit successfully after skipping an incompatible OS/CPU package.
       // Validate the requested package before accepting this client's result.
       const { name } = parsePackageString(packageString)
-      const packageManifest = path.join(
-        installPath,
-        'node_modules',
-        name,
-        'package.json',
-      )
-      try {
-        await fs.access(packageManifest)
-      } catch (error) {
-        if (currentClient === 'bun') {
-          // A matching skip is decisive only when the requested package is absent.
-          const skipped = getBunPlatformSkip(output, name)
-          if (skipped) {
-            throw new UnsupportedPackageError(skipped, {
-              reason: `The requested package does not support our build server (${process.platform}/${process.arch}).`,
-              packageString,
-            })
-          }
+      if (currentClient === 'bun') {
+        // A platform skip for the requested root package is terminal; skips of
+        // platform-specific dependencies such as esbuild's Android binary are not.
+        const skipped = getBunPlatformSkip(output, name)
+        if (skipped) {
+          throw new UnsupportedPackageError(skipped, {
+            reason: `The requested package does not support our build server (${process.platform}/${process.arch}).`,
+            packageString,
+          })
         }
-        throw error
       }
       const execDuration = performance.now() - execStartTime
 

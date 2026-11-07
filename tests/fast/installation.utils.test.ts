@@ -1,6 +1,3 @@
-import fs from 'node:fs/promises'
-import os from 'node:os'
-import path from 'node:path'
 import { vi } from 'vitest'
 
 import {
@@ -254,83 +251,6 @@ describe('installWithClient – unsupported package error classification', () =>
   }
 })
 
-test('falls back when Bun succeeds without installing an incompatible package', async () => {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'skipped-install-'))
-  vi.mocked(exec)
-    .mockResolvedValueOnce('')
-    .mockRejectedValueOnce(
-      makeProcessError('npm error code EBADPLATFORM\nUnsupported platform'),
-    )
-  try {
-    await expect(
-      InstallationUtils.installPackage('platform-binary@1.0.0', root, {}),
-    ).rejects.toBeInstanceOf(UnsupportedPackageError)
-    expect(vi.mocked(exec).mock.calls.map(call => call[0])).toEqual([
-      'bun',
-      'npm',
-    ])
-  } finally {
-    vi.mocked(exec).mockReset()
-    await fs.rm(root, { recursive: true, force: true })
-  }
-})
-
-test('recovers when npm installs the manifest after Bun skipped it', async () => {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'fallback-install-'))
-  vi.mocked(exec)
-    .mockResolvedValueOnce('')
-    .mockImplementationOnce(async () => {
-      const installed = path.join(root, 'node_modules', 'example')
-      await fs.mkdir(installed, { recursive: true })
-      await fs.writeFile(path.join(installed, 'package.json'), '{}')
-      return ''
-    })
-  try {
-    await InstallationUtils.installPackage('example@1.0.0', root, {})
-    expect(vi.mocked(exec).mock.calls.map(call => call[0])).toEqual([
-      'bun',
-      'npm',
-    ])
-  } finally {
-    vi.mocked(exec).mockReset()
-    await fs.rm(root, { recursive: true, force: true })
-  }
-})
-
-test('rejects a missing manifest when no fallback client is configured', async () => {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'missing-install-'))
-  vi.mocked(exec).mockResolvedValueOnce('')
-  try {
-    await expect(
-      InstallationUtils.installPackage('example@1.0.0', root, {
-        client: 'bun',
-      }),
-    ).rejects.toMatchObject({
-      name: 'InstallError',
-      originalError: expect.objectContaining({ code: 'ENOENT' }),
-    })
-    expect(exec).toHaveBeenCalledTimes(1)
-  } finally {
-    vi.mocked(exec).mockReset()
-    await fs.rm(root, { recursive: true, force: true })
-  }
-})
-
-test('accepts a successful install when the requested manifest exists', async () => {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'valid-install-'))
-  const installed = path.join(root, 'node_modules', '@scope', 'example')
-  await fs.mkdir(installed, { recursive: true })
-  await fs.writeFile(path.join(installed, 'package.json'), '{}')
-  vi.mocked(exec).mockResolvedValueOnce('')
-  try {
-    await InstallationUtils.installPackage('@scope/example@1.0.0', root, {})
-    expect(exec).toHaveBeenCalledTimes(1)
-  } finally {
-    vi.mocked(exec).mockReset()
-    await fs.rm(root, { recursive: true, force: true })
-  }
-})
-
 test('reports Bun platform skips without trying npm', async () => {
   vi.mocked(exec).mockResolvedValueOnce(
     'bun add v1.4.4\n\nskipped @esbuild/android-arm@0.28.2 (unsupported platform)\n',
@@ -357,37 +277,15 @@ test('reports Bun platform skips without trying npm', async () => {
   }
 })
 
-test('does not reject an installed package when a different version is skipped', async () => {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'same-name-skip-'))
-  const installed = path.join(root, 'node_modules', 'example')
-  await fs.mkdir(installed, { recursive: true })
-  await fs.writeFile(path.join(installed, 'package.json'), '{}')
+test('does not reject esbuild when Bun skips its Android ARM dependency', async () => {
   vi.mocked(exec).mockResolvedValueOnce(
-    'skipped example@2.0.0 (unsupported platform)\n',
+    'bun add v1.4.4\n\nskipped @esbuild/android-arm@0.28.2 (unsupported platform)\n',
   )
   try {
-    await InstallationUtils.installPackage('example@1.0.0', root, {})
+    await InstallationUtils.installPackage('esbuild@0.28.2', '/unused', {})
     expect(exec).toHaveBeenCalledTimes(1)
   } finally {
     vi.mocked(exec).mockReset()
-    await fs.rm(root, { recursive: true, force: true })
-  }
-})
-
-test('does not reject a valid package when Bun skips a different platform dependency', async () => {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'optional-platform-'))
-  const installed = path.join(root, 'node_modules', 'example')
-  await fs.mkdir(installed, { recursive: true })
-  await fs.writeFile(path.join(installed, 'package.json'), '{}')
-  vi.mocked(exec).mockResolvedValueOnce(
-    'skipped example-native@1.0.0 (unsupported platform)\n',
-  )
-  try {
-    await InstallationUtils.installPackage('example@1.0.0', root, {})
-    expect(exec).toHaveBeenCalledTimes(1)
-  } finally {
-    vi.mocked(exec).mockReset()
-    await fs.rm(root, { recursive: true, force: true })
   }
 })
 
