@@ -48,7 +48,7 @@ export default function makeRspackConfig({
     vars: { 'process.env.NODE_ENV': JSON.stringify('production') },
   }
   const javaScriptCodeFilter =
-    /process\.env\.NODE_ENV|<[A-Za-z_$]|<\/[A-Za-z_$]|<>|<\/>/
+    /^(?!\s*;\s*<template\b)[\s\S]*(?:process\.env\.NODE_ENV|<[A-Za-z_$]|<\/[A-Za-z_$]|<>|<\/>)/
 
   const configuration: Configuration = {
     entry: entry,
@@ -113,6 +113,7 @@ export default function makeRspackConfig({
             loader: 'builtin:swc-loader',
             // The production global and JSX both need SWC, but ordinary JS
             // does not. Let Rspack skip the loader when neither appears.
+            // Leave raw Vue SFCs for Rspack to reject as invalid JavaScript.
             codeFilter: javaScriptCodeFilter,
             options: {
               detectSyntax: 'auto',
