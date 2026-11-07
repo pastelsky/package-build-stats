@@ -1,5 +1,12 @@
 # package-build-stats
 
+## 9.5.7
+
+### Patch Changes
+
+- 098711b: Reduce export compilation batches from 100 to 20 at 75% of a configurable per-worker `memoryLimitBytes` budget (1 GiB by default), retaining larger batches for low-memory analyses and preserving every export measurement.
+- 6b9c96c: Limit generated-asset reads and gzip measurements to four concurrent tasks across overlapping analyses to reduce peak buffer memory.
+
 ## 9.5.6
 
 ### Patch Changes
