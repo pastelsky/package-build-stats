@@ -122,7 +122,7 @@ const installFlags = {
   bun: [
     `--cache-dir=${path.join(cachePath, 'bun')}`,
     ...flags(
-      '--no-save --production --omit=optional --ignore-scripts --no-progress --silent',
+      '--no-save --production --omit=optional --ignore-scripts --no-progress',
     ),
   ],
 } satisfies Record<PackageManager, string[]>
@@ -316,7 +316,11 @@ const InstallationUtils = {
         }
         return
       } catch (error) {
-        if (error instanceof BuildCancelledError || isOutOfSpace(error)) {
+        if (
+          error instanceof BuildCancelledError ||
+          error instanceof UnsupportedPackageError ||
+          isOutOfSpace(error)
+        ) {
           throw error
         }
         lastError = error
@@ -366,7 +370,7 @@ const InstallationUtils = {
         : packageString
 
       const execStartTime = performance.now()
-      await exec(
+      const output = await exec(
         currentClient,
         getInstallArgs(currentClient, packageToInstall, installOptions),
         {
@@ -379,6 +383,23 @@ const InstallationUtils = {
       // Bun can exit successfully after skipping an incompatible OS/CPU package.
       // Validate the requested package before accepting this client's result.
       const { name } = parsePackageString(packageString)
+      if (currentClient === 'bun') {
+        // Bun exits zero for platform skips. Only reject the requested package;
+        // skipping a different platform-specific dependency can be legitimate.
+        const skipped = output
+          .split('\n')
+          .find(
+            line =>
+              line.startsWith(`skipped ${name}@`) &&
+              line.endsWith(' (unsupported platform)'),
+          )
+        if (skipped) {
+          throw new UnsupportedPackageError(skipped, {
+            reason: `The requested package does not support our build server (${process.platform}/${process.arch}).`,
+            packageString,
+          })
+        }
+      }
       await fs.access(
         path.join(installPath, 'node_modules', name, 'package.json'),
       )
@@ -396,7 +417,10 @@ const InstallationUtils = {
         client: currentClient,
       })
     } catch (err) {
-      if (err instanceof BuildCancelledError) {
+      if (
+        err instanceof BuildCancelledError ||
+        err instanceof UnsupportedPackageError
+      ) {
         throw err
       }
       if (installOptions.debug || process.env.DEBUG_TIMING) {

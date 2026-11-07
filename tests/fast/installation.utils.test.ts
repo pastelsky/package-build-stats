@@ -330,3 +330,46 @@ test('accepts a successful install when the requested manifest exists', async ()
     await fs.rm(root, { recursive: true, force: true })
   }
 })
+
+test('reports Bun platform skips without trying npm', async () => {
+  vi.mocked(exec).mockResolvedValueOnce(
+    'bun add v1.4.4\n\nskipped @esbuild/android-arm@0.28.2 (unsupported platform)\n',
+  )
+  try {
+    await expect(
+      InstallationUtils.installPackage(
+        '@esbuild/android-arm@0.28.2',
+        '/unused',
+        {},
+      ),
+    ).rejects.toMatchObject({
+      name: 'UnsupportedPackageError',
+      originalError:
+        'skipped @esbuild/android-arm@0.28.2 (unsupported platform)',
+      extra: {
+        reason: expect.stringContaining('does not support our build server'),
+      },
+    })
+    expect(exec).toHaveBeenCalledTimes(1)
+    expect(vi.mocked(exec).mock.calls[0][1]).not.toContain('--silent')
+  } finally {
+    vi.mocked(exec).mockReset()
+  }
+})
+
+test('does not reject a valid package when Bun skips a different platform dependency', async () => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'optional-platform-'))
+  const installed = path.join(root, 'node_modules', 'example')
+  await fs.mkdir(installed, { recursive: true })
+  await fs.writeFile(path.join(installed, 'package.json'), '{}')
+  vi.mocked(exec).mockResolvedValueOnce(
+    'skipped example-native@1.0.0 (unsupported platform)\n',
+  )
+  try {
+    await InstallationUtils.installPackage('example@1.0.0', root, {})
+    expect(exec).toHaveBeenCalledTimes(1)
+  } finally {
+    vi.mocked(exec).mockReset()
+    await fs.rm(root, { recursive: true, force: true })
+  }
+})

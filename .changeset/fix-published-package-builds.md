@@ -2,4 +2,4 @@
 'package-build-stats': patch
 ---
 
-Reject successful package-manager runs that did not install the requested package so the existing fallback can report the real installation error.
+Report Bun platform skips as UnsupportedPackageError without retrying another installer. Verify the requested package exists before accepting installation success.
