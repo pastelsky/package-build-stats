@@ -250,6 +250,9 @@ describe('Export Size Analysis Edge Cases', () => {
   })
 
   test('should only compile the first 1000 exports and return placeholders with size 0/gzip 0 for the rest', async () => {
+    const memorySpy = vi
+      .spyOn(process.memoryUsage, 'rss')
+      .mockReturnValue(100 * 1024 * 1024)
     const installSpy = vi
       .spyOn(InstallationUtils, 'installPackage')
       .mockImplementation(async () => {})
@@ -281,7 +284,7 @@ describe('Export Size Analysis Edge Cases', () => {
     try {
       const result = await getPackageExportSizes('some-package')
 
-      expect(buildSpy).toHaveBeenCalledTimes(10)
+      expect(buildSpy).toHaveBeenCalledTimes(11)
       expect(result.assets.length).toBe(1050)
 
       expect(result.assets[0]).toEqual({
@@ -317,10 +320,14 @@ describe('Export Size Analysis Edge Cases', () => {
       getAllExportsSpy.mockRestore()
       buildSpy.mockRestore()
       installSpy.mockRestore()
+      memorySpy.mockRestore()
     }
   })
 
-  test('should chunk export compilation serially in batches of 100 internally without breaking response format', async () => {
+  test('should grow batches below the configured worker budget', async () => {
+    const memorySpy = vi
+      .spyOn(process.memoryUsage, 'rss')
+      .mockReturnValue(900 * 1024 * 1024)
     const installSpy = vi
       .spyOn(InstallationUtils, 'installPackage')
       .mockImplementation(async () => {})
@@ -350,23 +357,25 @@ describe('Export Size Analysis Edge Cases', () => {
       })
 
     try {
-      const result = await getPackageExportSizes('some-package')
+      const result = await getPackageExportSizes('some-package', {
+        memoryLimitBytes: 2 * 1024 * 1024 * 1024,
+      })
 
-      expect(buildSpy).toHaveBeenCalledTimes(2)
+      expect(buildSpy).toHaveBeenCalledTimes(3)
 
-      expect(buildSpy.mock.calls[0][0].options?.customImports?.length).toBe(100)
+      expect(buildSpy.mock.calls[0][0].options?.customImports?.length).toBe(20)
       expect(buildSpy.mock.calls[0][0].options?.customImports?.[0]).toBe(
         'export_0',
       )
-      expect(buildSpy.mock.calls[0][0].options?.customImports?.[99]).toBe(
-        'export_99',
+      expect(buildSpy.mock.calls[0][0].options?.customImports?.[19]).toBe(
+        'export_19',
       )
 
-      expect(buildSpy.mock.calls[1][0].options?.customImports?.length).toBe(50)
-      expect(buildSpy.mock.calls[1][0].options?.customImports?.[0]).toBe(
-        'export_100',
+      expect(buildSpy.mock.calls[2][0].options?.customImports?.length).toBe(30)
+      expect(buildSpy.mock.calls[2][0].options?.customImports?.[0]).toBe(
+        'export_120',
       )
-      expect(buildSpy.mock.calls[1][0].options?.customImports?.[49]).toBe(
+      expect(buildSpy.mock.calls[2][0].options?.customImports?.[29]).toBe(
         'export_149',
       )
 
@@ -389,6 +398,92 @@ describe('Export Size Analysis Edge Cases', () => {
       getAllExportsSpy.mockRestore()
       buildSpy.mockRestore()
       installSpy.mockRestore()
+      memorySpy.mockRestore()
     }
   })
+  test.each([0, -1, NaN, Infinity])(
+    'rejects invalid memory budget %s',
+    async memoryLimitBytes => {
+      await expect(
+        getPackageExportSizes('some-package', { memoryLimitBytes }),
+      ).rejects.toThrow(
+        'memoryLimitBytes must be a positive, finite byte count',
+      )
+    },
+  )
+  test.each([
+    [true, 512],
+    [false, 512],
+    [true, 2048],
+    [false, 2048],
+  ] as const)(
+    'keeps serial, smaller batches after pressure (already high: %s, budget MiB: %s)',
+    async (alreadyHigh, budgetMiB) => {
+      const names = Array.from({ length: 250 }, (_, index) => `export_${index}`)
+      const memorySpy = vi
+        .spyOn(process.memoryUsage, 'rss')
+        .mockReturnValue(100 * 1024 * 1024)
+      memorySpy.mockReturnValueOnce(
+        (alreadyHigh ? budgetMiB * 0.8 : 100) * 1024 * 1024,
+      )
+      if (!alreadyHigh) {
+        memorySpy.mockReturnValueOnce(100 * 1024 * 1024)
+        memorySpy.mockReturnValueOnce(budgetMiB * 0.8 * 1024 * 1024)
+      }
+      const installSpy = vi
+        .spyOn(InstallationUtils, 'installPackage')
+        .mockImplementation(async () => {})
+      const exportsSpy = vi
+        .spyOn(exportsUtils, 'getAllExports')
+        .mockResolvedValue(
+          Object.fromEntries(names.map(name => [name, `src/${name}.js`])),
+        )
+      const batches: string[][] = []
+      let active = 0
+      let peakActive = 0
+      const buildSpy = vi
+        .spyOn(BuildUtils, 'buildPackageIgnoringMissingDeps')
+        .mockImplementation(async args => {
+          const imports = args.options?.customImports || []
+          batches.push(imports)
+          peakActive = Math.max(peakActive, ++active)
+          await Promise.resolve()
+          active--
+          return {
+            assets: imports.map(name => ({
+              name,
+              type: 'js',
+              size: 100,
+              gzip: 50,
+            })),
+          }
+        })
+      try {
+        const result = await getPackageExportSizes('some-package', {
+          memoryLimitBytes: budgetMiB * 1024 * 1024,
+        })
+        expect(batches[0]).toHaveLength(20)
+        if (!alreadyHigh) expect(batches[1]).toHaveLength(100)
+        expect(
+          batches.slice(alreadyHigh ? 1 : 2).every(batch => batch.length <= 20),
+        ).toBe(true)
+        expect(batches.flat()).toEqual(names)
+        expect(result.assets.map(asset => asset.name)).toEqual(names)
+        expect(
+          result.assets.every(
+            asset =>
+              asset.size === 100 &&
+              asset.gzip === 50 &&
+              asset.path === `src/${asset.name}.js`,
+          ),
+        ).toBe(true)
+        expect(peakActive).toBe(1)
+      } finally {
+        buildSpy.mockRestore()
+        exportsSpy.mockRestore()
+        installSpy.mockRestore()
+        memorySpy.mockRestore()
+      }
+    },
+  )
 })

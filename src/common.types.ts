@@ -31,6 +31,8 @@ type AllOptions = {
   networkConcurrency?: number
   additionalPackages?: Array<string>
   isLocal?: boolean
+  /** Per-worker RSS budget in bytes; export batching uses 75%. Defaults to 1 GiB. */
+  memoryLimitBytes?: number
   installTimeout?: number
   signal?: AbortSignal
   installationProvider?: InstallationProvider
@@ -67,6 +69,7 @@ export type InstallPackageOptions = Pick<
 
 export type GetPackageStatsOptions = Pick<
   AllOptions,
+  | 'memoryLimitBytes'
   | 'client'
   | 'limitConcurrency'
   | 'networkConcurrency'

@@ -47,6 +47,12 @@ export async function getPackageExportSizes(
   packageString: string,
   options: GetPackageStatsOptions = {},
 ) {
+  const memoryLimitBytes = options.memoryLimitBytes ?? 1024 * 1024 * 1024
+  if (!Number.isFinite(memoryLimitBytes) || memoryLimitBytes <= 0) {
+    throw new RangeError(
+      'memoryLimitBytes must be a positive, finite byte count',
+    )
+  }
   const startTime = performance.now()
   const timings: Record<string, number> = {}
   let preparedPackage: PreparedPackage | undefined
@@ -91,7 +97,12 @@ export async function getPackageExportSizes(
     )
 
     const buildStart = performance.now()
-    const chunkSize = 100
+    const maxChunkSize = 100
+    const smallChunkSize = 20
+    const rssThreshold = memoryLimitBytes * 0.75
+    let useSmallChunks = process.memoryUsage.rss() >= rssThreshold
+    // Probe a small batch before choosing the size of subsequent compilations.
+    let chunkSize = smallChunkSize
     const assets: Array<{
       name: string
       type: string
@@ -100,7 +111,7 @@ export async function getPackageExportSizes(
     }> = []
     const ignoredMissingDependenciesSet = new Set<string>()
 
-    for (let i = 0; i < buildExports.length; i += chunkSize) {
+    for (let i = 0; i < buildExports.length;) {
       throwIfAborted(options.signal)
       const chunk = buildExports.slice(i, i + chunkSize)
       // Build chunks sequentially to cap Rspack's peak memory usage.
@@ -120,6 +131,10 @@ export async function getPackageExportSizes(
       })
       throwIfAborted(options.signal)
       assets.push(...chunkDetails.assets)
+      i += chunk.length
+      // Keep smaller batches for this analysis once the process is under pressure.
+      useSmallChunks ||= process.memoryUsage.rss() >= rssThreshold
+      chunkSize = useSmallChunks ? smallChunkSize : maxChunkSize
       if (chunkDetails.ignoredMissingDependencies) {
         chunkDetails.ignoredMissingDependencies.forEach(dep => {
           ignoredMissingDependenciesSet.add(dep)
