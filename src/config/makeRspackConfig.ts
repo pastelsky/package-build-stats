@@ -47,8 +47,7 @@ export default function makeRspackConfig({
   const productionGlobals = {
     vars: { 'process.env.NODE_ENV': JSON.stringify('production') },
   }
-  const javaScriptCodeFilter =
-    /^(?!\s*;\s*<template\b)[\s\S]*(?:process\.env\.NODE_ENV|<[A-Za-z_$]|<\/[A-Za-z_$]|<>|<\/>)/
+  const hasReactPeerDependency = externals.externalPackages.includes('react')
 
   const configuration: Configuration = {
     entry: entry,
@@ -111,17 +110,24 @@ export default function makeRspackConfig({
           test: /\.[cm]?js$/,
           use: {
             loader: 'builtin:swc-loader',
-            // The production global and JSX both need SWC, but ordinary JS
-            // does not. Let Rspack skip the loader when neither appears.
-            // Leave raw Vue SFCs for Rspack to reject as invalid JavaScript.
-            codeFilter: javaScriptCodeFilter,
+            // React packages can use JSX in .js files. Other packages only
+            // need SWC when they reference the production environment value.
+            ...(hasReactPeerDependency
+              ? {}
+              : { codeFilter: 'process.env.NODE_ENV' }),
             options: {
-              detectSyntax: 'auto',
               jsc: {
+                parser: {
+                  syntax: 'ecmascript',
+                  jsx: hasReactPeerDependency,
+                  allowReturnOutsideFunction: true,
+                },
                 target: 'esnext',
                 transform: {
                   optimizer: { globals: productionGlobals },
-                  react: { runtime: 'automatic' },
+                  ...(hasReactPeerDependency
+                    ? { react: { runtime: 'automatic' as const } }
+                    : {}),
                 },
               },
             },
