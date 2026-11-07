@@ -397,8 +397,8 @@ const InstallationUtils = {
         },
         installTimeout,
       )
-      // Bun can exit successfully after skipping an incompatible OS/CPU package.
-      // Validate the requested package before accepting this client's result.
+      // Bun exits successfully after printing an unsupported-platform skip.
+      // Match only the requested root package; platform-specific subdependencies are valid.
       const { name } = parsePackageString(packageString)
       if (currentClient === 'bun') {
         // A platform skip for the requested root package is terminal; skips of
