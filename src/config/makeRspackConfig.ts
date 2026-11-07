@@ -44,12 +44,19 @@ export default function makeRspackConfig({
     const isBuiltIn = externals.externalBuiltIns.includes(request)
     return isPeerDep || isBuiltIn
   }
+  const productionGlobals = {
+    vars: { 'process.env.NODE_ENV': JSON.stringify('production') },
+  }
+  const hasReactPeerDependency = externals.externalPackages.includes('react')
 
   const configuration: Configuration = {
     entry: entry,
     mode: 'production',
     devtool: _debug ? 'source-map' : false,
     optimization: {
+      // DefinePlugin also replaces assignment targets, producing invalid JS.
+      // Let SWC inline production reads while preserving writes instead.
+      nodeEnv: false,
       // Use 'multiple' to create a separate runtime chunk per entry point
       // 'single' or { name: 'runtime' } shares one runtime across all entries,
       // which breaks tree-shaking when building many exports simultaneously
@@ -100,10 +107,40 @@ export default function makeRspackConfig({
     module: {
       rules: [
         {
+          test: /\.[cm]?js$/,
+          use: {
+            loader: 'builtin:swc-loader',
+            // React packages can use JSX in .js files. Other packages only
+            // need SWC when they reference the production environment value.
+            ...(hasReactPeerDependency
+              ? {}
+              : { codeFilter: 'process.env.NODE_ENV' }),
+            options: {
+              jsc: {
+                parser: {
+                  syntax: 'ecmascript',
+                  jsx: hasReactPeerDependency,
+                  allowReturnOutsideFunction: true,
+                },
+                target: 'esnext',
+                transform: {
+                  optimizer: { globals: productionGlobals },
+                  ...(hasReactPeerDependency
+                    ? { react: { runtime: 'automatic' as const } }
+                    : {}),
+                },
+              },
+            },
+          },
+        },
+        {
           test: /\.(jsx|[cm]?ts|tsx)$/,
           loader: 'builtin:swc-loader',
           options: {
             detectSyntax: 'auto',
+            jsc: {
+              transform: { optimizer: { globals: productionGlobals } },
+            },
           },
           type: 'javascript/auto',
         },
