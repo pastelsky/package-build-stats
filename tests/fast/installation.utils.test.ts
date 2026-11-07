@@ -250,3 +250,61 @@ describe('installWithClient – unsupported package error classification', () =>
     })
   }
 })
+
+test('reports Bun platform skips without trying npm', async () => {
+  vi.mocked(exec).mockResolvedValueOnce(
+    'bun add v1.4.4\n\nskipped @esbuild/android-arm@0.28.2 (unsupported platform)\n',
+  )
+  try {
+    await expect(
+      InstallationUtils.installPackage(
+        '@esbuild/android-arm@0.28.2',
+        '/unused',
+        {},
+      ),
+    ).rejects.toMatchObject({
+      name: 'UnsupportedPackageError',
+      originalError:
+        'skipped @esbuild/android-arm@0.28.2 (unsupported platform)',
+      extra: {
+        reason: expect.stringContaining('does not support our build server'),
+      },
+    })
+    expect(exec).toHaveBeenCalledTimes(1)
+    expect(vi.mocked(exec).mock.calls[0][1]).not.toContain('--silent')
+  } finally {
+    vi.mocked(exec).mockReset()
+  }
+})
+
+test('does not reject esbuild when Bun skips its Android ARM dependency', async () => {
+  vi.mocked(exec).mockResolvedValueOnce(
+    'bun add v1.4.4\n\nskipped @esbuild/android-arm@0.28.2 (unsupported platform)\n',
+  )
+  try {
+    await InstallationUtils.installPackage('esbuild@0.28.2', '/unused', {})
+    expect(exec).toHaveBeenCalledTimes(1)
+  } finally {
+    vi.mocked(exec).mockReset()
+  }
+})
+
+test('retains a readable reason for explicit npm platform failures', async () => {
+  vi.mocked(exec).mockRejectedValueOnce(
+    makeProcessError('npm error code EBADPLATFORM'),
+  )
+  try {
+    await expect(
+      InstallationUtils.installPackage('platform-only@1.0.0', '/unused', {
+        client: 'npm',
+      }),
+    ).rejects.toMatchObject({
+      name: 'UnsupportedPackageError',
+      extra: {
+        reason: expect.stringContaining('does not support our build server'),
+      },
+    })
+  } finally {
+    vi.mocked(exec).mockReset()
+  }
+})
