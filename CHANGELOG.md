@@ -1,5 +1,12 @@
 # package-build-stats
 
+## 9.5.8
+
+### Patch Changes
+
+- b31f3fe: Upgrade Rspack, Rsdoctor's Rspack plugin, and Oxc compiler dependencies.
+- f6b25ab: Report Bun platform skips as UnsupportedPackageError without retrying another installer.
+
 ## 9.5.7
 
 ### Patch Changes
