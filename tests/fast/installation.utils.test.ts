@@ -357,6 +357,23 @@ test('reports Bun platform skips without trying npm', async () => {
   }
 })
 
+test('does not reject an installed package when a different version is skipped', async () => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'same-name-skip-'))
+  const installed = path.join(root, 'node_modules', 'example')
+  await fs.mkdir(installed, { recursive: true })
+  await fs.writeFile(path.join(installed, 'package.json'), '{}')
+  vi.mocked(exec).mockResolvedValueOnce(
+    'skipped example@2.0.0 (unsupported platform)\n',
+  )
+  try {
+    await InstallationUtils.installPackage('example@1.0.0', root, {})
+    expect(exec).toHaveBeenCalledTimes(1)
+  } finally {
+    vi.mocked(exec).mockReset()
+    await fs.rm(root, { recursive: true, force: true })
+  }
+})
+
 test('does not reject a valid package when Bun skips a different platform dependency', async () => {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'optional-platform-'))
   const installed = path.join(root, 'node_modules', 'example')
