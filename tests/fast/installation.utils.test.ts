@@ -373,3 +373,23 @@ test('does not reject a valid package when Bun skips a different platform depend
     await fs.rm(root, { recursive: true, force: true })
   }
 })
+
+test('retains a readable reason for explicit npm platform failures', async () => {
+  vi.mocked(exec).mockRejectedValueOnce(
+    makeProcessError('npm error code EBADPLATFORM'),
+  )
+  try {
+    await expect(
+      InstallationUtils.installPackage('platform-only@1.0.0', '/unused', {
+        client: 'npm',
+      }),
+    ).rejects.toMatchObject({
+      name: 'UnsupportedPackageError',
+      extra: {
+        reason: expect.stringContaining('does not support our build server'),
+      },
+    })
+  } finally {
+    vi.mocked(exec).mockReset()
+  }
+})

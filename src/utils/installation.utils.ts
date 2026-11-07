@@ -171,9 +171,10 @@ function isPackageNotFound(err: ProcessExecutionError): boolean {
   )
 }
 
-// Returns true when the error indicates a platform architecture mismatch (os/cpu)
-// or an unresolvable private git repository authentication error.
-function isUnsupportedPackage(err: ProcessExecutionError): boolean {
+// Explain deterministic installation rejections without exposing raw installer output.
+function unsupportedPackageReason(
+  err: ProcessExecutionError,
+): string | undefined {
   const output = `${err.stderr}\n${err.stdout}`
 
   const isPlatformMismatch =
@@ -190,7 +191,13 @@ function isUnsupportedPackage(err: ProcessExecutionError): boolean {
       (output.includes('ls-remote ssh://') ||
         output.includes('git@github.com')))
 
-  return isPlatformMismatch || isGitAuthError
+  if (isPlatformMismatch) {
+    return `A required package does not support our build server (${process.platform}/${process.arch}).`
+  }
+  if (isGitAuthError) {
+    return 'A required private Git repository is inaccessible.'
+  }
+  return undefined
 }
 
 const InstallationUtils = {
@@ -434,8 +441,9 @@ const InstallationUtils = {
         if (isPackageNotFound(err)) {
           throw new PackageNotFoundError(err)
         }
-        if (isUnsupportedPackage(err)) {
-          throw new UnsupportedPackageError(err)
+        const reason = unsupportedPackageReason(err)
+        if (reason) {
+          throw new UnsupportedPackageError(err, { reason })
         }
       }
       throw new InstallError(err)
