@@ -47,6 +47,8 @@ export default function makeRspackConfig({
   const productionGlobals = {
     vars: { 'process.env.NODE_ENV': JSON.stringify('production') },
   }
+  const javaScriptCodeFilter =
+    /process\.env\.NODE_ENV|<[A-Za-z_$]|<\/[A-Za-z_$]|<>|<\/>/
 
   const configuration: Configuration = {
     entry: entry,
@@ -107,15 +109,20 @@ export default function makeRspackConfig({
       rules: [
         {
           test: /\.[cm]?js$/,
-          loader: 'builtin:swc-loader',
-          options: {
-            jsc: {
-              target: 'esnext',
-              parser: {
-                syntax: 'ecmascript',
-                allowReturnOutsideFunction: true,
+          use: {
+            loader: 'builtin:swc-loader',
+            // The production global and JSX both need SWC, but ordinary JS
+            // does not. Let Rspack skip the loader when neither appears.
+            codeFilter: javaScriptCodeFilter,
+            options: {
+              detectSyntax: 'auto',
+              jsc: {
+                target: 'esnext',
+                transform: {
+                  optimizer: { globals: productionGlobals },
+                  react: { runtime: 'automatic' },
+                },
               },
-              transform: { optimizer: { globals: productionGlobals } },
             },
           },
         },

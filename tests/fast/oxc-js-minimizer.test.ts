@@ -19,6 +19,7 @@ async function compile(
     }
     console.log(addTheseNumbersTogether(1, 2))
   `,
+  externalPackages: string[] = [],
 ) {
   const directory = await fs.mkdtemp(
     path.join(os.tmpdir(), 'package-build-stats-oxc-'),
@@ -34,7 +35,7 @@ async function compile(
       packageName: 'fixture',
       entry,
       externals: {
-        externalPackages: [],
+        externalPackages,
         externalBuiltIns: [],
       },
       minify,
@@ -103,6 +104,17 @@ describe('OxcJsMinimizerRspackPlugin', () => {
       expect(output).not.toContain('missing-development-only-dependency')
     },
   )
+
+  test('transforms JSX in JavaScript files', async () => {
+    const output = await compile(
+      false,
+      `const element = <div data-testid="fixture" />; console.log(element)`,
+      ['react'],
+    )
+
+    expect(output).not.toContain('<div')
+    expect(output).toContain('react/jsx-runtime')
+  })
 
   test('minifies JavaScript assets when minification is enabled', async () => {
     const output = await compile(true)
