@@ -1,5 +1,11 @@
 # package-build-stats
 
+## 9.5.9
+
+### Patch Changes
+
+- 265b2bd: Preserve assignments to process.env.NODE_ENV while inlining production reads, and transform JSX in JavaScript files when needed without running SWC on every file.
+
 ## 9.5.8
 
 ### Patch Changes
