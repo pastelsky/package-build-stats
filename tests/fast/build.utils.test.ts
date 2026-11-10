@@ -1,5 +1,9 @@
 import { afterEach, describe, expect, test, vi } from 'vitest'
-import { BuildCancelledError } from '../../src/errors/CustomError'
+import {
+  BuildCancelledError,
+  CLIBuildError,
+  EntryPointError,
+} from '../../src/errors/CustomError'
 import fs from 'node:fs'
 import path from 'node:path'
 import { gzipSync } from 'node:zlib'
@@ -298,5 +302,76 @@ describe('BuildUtils.buildPackage', () => {
 
     const missing = BuildUtils.parseMissingModules(compilationErrors)
     expect(missing).toEqual([])
+  })
+
+  test('throws CLIBuildError when the root package cannot resolve and has a bin entry', async () => {
+    const cliBuildArgs = {
+      name: 'sample-cli',
+      installPath: '/tmp/project',
+      dependencyPath: '/tmp/project',
+      externals: { externalPackages: [], externalBuiltIns: [] },
+      options: { includeDependencySizes: false },
+    }
+
+    const stats = {
+      compilation: {
+        errors: [{ message: "Can't resolve 'sample-cli' in '/tmp/project'" }],
+      },
+      toJson: () => ({ assets: [] }),
+    }
+
+    vi.spyOn(BuildUtils, 'createEntryPoint').mockReturnValue('/tmp/index.js')
+    vi.spyOn(BuildUtils, 'compilePackage').mockResolvedValue({
+      error: null,
+      stats: stats as any,
+    })
+
+    vi.spyOn(fs, 'existsSync').mockReturnValue(true)
+    vi.spyOn(fs, 'readFileSync').mockReturnValue(
+      JSON.stringify({
+        name: 'sample-cli',
+        version: '1.0.0',
+        bin: { 'sample-cli': './bin/cli.js' },
+      }),
+    )
+
+    await expect(BuildUtils.buildPackage(cliBuildArgs)).rejects.toBeInstanceOf(
+      CLIBuildError,
+    )
+  })
+
+  test('throws EntryPointError when the root package cannot resolve and has no bin entry', async () => {
+    const brokenLibBuildArgs = {
+      name: 'broken-lib',
+      installPath: '/tmp/project',
+      dependencyPath: '/tmp/project',
+      externals: { externalPackages: [], externalBuiltIns: [] },
+      options: { includeDependencySizes: false },
+    }
+
+    const stats = {
+      compilation: {
+        errors: [{ message: "Can't resolve 'broken-lib' in '/tmp/project'" }],
+      },
+      toJson: () => ({ assets: [] }),
+    }
+
+    vi.spyOn(BuildUtils, 'createEntryPoint').mockReturnValue('/tmp/index.js')
+    vi.spyOn(BuildUtils, 'compilePackage').mockResolvedValue({
+      error: null,
+      stats: stats as any,
+    })
+
+    vi.spyOn(fs, 'existsSync').mockReturnValue(true)
+    vi.spyOn(fs, 'readFileSync').mockReturnValue(
+      JSON.stringify({
+        name: 'broken-lib',
+        version: '1.0.0',
+      }),
+    )
+
+    await expect(
+      BuildUtils.buildPackage(brokenLibBuildArgs),
+    ).rejects.toBeInstanceOf(EntryPointError)
   })
 })

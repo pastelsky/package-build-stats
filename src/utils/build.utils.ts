@@ -10,6 +10,7 @@ import getDependencySizes from '../getDependencySizeTree.js'
 import makeRspackConfig from '../config/makeRspackConfig.js'
 import {
   BuildError,
+  CLIBuildError,
   EntryPointError,
   MissingDependencyError,
   UnexpectedBuildError,
@@ -330,6 +331,34 @@ const BuildUtils = {
           getPackageImportPath(packageName, options.entryPoint),
         )
       ) {
+        try {
+          const pkgJsonPath = path.join(
+            dependencyPath,
+            'node_modules',
+            packageName,
+            'package.json',
+          )
+          if (fs.existsSync(pkgJsonPath)) {
+            const raw = fs.readFileSync(pkgJsonPath, 'utf8')
+            const pkgJson = JSON.parse(raw)
+            const hasBin =
+              pkgJson.bin &&
+              (typeof pkgJson.bin === 'string' ||
+                (typeof pkgJson.bin === 'object' &&
+                  Object.keys(pkgJson.bin).length > 0))
+            if (hasBin && !options.entryPoint) {
+              throw new CLIBuildError(
+                compilationErrors.map(err => err.message),
+                { bin: pkgJson.bin },
+              )
+            }
+          }
+        } catch (checkErr) {
+          if (checkErr instanceof CLIBuildError) {
+            throw checkErr
+          }
+        }
+
         throw new EntryPointError(compilationErrors.map(err => err.message))
       }
 
