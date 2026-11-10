@@ -1,5 +1,11 @@
 # package-build-stats
 
+## 9.5.10
+
+### Patch Changes
+
+- ed91f7c: Throw `CLIBuildError` instead of `EntryPointError` when an unresolvable package defines executable `bin` scripts.
+
 ## 9.5.9
 
 ### Patch Changes
