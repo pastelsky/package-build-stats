@@ -28,6 +28,10 @@
       "types": "./build/installation.d.ts",
       "default": "./build/installation.js"
     },
+    "./preflight": {
+      "types": "./build/preflight.d.ts",
+      "default": "./build/preflight.js"
+    },
     "./package.json": "./package.json",
     "./*": "./*"
   },
