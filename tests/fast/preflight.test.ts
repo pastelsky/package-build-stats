@@ -7,7 +7,7 @@ import {
 } from '../../src/preflight.js'
 
 describe('screenPackageManifest', () => {
-  it('allows valid frontend and legacy packages', () => {
+  it('allows valid frontend, wildcard, and legacy packages', () => {
     expect(() =>
       screenPackageManifest(
         {
@@ -42,9 +42,20 @@ describe('screenPackageManifest', () => {
         { platform: 'linux', arch: 'x64' },
       ),
     ).not.toThrow()
+
+    // Wildcard subpath exports resolve cleanly
+    expect(() =>
+      screenPackageManifest(
+        {
+          name: 'wildcard-pkg',
+          exports: { './*': './dist/*.js' },
+        },
+        { platform: 'linux', arch: 'x64', entryPoint: './utils' },
+      ),
+    ).not.toThrow()
   })
 
-  it('rejects packages whose os or cpu constraints exclude the target host', () => {
+  it('rejects packages whose os, cpu, or libc constraints exclude the target host', () => {
     expect(() =>
       screenPackageManifest(
         { name: 'mac-only', os: ['darwin'] },
@@ -68,13 +79,25 @@ describe('screenPackageManifest', () => {
 
     expect(() =>
       screenPackageManifest(
-        { name: 'linux-ok', os: ['darwin', 'linux'], cpu: ['!arm64'] },
-        { platform: 'linux', arch: 'x64' },
+        { name: 'musl-only', os: ['linux'], libc: ['musl'] },
+        { platform: 'linux', arch: 'x64', libc: 'glibc' },
+      ),
+    ).toThrow(UnsupportedPackageError)
+
+    expect(() =>
+      screenPackageManifest(
+        {
+          name: 'linux-ok',
+          os: ['darwin', 'linux'],
+          cpu: ['!arm64'],
+          libc: ['glibc'],
+        },
+        { platform: 'linux', arch: 'x64', libc: 'glibc' },
       ),
     ).not.toThrow()
   })
 
-  it('rejects subpath-map exports that omit root "."', () => {
+  it('rejects subpath-map exports that omit the requested entry point', () => {
     expect(() =>
       screenPackageManifest(
         {
@@ -109,9 +132,30 @@ describe('screenPackageManifest', () => {
         { platform: 'linux', arch: 'x64', entryPoint: './utils' },
       ),
     ).not.toThrow()
+
+    // Rejected when requesting an unexported subpath
+    expect(() =>
+      screenPackageManifest(
+        {
+          name: 'subpath-only-lib',
+          exports: { './utils': './utils.js' },
+        },
+        { platform: 'linux', arch: 'x64', entryPoint: './missing' },
+      ),
+    ).toThrow(EntryPointError)
   })
 
-  it('rejects null or types-only exports targets', () => {
+  it('rejects node-only, null, and declaration-only exports targets', () => {
+    expect(() =>
+      screenPackageManifest(
+        {
+          name: 'node-only-pkg',
+          exports: { '.': { node: './node.js' } },
+        },
+        { platform: 'linux', arch: 'x64' },
+      ),
+    ).toThrow(EntryPointError)
+
     expect(() =>
       screenPackageManifest(
         {
@@ -125,8 +169,8 @@ describe('screenPackageManifest', () => {
     expect(() =>
       screenPackageManifest(
         {
-          name: 'types-only-conditions',
-          exports: { types: './index.d.ts' },
+          name: 'dts-direct-target',
+          exports: { '.': './index.d.ts' },
         },
         { platform: 'linux', arch: 'x64' },
       ),

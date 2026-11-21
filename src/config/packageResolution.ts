@@ -1,43 +1,16 @@
 import { ResolverFactory } from 'oxc-resolver'
+import {
+  browserImportConditions,
+  packageExtensions,
+  packageMainFields,
+} from './packageConditions.js'
 
-// Browser ESM conditions shared by bundling and named-export discovery.
-export const browserImportConditions = [
-  'svelte',
-  'webpack',
-  'production',
-  'browser',
-  'import',
-  'module',
-  'default',
-]
-
-export const packageMainFields = ['browser', 'module', 'main', 'style']
-
-export const packageExtensions = [
-  '.web.tsx',
-  '.web.ts',
-  '.tsx',
-  '.ts',
-  '.mts',
-  '.cts',
-  '.jsx',
-  '.web.mjs',
-  '.mjs',
-  '.web.js',
-  '.js',
-  '.cjs',
-  '.json',
-  '.css',
-  '.sass',
-  '.scss',
-  '.less',
-  '.svelte',
-]
+export { browserImportConditions, packageExtensions, packageMainFields }
 
 const resolver = new ResolverFactory({
   extensions: packageExtensions,
   mainFields: packageMainFields,
-  conditionNames: browserImportConditions,
+  conditionNames: [...browserImportConditions],
   aliasFields: ['browser'],
   symlinks: false,
 })
