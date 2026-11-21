@@ -308,3 +308,31 @@ test('retains a readable reason for explicit npm platform failures', async () =>
     vi.mocked(exec).mockReset()
   }
 })
+
+test('short-circuits PackageNotFoundError without falling back to npm', async () => {
+  vi.mocked(exec).mockRejectedValueOnce(
+    makeProcessError('error: bun package not found missing-dep@9.9.9'),
+  )
+  try {
+    await expect(
+      InstallationUtils.installPackage('some-pkg@1.0.0', '/unused', {}),
+    ).rejects.toBeInstanceOf(PackageNotFoundError)
+    expect(exec).toHaveBeenCalledTimes(1)
+  } finally {
+    vi.mocked(exec).mockReset()
+  }
+})
+
+test('falls back to npm when bun fails with a generic InstallError', async () => {
+  vi.mocked(exec)
+    .mockRejectedValueOnce(makeProcessError('bun install unexpected failure'))
+    .mockResolvedValueOnce('added 1 package')
+  try {
+    await InstallationUtils.installPackage('some-pkg@1.0.0', '/unused', {})
+    expect(exec).toHaveBeenCalledTimes(2)
+    expect(vi.mocked(exec).mock.calls[0][0]).toBe('bun')
+    expect(vi.mocked(exec).mock.calls[1][0]).toBe('npm')
+  } finally {
+    vi.mocked(exec).mockReset()
+  }
+})

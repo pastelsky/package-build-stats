@@ -335,6 +335,7 @@ const InstallationUtils = {
       } catch (error) {
         if (
           error instanceof BuildCancelledError ||
+          error instanceof PackageNotFoundError ||
           error instanceof UnsupportedPackageError ||
           isOutOfSpace(error)
         ) {
