@@ -92,13 +92,9 @@ const DEPENDENCY_STATS_OPTIONS: StatsOptions = {
   modules: true,
   cachedModules: true,
   orphanModules: true,
-  dependentModules: true,
-  runtimeModules: true,
   nestedModules: true,
   source: true,
 
-  depth: true,
-  modulesSort: 'depth',
   modulesSpace: Number.POSITIVE_INFINITY,
   nestedModulesSpace: Number.POSITIVE_INFINITY,
 }
