@@ -5,7 +5,7 @@
  * using the public npm packages oxc-parser and oxc-resolver.
  */
 
-import { parseSync } from 'oxc-parser'
+import { parse, parseSync } from 'oxc-parser'
 import type { StaticExport, StaticExportEntry } from 'oxc-parser'
 import fs from 'node:fs/promises'
 import path from 'node:path'
@@ -111,7 +111,8 @@ async function walkExports(
     if (cached) return cached
     const code = await fs.readFile(modulePath, 'utf8')
     throwIfAborted(signal)
-    const { module } = parseSync(modulePath, code, { sourceType: 'module' })
+    const { module } = await parse(modulePath, code, { sourceType: 'module' })
+    throwIfAborted(signal)
     const details = getExportsFromStaticExports(module.staticExports)
     const result = {
       named: new Map(details.exports.map(exp => [exp.name, exp])),
