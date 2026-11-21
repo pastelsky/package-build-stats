@@ -1,7 +1,8 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { performance } from 'node:perf_hooks'
-import { gzipSync } from 'node:zlib'
+import { promisify } from 'node:util'
+import { gzip as gzipCallback } from 'node:zlib'
 import { rspack } from '@rspack/core'
 import PQueue from 'p-queue'
 import type { Entry, Stats, StatsOptions } from '@rspack/core'
@@ -25,6 +26,8 @@ import { getPackageImportPath, throwIfAborted } from './common.utils.js'
 
 // Share the buffer budget across overlapping builds in this process.
 const assetStatsQueue = new PQueue({ concurrency: 4 })
+
+const gzipAsync = promisify(gzipCallback)
 
 type CompilePackageArgs = {
   name: string
@@ -406,7 +409,8 @@ const BuildUtils = {
       const bundle = path.join(outputPath, asset.name)
       const bundleContents = await fs.promises.readFile(bundle)
       throwIfAborted(options.signal)
-      const gzip = gzipSync(bundleContents, {}).length
+      const gzip = (await gzipAsync(bundleContents)).length
+      throwIfAborted(options.signal)
       const matches = asset.name.match(/(.+?)\.bundle\.(.+)$/)
 
       if (!matches) {
