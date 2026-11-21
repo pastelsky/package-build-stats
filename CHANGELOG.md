@@ -1,5 +1,13 @@
 # package-build-stats
 
+## 9.6.1
+
+### Patch Changes
+
+- e59ed41: Use async `zlib.gzip` in `buildPackage` and async `oxc-parser` `parse()` in `getExportsTree` to avoid blocking the Node.js event loop.
+- ae5e778: Remove unused `dependentModules`, `runtimeModules`, `depth`, and `modulesSort` fields from `DEPENDENCY_STATS_OPTIONS` in `buildPackage`.
+- 7db2f62: Short-circuit `PackageNotFoundError` during installation instead of retrying with fallback package managers like `npm`.
+
 ## 9.6.0
 
 ### Minor Changes
