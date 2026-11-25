@@ -76,11 +76,29 @@ async function minifyDependencyCode(source: string, filename: string) {
 
   try {
     const startTime = Date.now()
-    const result = await minify(filename, source, {
+    const options = {
       compress: true,
       mangle: true,
+    }
+    let result = await minify(filename, source, {
+      ...options,
       module: true, // Treat as ES module to support import/export
     })
+
+    // Dependency sources are minified individually, outside the module wrapper
+    // Rspack uses for CommonJS. If the ESM parse rejects a top-level return,
+    // retry as CommonJS; accept it only if the alternate parse succeeds.
+    if (result.errors.length > 0) {
+      const commonJsFilename = filename.replace(/\.[^.]+$/, '.cjs')
+      const commonJsResult = await minify(commonJsFilename, source, {
+        ...options,
+        module: false,
+      })
+
+      if (commonJsResult.errors.length === 0) {
+        result = commonJsResult
+      }
+    }
 
     if (result.errors.length > 0) {
       const error = new Error(

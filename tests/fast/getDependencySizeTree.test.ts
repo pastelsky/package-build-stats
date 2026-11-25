@@ -33,6 +33,15 @@ async function minifiedUtf8Size(source: string | Buffer) {
   return Buffer.byteLength(minifiedResult.code || '', 'utf8')
 }
 
+async function commonJsMinifiedUtf8Size(source: string) {
+  const minifiedResult = await minify('dependency.cjs', source, {
+    compress: true,
+    mangle: true,
+    module: false,
+  })
+  return Buffer.byteLength(minifiedResult.code || '', 'utf8')
+}
+
 describe('getDependencySizeTree - accuracy', () => {
   it('returns only top-level dependencies and normalizes package names', async () => {
     const base = '/project'
@@ -135,6 +144,27 @@ describe('getDependencySizeTree - accuracy', () => {
       }
       // Allow the test to pass whether it throws or not, since minifiers can be robust
     }
+  })
+
+  it('minifies valid CommonJS sources with a top-level return', async () => {
+    const base = '/project'
+    const source = 'return typeof module === "undefined" ? 1 : 2;'
+    const stats = createStats([
+      {
+        identifier: `${base}/node_modules/commonjs-return/index.js`,
+        moduleType: 'javascript/auto',
+        source,
+      },
+    ])
+
+    const result = await getDependencySizeTree('fixture-pkg', stats)
+
+    expect(result).toEqual([
+      {
+        name: 'commonjs-return',
+        approximateSize: await commonJsMinifiedUtf8Size(source),
+      },
+    ])
   })
 
   it('does not pass non-JavaScript modules to the JavaScript minifier', async () => {
